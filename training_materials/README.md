@@ -1,27 +1,44 @@
 # Odoo Full-Stack Developer Training Materials
 
-Professional curriculum documents generated from the Weblearns Odoo training backlog (Odoo 17/18/19, Python, Linux, PostgreSQL, OWL, DevOps).
+Complete teaching documentation and per-section lecture presentations for the
+Odoo Full-Stack Developer Program (Linux, Python, PostgreSQL, Odoo 17/18/19,
+OWL/POS, Infrastructure).
 
-## Deliverables
+## 1. Full Training Documentation (~300 pages of detailed content)
 
-| File | Description | Pages |
-|------|-------------|-------|
-| [`Odoo_FullStack_Developer_Training_Plan.pdf`](Odoo_FullStack_Developer_Training_Plan.pdf) | Master training plan / syllabus (30+ pages) | 33 |
-| [`Odoo_FullStack_Training_Presentation.pdf`](Odoo_FullStack_Training_Presentation.pdf) | Landscape facilitation slide deck | 32 |
+| File | Description |
+|------|-------------|
+| [`Odoo_FullStack_Training_Documentation.pdf`](Odoo_FullStack_Training_Documentation.pdf) | Full-page lesson documentation: objectives, explanations, examples, mistakes, labs |
+
+Covers 160 lessons across Foundations → Odoo Core → Views/Security/QWeb → OWL/POS/APIs → Infrastructure.
+
+## 2. Section Presentation Decks (lecture materials)
+
+Located in [`presentations/`](presentations/):
+
+| Deck | Focus | Slides (approx.) |
+|------|-------|------------------|
+| `01_Linux_CLI_Mastery.pdf` | Linux OS & CLI | ~176 |
+| `02_Python_for_Odoo.pdf` | Python for Odoo | ~229 |
+| `03_PostgreSQL_Database.pdf` | PostgreSQL & SQL | ~124 |
+| `04_Odoo_Core_Development.pdf` | Install, modules, fields, ORM | ~199 |
+| `05_Views_Security_QWeb.pdf` | Views, security, data, QWeb | ~265 |
+| `06_OWL_POS_APIs.pdf` | OWL, POS, XML-RPC | ~191 |
+| `07_Infrastructure_DevOps.pdf` | Docker, VPS, Nginx, workers | ~190 |
+
+**Total: ~1,370 teaching slides** with explanations, examples, pitfalls, and labs.
 
 ## Regenerate
 
 ```bash
-python3 scripts/generate_training_plan.py
-python3 scripts/generate_presentation.py
+pip install reportlab
+python3 scripts/training_pdf/generate_documentation.py
+python3 scripts/training_pdf/generate_section_presentations.py
 ```
 
-Requires: `reportlab` (`pip install reportlab`).
+Lesson source content lives in `scripts/training_pdf/content/`.
 
-## Contents Covered
+## Legacy short syllabus PDFs
 
-- Foundations: Linux CLI, Python, PostgreSQL
-- Odoo core: install/CLI, modules, fields, ORM, views, security, XML/CSV, inheritance
-- Advanced: QWeb, OWL, POS, XML-RPC, email, server actions
-- Production: Docker, VPS/Nginx/SSL, workers/performance, CI/CD basics
-- Delivery: 12-week schedule, capstones, assessment rubric, cheat sheets
+Earlier short syllabus/overview PDFs may still exist in this folder for reference.
+Prefer the Documentation + section decks above for teaching delivery.
