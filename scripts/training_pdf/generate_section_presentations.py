@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate separate professional teaching presentation decks per curriculum section."""
+"""Generate Cookie-Beamer-styled teaching decks per curriculum section."""
 
 from __future__ import annotations
 
@@ -18,6 +18,7 @@ from training_pdf.lib.slide_builder import (  # noqa: E402
     cards,
     code_block,
     simple_table,
+    tags_row,
 )
 from training_pdf.content.linux_lessons import LESSONS as LINUX  # noqa: E402
 from training_pdf.content.python_lessons import LESSONS as PYTHON  # noqa: E402
@@ -34,106 +35,109 @@ DECKS = [
         "file": "01_Linux_CLI_Mastery.pdf",
         "series": "Section 01 · Linux",
         "title": "Linux OS & CLI Mastery",
-        "subtitle": "Senior lecture materials with commands, hardening, and Odoo server habits",
+        "subtitle": "Modern lecture slides for Odoo server fluency",
         "lessons": LINUX,
         "agenda": [
-            ("Navigate", "Filesystem fluency and safe file operations"),
-            ("Operate", "Users, processes, systemd, logs, packages"),
-            ("Secure", "SSH, UFW, permissions, production layout"),
-            ("Automate", "cron, env, troubleshooting checklists"),
+            "Design the mental model: kernel, shell, services",
+            "Navigate and manage files with precision",
+            "Operate users, processes, systemd, and logs",
+            "Secure SSH, firewall, and production layout",
         ],
+        "tags": ["Ubuntu LTS", "CLI", "systemd", "SSH"],
     },
     {
         "file": "02_Python_for_Odoo.pdf",
         "series": "Section 02 · Python",
         "title": "Python for Odoo Developers",
-        "subtitle": "Language fundamentals through OOP, FP, tooling—mapped to Odoo work",
+        "subtitle": "Language foundations mapped to Odoo engineering work",
         "lessons": PYTHON,
         "agenda": [
-            ("Core", "Types, strings, collections, control flow"),
-            ("Functions", "Scope, clean APIs, errors"),
-            ("OOP/FP", "Classes, inheritance, decorators, generators"),
-            ("Tooling", "venv, pip, debugging for Odoo"),
+            "Core syntax, types, and collections",
+            "Control flow and clean functions",
+            "OOP, functional tools, and errors",
+            "Tooling: venv, pip, and debugging",
         ],
+        "tags": ["Python 3", "OOP", "venv", "PEP 8"],
     },
     {
         "file": "03_PostgreSQL_Database.pdf",
         "series": "Section 03 · Database",
-        "title": "PostgreSQL Administration & SQL",
-        "subtitle": "Roles, SQL fluency, indexes, EXPLAIN, backups for Odoo databases",
+        "title": "PostgreSQL for Odoo",
+        "subtitle": "SQL fluency, roles, indexes, and backup discipline",
         "lessons": POSTGRES,
         "agenda": [
-            ("Setup", "Install, roles, grants, config files"),
-            ("SQL", "DDL, CRUD, joins, aggregations"),
-            ("Performance", "Indexes, EXPLAIN, locks"),
-            ("Ops", "Dump/restore and Odoo DB habits"),
+            "Install, roles, grants, and configuration",
+            "DDL, CRUD, joins, and aggregations",
+            "Indexes, EXPLAIN, and lock awareness",
+            "Dump, restore, and Odoo DB habits",
         ],
+        "tags": ["PostgreSQL", "SQL", "Indexes", "Backup"],
     },
     {
         "file": "04_Odoo_Core_Development.pdf",
         "series": "Section 04 · Odoo Core",
         "title": "Odoo Core Development",
-        "subtitle": "Install, modules, fields, ORM methods, environments, special commands",
+        "subtitle": "Install, modules, fields, ORM, and environments",
         "lessons": ODOO,
         "agenda": [
-            ("Platform", "Install, CLI, configuration, IDE"),
-            ("Modules", "Scaffold, manifest, addons paths"),
-            ("Fields", "Scalar, relational, compute, binary"),
-            ("ORM", "Overrides, search APIs, recordset helpers"),
+            "Install, CLI, and configuration",
+            "Modules, manifests, and addons paths",
+            "Field design and relational models",
+            "ORM overrides and recordset APIs",
         ],
+        "tags": ["Odoo 17", "ORM", "Fields", "CLI"],
     },
     {
         "file": "05_Views_Security_QWeb.pdf",
         "series": "Section 05 · Views & Security",
-        "title": "Views, Security, Data & QWeb",
-        "subtitle": "UX views, ACLs/rules, XML/CSV data, inheritance, reports, automation",
+        "title": "Views, Security & QWeb",
+        "subtitle": "Business UX, ACLs, data loading, and PDF reports",
         "lessons": VIEWS,
         "agenda": [
-            ("Views", "List, form, search, kanban, analytics"),
-            ("Security", "Groups, ACLs, record rules, Odoo 19"),
-            ("Data", "XML/CSV loading and inheritance"),
-            ("QWeb", "PDF reports, sequences, server actions"),
+            "List, form, search, and kanban patterns",
+            "Groups, access rights, and record rules",
+            "XML/CSV data and view inheritance",
+            "QWeb reports and automation hooks",
         ],
+        "tags": ["Views", "Security", "XML", "QWeb"],
     },
     {
         "file": "06_OWL_POS_APIs.pdf",
         "series": "Section 06 · OWL / POS / API",
-        "title": "OWL Frontend, POS & APIs",
-        "subtitle": "Reactive OWL, POS customization, XML-RPC integrations",
+        "title": "OWL, POS & External APIs",
+        "subtitle": "Reactive frontend, POS customization, XML-RPC",
         "lessons": OWL,
         "agenda": [
-            ("OWL", "Components, state, templates, patch, rpc"),
-            ("POS", "Buttons, popups, translations, order utils"),
-            ("API", "XML-RPC auth and CRUD"),
-            ("Practice", "Postman workflows and labs"),
+            "OWL components, state, and templates",
+            "Patching, rpc, and custom widgets",
+            "POS buttons, popups, and translations",
+            "XML-RPC authentication and CRUD",
         ],
+        "tags": ["OWL", "POS", "RPC", "XML-RPC"],
     },
     {
         "file": "07_Infrastructure_DevOps.pdf",
         "series": "Section 07 · Infrastructure",
-        "title": "Infrastructure, Docker & Performance",
-        "subtitle": "Containers, VPS, Nginx/SSL, systemd, workers, monitoring",
+        "title": "Infrastructure & DevOps",
+        "subtitle": "Docker, VPS, Nginx/SSL, workers, and monitoring",
         "lessons": INFRA,
         "agenda": [
-            ("Docker", "Images, Compose, volumes, upgrades"),
-            ("VPS", "Hardening, Nginx, longpolling, Certbot"),
-            ("Runtime", "systemd and backup automation"),
-            ("Scale", "Workers, indexes, Redis, observability"),
+            "Containers and Compose for Odoo",
+            "Hardened VPS and Nginx reverse proxy",
+            "systemd, backups, and TLS",
+            "Workers, indexes, and observability",
         ],
+        "tags": ["Docker", "Nginx", "SSL", "Workers"],
     },
 ]
 
 
-def chunk_text(paragraphs, max_chars=520):
-    """Group paragraphs into slide-sized chunks."""
-    chunks = []
-    buf = []
-    size = 0
+def chunk_text(paragraphs, max_chars=560):
+    chunks, buf, size = [], [], 0
     for p in paragraphs:
         if size + len(p) > max_chars and buf:
             chunks.append(buf)
-            buf = [p]
-            size = len(p)
+            buf, size = [p], len(p)
         else:
             buf.append(p)
             size += len(p)
@@ -146,32 +150,30 @@ def add_lesson_slides(deck: Deck, lesson: dict):
     lid = lesson["id"]
     title = lesson["title"]
 
-    # 1) Objectives
     def objectives(story, s):
         story.extend(bullets(s, lesson.get("objectives") or ["Understand the topic"]))
         if lesson.get("lab"):
-            story.append(Spacer(1, 0.25 * cm))
+            story.append(Spacer(1, 0.3 * cm))
             story.append(callout(s, lesson["lab"], title="Lab target"))
 
-    deck.slide(f"{lid} · OBJECTIVES", title, objectives)
+    deck.slide(f"{lid} · Objectives", title, objectives)
 
-    # 2+) Explanation chunks
-    for i, paras in enumerate(chunk_text(lesson.get("explanation") or [], 580), start=1):
+    for i, paras in enumerate(chunk_text(lesson.get("explanation") or [], 600), start=1):
         def make_builder(ps):
             def builder(story, s):
                 for p in ps:
                     story.append(Paragraph(p, s["body"]))
             return builder
-        deck.slide(f"{lid} · TEACHING {i}", title if i == 1 else f"{title} (continued)", make_builder(paras))
 
-    # Key points
+        heading = title if i == 1 else f"{title} (continued)"
+        deck.slide(f"{lid} · Teaching {i}", heading, make_builder(paras))
+
     kps = lesson.get("key_points") or []
     if kps:
         def keypoints(story, s):
             story.extend(bullets(s, kps))
-        deck.slide(f"{lid} · KEY POINTS", "What to remember", keypoints)
+        deck.slide(f"{lid} · Key points", "What to remember", keypoints)
 
-    # Examples
     for idx, ex in enumerate(lesson.get("examples") or [], start=1):
         def make_ex(e, n):
             def builder(story, s):
@@ -179,25 +181,29 @@ def add_lesson_slides(deck: Deck, lesson: dict):
                 if e.get("explain"):
                     story.append(Paragraph(e["explain"], s["body"]))
                 if e.get("code"):
-                    # Truncate extremely long code for slide readability
                     code = e["code"]
                     lines = code.splitlines()
-                    if len(lines) > 16:
-                        code = "\n".join(lines[:16]) + "\n# ... truncated for slide"
+                    if len(lines) > 14:
+                        code = "\n".join(lines[:14]) + "\n# ... truncated for slide"
                     story.append(code_block(s, code))
             return builder
-        deck.slide(f"{lid} · EXAMPLE {idx}", ex.get("title") or title, make_ex(ex, idx))
+        deck.slide(f"{lid} · Example {idx}", ex.get("title") or title, make_ex(ex, idx))
 
-    # Mistakes
     mistakes = lesson.get("common_mistakes") or []
     if mistakes:
         def mistakes_slide(story, s):
             story.extend(bullets(s, mistakes))
-            story.append(Spacer(1, 0.2 * cm))
-            story.append(callout(s, "Validate fixes in a disposable database before production.", warn=True))
-        deck.slide(f"{lid} · PITFALLS", "Common mistakes", mistakes_slide)
+            story.append(Spacer(1, 0.25 * cm))
+            story.append(
+                callout(
+                    s,
+                    "Validate fixes in a disposable database before production.",
+                    title="Caution",
+                    warn=True,
+                )
+            )
+        deck.slide(f"{lid} · Pitfalls", "Common mistakes", mistakes_slide)
 
-    # slide extras
     for extra in lesson.get("slide_extras") or []:
         kind = extra.get("kind")
         etitle = extra.get("title") or "Deep dive"
@@ -211,95 +217,90 @@ def add_lesson_slides(deck: Deck, lesson: dict):
                 elif k == "callout":
                     story.append(callout(s, ex.get("text") or "", title=ex.get("title") or "Note"))
                 elif k == "table" and ex.get("headers") and ex.get("rows"):
-                    widths = [(26.5 * cm) / len(ex["headers"]) ] * len(ex["headers"])
+                    widths = [(26 * cm) / len(ex["headers"])] * len(ex["headers"])
                     story.append(simple_table(s, ex["headers"], ex["rows"], widths))
                 else:
                     story.extend(bullets(s, ex.get("items") or [ex.get("text") or ""]))
             return builder
 
-        deck.slide(f"{lid} · EXTRA", etitle, make_extra())
+        deck.slide(f"{lid} · Extra", etitle, make_extra())
 
 
 def build_deck(spec):
     path = os.path.join(OUT_DIR, spec["file"])
-    deck = Deck(path, spec["series"], spec["title"], spec["subtitle"])
+    estimate = max(80, len(spec["lessons"]) * 7)
+    deck = Deck(
+        path,
+        spec["series"],
+        spec["title"],
+        spec["subtitle"],
+        author_lines=[
+            "Weblearns Academy",
+            "Odoo Full-Stack Developer Program",
+            "Senior Developer Lecture Materials",
+            datetime_line(),
+        ],
+        total_estimate=estimate,
+    )
     deck.title_slide()
+    deck.agenda_slide(spec["agenda"])
 
-    # Agenda
-    agenda = spec["agenda"]
-
-    def agenda_builder(story, s):
-        story.append(cards(s, agenda, [6.7 * cm] * len(agenda)))
-        story.append(Spacer(1, 0.35 * cm))
+    # Design system / method slide
+    def method(story, s):
         story.append(
-            Paragraph(
-                f"{len(spec['lessons'])} lessons · explanations · examples · labs",
-                s["small"],
-            )
-        )
-
-    deck.slide("AGENDA", "What this section teaches", agenda_builder)
-
-    # How to use
-    def how_to(story, s):
-        story.extend(
-            bullets(
+            cards(
                 s,
                 [
-                    "Each lesson starts with objectives, then teaching narrative",
-                    "Code/command slides are meant to be typed live or in labs",
-                    "Pitfall slides capture production failure modes",
-                    "Use the matching documentation part for full prose depth",
+                    ("Pattern", "Objectives → teaching → examples → pitfalls → lab"),
+                    ("Live coding", "Type commands with learners; freeze a reference commit"),
+                    ("Safety", "Use disposable DBs; never demo sudo shortcuts in production"),
                 ],
+                [8.5 * cm, 8.5 * cm, 8.5 * cm],
             )
         )
-        story.append(Spacer(1, 0.25 * cm))
-        story.append(
-            callout(
-                s,
-                "These are lecture materials—pause for learner typing time after every example.",
-                title="Facilitation",
-            )
-        )
+        story.append(Spacer(1, 0.45 * cm))
+        story.append(tags_row(s, spec.get("tags") or ["Training", "Odoo", "Labs"]))
 
-    deck.slide("METHOD", "How to teach and learn this deck", how_to)
+    deck.slide("Method", "How this deck is taught", method)
 
-    # Group lessons into chapter section dividers every ~5 lessons
     lessons = spec["lessons"]
+    block = 0
     for i, lesson in enumerate(lessons):
         if i % 5 == 0:
+            block += 1
             end = min(i + 5, len(lessons))
-            first = lessons[i]["id"]
-            last = lessons[end - 1]["id"]
             deck.section(
-                f"LESSONS {first}–{last}",
-                spec["title"],
-                f"Teaching block {i // 5 + 1}",
+                block,
+                f"{lessons[i]['id']} – {lessons[end - 1]['id']}",
+                f"{spec['title']} · teaching block {block}",
             )
         add_lesson_slides(deck, lesson)
 
-    # Section summary
     def summary(story, s):
-        titles = [f"{l['id']} {l['title']}" for l in lessons[:8]]
+        titles = [f"<b>{l['id']}</b>  {l['title']}" for l in lessons[:6]]
         more = len(lessons) - len(titles)
         items = titles + ([f"... and {more} more lessons in this deck"] if more > 0 else [])
         story.extend(bullets(s, items))
-        story.append(Spacer(1, 0.2 * cm))
+        story.append(Spacer(1, 0.3 * cm))
         story.append(callout(s, "Complete outstanding labs before starting the next section."))
+        story.append(Spacer(1, 0.35 * cm))
+        story.append(tags_row(s, spec.get("tags") or ["Done", "Labs", "Next"]))
 
-    deck.slide("SECTION WRAP", "You should now be able to…", summary)
-    deck.closing("Complete the section labs", "Then open the next presentation deck")
+    deck.slide("Wrap-up", "You should now be able to…", summary)
+    deck.closing("Complete the section labs", "Open the next presentation deck")
     return deck.build()
+
+
+def datetime_line():
+    from datetime import datetime
+    return datetime.now().strftime("%B %Y")
 
 
 def main():
     os.makedirs(OUT_DIR, exist_ok=True)
-    written = []
     for spec in DECKS:
         path = build_deck(spec)
-        written.append(path)
         print(f"Wrote {path}")
-    return written
 
 
 if __name__ == "__main__":
