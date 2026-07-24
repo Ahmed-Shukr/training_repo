@@ -1,25 +1,31 @@
 #!/usr/bin/env python3
-"""Generate Cookie-Beamer-styled teaching decks per curriculum section."""
+"""Generate Cookie-Beamer exact-size dense teaching decks."""
 
 from __future__ import annotations
 
 import os
 import sys
-from reportlab.lib.units import cm
+from datetime import datetime
+
 from reportlab.platypus import Paragraph, Spacer
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # .../scripts
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 
 from training_pdf.lib.slide_builder import (  # noqa: E402
     Deck,
+    ML,
+    MR,
+    block,
     bullets,
-    callout,
     cards,
     code_block,
+    numbered,
     simple_table,
     tags_row,
+    two_col,
 )
+from training_pdf.lib.styles import PAGE_W  # noqa: E402
 from training_pdf.content.linux_lessons import LESSONS as LINUX  # noqa: E402
 from training_pdf.content.python_lessons import LESSONS as PYTHON  # noqa: E402
 from training_pdf.content.postgres_lessons import LESSONS as POSTGRES  # noqa: E402
@@ -34,6 +40,7 @@ DECKS = [
     {
         "file": "01_Linux_CLI_Mastery.pdf",
         "series": "Section 01 · Linux",
+        "section_name": "Linux",
         "title": "Linux OS & CLI Mastery",
         "subtitle": "Modern lecture slides for Odoo server fluency",
         "lessons": LINUX,
@@ -48,6 +55,7 @@ DECKS = [
     {
         "file": "02_Python_for_Odoo.pdf",
         "series": "Section 02 · Python",
+        "section_name": "Python",
         "title": "Python for Odoo Developers",
         "subtitle": "Language foundations mapped to Odoo engineering work",
         "lessons": PYTHON,
@@ -62,6 +70,7 @@ DECKS = [
     {
         "file": "03_PostgreSQL_Database.pdf",
         "series": "Section 03 · Database",
+        "section_name": "Database",
         "title": "PostgreSQL for Odoo",
         "subtitle": "SQL fluency, roles, indexes, and backup discipline",
         "lessons": POSTGRES,
@@ -76,6 +85,7 @@ DECKS = [
     {
         "file": "04_Odoo_Core_Development.pdf",
         "series": "Section 04 · Odoo Core",
+        "section_name": "Odoo Core",
         "title": "Odoo Core Development",
         "subtitle": "Install, modules, fields, ORM, and environments",
         "lessons": ODOO,
@@ -90,6 +100,7 @@ DECKS = [
     {
         "file": "05_Views_Security_QWeb.pdf",
         "series": "Section 05 · Views & Security",
+        "section_name": "Views & Security",
         "title": "Views, Security & QWeb",
         "subtitle": "Business UX, ACLs, data loading, and PDF reports",
         "lessons": VIEWS,
@@ -104,6 +115,7 @@ DECKS = [
     {
         "file": "06_OWL_POS_APIs.pdf",
         "series": "Section 06 · OWL / POS / API",
+        "section_name": "OWL / POS / API",
         "title": "OWL, POS & External APIs",
         "subtitle": "Reactive frontend, POS customization, XML-RPC",
         "lessons": OWL,
@@ -118,6 +130,7 @@ DECKS = [
     {
         "file": "07_Infrastructure_DevOps.pdf",
         "series": "Section 07 · Infrastructure",
+        "section_name": "Infrastructure",
         "title": "Infrastructure & DevOps",
         "subtitle": "Docker, VPS, Nginx/SSL, workers, and monitoring",
         "lessons": INFRA,
@@ -132,103 +145,136 @@ DECKS = [
 ]
 
 
-def chunk_text(paragraphs, max_chars=560):
-    chunks, buf, size = [], [], 0
-    for p in paragraphs:
-        if size + len(p) > max_chars and buf:
-            chunks.append(buf)
-            buf, size = [p], len(p)
-        else:
-            buf.append(p)
-            size += len(p)
-    if buf:
-        chunks.append(buf)
-    return chunks or [[]]
+def _clip(text, n=420):
+    text = (text or "").strip()
+    if len(text) <= n:
+        return text
+    return text[: n - 1].rsplit(" ", 1)[0] + "…"
 
 
-def add_lesson_slides(deck: Deck, lesson: dict):
+def _code_trim(code, max_lines=11):
+    lines = (code or "").strip("\n").splitlines()
+    if len(lines) > max_lines:
+        return "\n".join(lines[:max_lines]) + "\n# ..."
+    return "\n".join(lines)
+
+
+def add_lesson_slides(deck: Deck, lesson: dict, frame_prefix: str):
+    """Dense Cookie frames: pack related content; avoid sparse slides."""
     lid = lesson["id"]
     title = lesson["title"]
+    number = lid.replace("L", "").replace("P", "").replace("DB", "").replace("O", "").replace("VS", "").replace("W", "").replace("I", "")
+    # Keep readable section number like 1.1 / L01
+    num_label = lid
 
-    def objectives(story, s):
-        story.extend(bullets(s, lesson.get("objectives") or ["Understand the topic"]))
-        if lesson.get("lab"):
-            story.append(Spacer(1, 0.3 * cm))
-            story.append(callout(s, lesson["lab"], title="Lab target"))
-
-    deck.slide(f"{lid} · Objectives", title, objectives)
-
-    for i, paras in enumerate(chunk_text(lesson.get("explanation") or [], 600), start=1):
-        def make_builder(ps):
-            def builder(story, s):
-                for p in ps:
-                    story.append(Paragraph(p, s["body"]))
-            return builder
-
-        heading = title if i == 1 else f"{title} (continued)"
-        deck.slide(f"{lid} · Teaching {i}", heading, make_builder(paras))
-
-    kps = lesson.get("key_points") or []
-    if kps:
-        def keypoints(story, s):
-            story.extend(bullets(s, kps))
-        deck.slide(f"{lid} · Key points", "What to remember", keypoints)
-
-    for idx, ex in enumerate(lesson.get("examples") or [], start=1):
-        def make_ex(e, n):
-            def builder(story, s):
-                story.append(Paragraph(e.get("title") or f"Example {n}", s["example_label"]))
-                if e.get("explain"):
-                    story.append(Paragraph(e["explain"], s["body"]))
-                if e.get("code"):
-                    code = e["code"]
-                    lines = code.splitlines()
-                    if len(lines) > 14:
-                        code = "\n".join(lines[:14]) + "\n# ... truncated for slide"
-                    story.append(code_block(s, code))
-            return builder
-        deck.slide(f"{lid} · Example {idx}", ex.get("title") or title, make_ex(ex, idx))
-
+    objectives = lesson.get("objectives") or []
+    keypoints = lesson.get("key_points") or []
+    explanation = lesson.get("explanation") or []
+    examples = lesson.get("examples") or []
     mistakes = lesson.get("common_mistakes") or []
-    if mistakes:
-        def mistakes_slide(story, s):
-            story.extend(bullets(s, mistakes))
-            story.append(Spacer(1, 0.25 * cm))
+    lab = lesson.get("lab") or ""
+
+    # Frame A: Objectives | Key points (two columns) + compact lab
+    def frame_overview(story, s):
+        left = [Paragraph("<b>Objectives</b>", s["card_title"])] + bullets(
+            s, [_clip(o, 95) for o in objectives[:4]]
+        )
+        right = [Paragraph("<b>Key points</b>", s["card_title"])] + bullets(
+            s, [_clip(k, 95) for k in keypoints[:5]]
+        )
+        story.append(two_col(left, right))
+        if lab:
+            story.append(Spacer(1, 3))
             story.append(
-                callout(
+                block(s, "Lab target", _clip(lab, 220), kind="example", width=PAGE_W - ML - MR)
+            )
+
+    deck.slide(num_label, title, frame_overview, subtitle="Objectives, key points, and lab target")
+
+    # Frame B: Teaching packed into ONE frame (no orphan overflow pages)
+    def frame_teach(story, s):
+        chunks = []
+        for p in explanation[:3]:
+            chunks.append(Paragraph(_clip(p, 480), s["body"]))
+        if len(explanation) > 3:
+            chunks.append(Paragraph("<b>Also remember</b>", s["card_title"]))
+            chunks.extend(bullets(s, [_clip(p, 120) for p in explanation[3:5]]))
+        # KeepTogether prevents a lonely overflow frame
+        from reportlab.platypus import KeepTogether
+        story.append(KeepTogether(chunks))
+
+    if explanation:
+        deck.slide(num_label, title, frame_teach, subtitle="Teaching notes")
+
+    # Frame C: Example code + pitfalls as Cookie blocks
+    def frame_practice(story, s):
+        ex = examples[0] if examples else None
+        left_bits = []
+        if ex:
+            left_bits.append(Paragraph(ex.get("title") or "Worked example", s["example_label"]))
+            if ex.get("explain"):
+                left_bits.append(Paragraph(_clip(ex["explain"], 180), s["body"]))
+            if ex.get("code"):
+                left_bits.append(code_block(s, _code_trim(ex["code"], 10), width=(PAGE_W - ML - MR - 8) / 2))
+        else:
+            left_bits.append(Paragraph("No code sample for this lesson — use the lab.", s["body"]))
+
+        right_bits = []
+        if mistakes:
+            right_bits.append(
+                block(
                     s,
-                    "Validate fixes in a disposable database before production.",
-                    title="Caution",
-                    warn=True,
+                    "Common mistakes",
+                    "<br/>".join(f"• {_clip(m, 90)}" for m in mistakes[:4]),
+                    kind="alert",
+                    width=(PAGE_W - ML - MR - 8) / 2,
                 )
             )
-        deck.slide(f"{lid} · Pitfalls", "Common mistakes", mistakes_slide)
+        if len(examples) > 1 and examples[1].get("code"):
+            right_bits.append(Spacer(1, 3))
+            right_bits.append(Paragraph(examples[1].get("title") or "More", s["example_label"]))
+            right_bits.append(code_block(s, _code_trim(examples[1]["code"], 7), width=(PAGE_W - ML - MR - 8) / 2))
 
-    for extra in lesson.get("slide_extras") or []:
-        kind = extra.get("kind")
-        etitle = extra.get("title") or "Deep dive"
+        story.append(two_col(left_bits, right_bits or [Paragraph(" ", s["body"])]))
 
-        def make_extra(ex=extra, k=kind):
-            def builder(story, s):
-                if k == "bullets":
-                    story.extend(bullets(s, ex.get("items") or []))
-                elif k == "code" and ex.get("code"):
-                    story.append(code_block(s, ex["code"]))
-                elif k == "callout":
-                    story.append(callout(s, ex.get("text") or "", title=ex.get("title") or "Note"))
-                elif k == "table" and ex.get("headers") and ex.get("rows"):
-                    widths = [(26 * cm) / len(ex["headers"])] * len(ex["headers"])
-                    story.append(simple_table(s, ex["headers"], ex["rows"], widths))
+    if examples or mistakes:
+        deck.slide(num_label, title, frame_practice, subtitle="Example and pitfalls")
+
+    # Optional extras compacted into one frame
+    extras = lesson.get("slide_extras") or []
+    if extras:
+        def frame_extra(story, s):
+            cols = []
+            for ex in extras[:3]:
+                kind = ex.get("kind")
+                title_e = ex.get("title") or "Note"
+                if kind == "code" and ex.get("code"):
+                    cols.append(
+                        block(s, title_e, f"<font face='NotoMonoSC' size='6'>{_clip(ex['code'].replace(chr(10), ' / '), 160)}</font>", kind="plain")
+                    )
+                elif kind == "callout":
+                    cols.append(block(s, title_e, _clip(ex.get("text") or "", 180), kind="plain"))
                 else:
-                    story.extend(bullets(s, ex.get("items") or [ex.get("text") or ""]))
-            return builder
+                    items = ex.get("items") or [ex.get("text") or ""]
+                    cols.append(block(s, title_e, "<br/>".join(f"• {_clip(i, 70)}" for i in items[:4]), kind="plain"))
+            if len(cols) == 1:
+                story.append(cols[0])
+            elif len(cols) == 2:
+                story.append(two_col([cols[0]], [cols[1]]))
+            else:
+                avail = PAGE_W - ML - MR
+                w = avail / 3
+                from reportlab.platypus import Table, TableStyle
+                row = Table([cols], colWidths=[w] * 3)
+                row.setStyle(TableStyle([("VALIGN", (0, 0), (-1, -1), "TOP")]))
+                story.append(row)
 
-        deck.slide(f"{lid} · Extra", etitle, make_extra())
+        deck.slide(num_label, title, frame_extra, subtitle="Extra patterns")
 
 
 def build_deck(spec):
     path = os.path.join(OUT_DIR, spec["file"])
-    estimate = max(80, len(spec["lessons"]) * 7)
+    estimate = max(40, len(spec["lessons"]) * 3 + 8)
     deck = Deck(
         path,
         spec["series"],
@@ -236,64 +282,63 @@ def build_deck(spec):
         spec["subtitle"],
         author_lines=[
             "Weblearns Academy",
+            "weblearns@training.local",
             "Odoo Full-Stack Developer Program",
-            "Senior Developer Lecture Materials",
-            datetime_line(),
+            f"Lecture materials / {datetime.now().strftime('%B %Y')}",
         ],
         total_estimate=estimate,
+        section_name=spec.get("section_name", "Training"),
     )
     deck.title_slide()
     deck.agenda_slide(spec["agenda"])
 
-    # Design system / method slide
     def method(story, s):
         story.append(
             cards(
                 s,
                 [
-                    ("Pattern", "Objectives → teaching → examples → pitfalls → lab"),
-                    ("Live coding", "Type commands with learners; freeze a reference commit"),
-                    ("Safety", "Use disposable DBs; never demo sudo shortcuts in production"),
+                    ("Awesome-style frame", "Number rails, angled title art, and section slides are built in."),
+                    ("Metropolis defaults", "Progress bars, block styles, and fonts are set from theme options."),
+                    ("Dense teaching", "Two-column frames pack objectives, examples, and pitfalls."),
                 ],
-                [8.5 * cm, 8.5 * cm, 8.5 * cm],
             )
         )
-        story.append(Spacer(1, 0.45 * cm))
+        story.append(Spacer(1, 6))
         story.append(tags_row(s, spec.get("tags") or ["Training", "Odoo", "Labs"]))
 
-    deck.slide("Method", "How this deck is taught", method)
+    deck.slide("1", "A theme for modern talks", method, subtitle="How this deck is taught")
 
     lessons = spec["lessons"]
-    block = 0
+    block_i = 0
     for i, lesson in enumerate(lessons):
         if i % 5 == 0:
-            block += 1
+            block_i += 1
             end = min(i + 5, len(lessons))
             deck.section(
-                block,
+                block_i,
                 f"{lessons[i]['id']} – {lessons[end - 1]['id']}",
-                f"{spec['title']} · teaching block {block}",
+                f"{spec['title']} · teaching block {block_i}",
             )
-        add_lesson_slides(deck, lesson)
+        add_lesson_slides(deck, lesson, frame_prefix=str(block_i))
 
     def summary(story, s):
-        titles = [f"<b>{l['id']}</b>  {l['title']}" for l in lessons[:6]]
-        more = len(lessons) - len(titles)
-        items = titles + ([f"... and {more} more lessons in this deck"] if more > 0 else [])
-        story.extend(bullets(s, items))
-        story.append(Spacer(1, 0.3 * cm))
-        story.append(callout(s, "Complete outstanding labs before starting the next section."))
-        story.append(Spacer(1, 0.35 * cm))
+        left = bullets(s, [f"<b>{l['id']}</b>  {l['title']}" for l in lessons[:8]])
+        right = bullets(
+            s,
+            [
+                "Complete every lab before the next section",
+                "Keep a command/error journal",
+                "Prefer disposable databases for experiments",
+                "Re-read pitfalls before production changes",
+            ],
+        )
+        story.append(two_col(left, right))
+        story.append(Spacer(1, 5))
         story.append(tags_row(s, spec.get("tags") or ["Done", "Labs", "Next"]))
 
-    deck.slide("Wrap-up", "You should now be able to…", summary)
+    deck.slide("Σ", "You should now be able to…", summary, subtitle="Section wrap-up")
     deck.closing("Complete the section labs", "Open the next presentation deck")
     return deck.build()
-
-
-def datetime_line():
-    from datetime import datetime
-    return datetime.now().strftime("%B %Y")
 
 
 def main():
