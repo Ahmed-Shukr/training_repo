@@ -12,27 +12,29 @@ OWL/POS, Infrastructure).
 
 Covers 160 lessons across Foundations → Odoo Core → Views/Security/QWeb → OWL/POS/APIs → Infrastructure.
 
-## 2. Section Presentation Decks (Cookie Beamer template)
+## 2. Section Presentation Decks (Merit Advisory · Cookie template)
 
-Exact template match from the shared Cookie Beamer PDF:
-- **Page size:** 453.54 × 255.12 pt (Beamer 16:9) — not A4
-- **Fonts:** Noto Sans SemiCondensed + Noto Sans Mono SemiCondensed
-- **Chrome:** blue accent, progress bar + dot, footer labels, blue `N / Total` counter
-- **Layouts:** dense two-column frames, example/alert blocks, pill tags
+Exact Cookie Beamer page size with concise beginner-friendly lecture slides:
+- **Branding:** Merit Advisory
+- **One topic per slide** (e.g. `pwd`, `cd`, Char field)
+- Short bullets + at least two examples
+- Agenda by Section 1..N (no TOC watermark, no objectives/method filler)
 
 Located in [`presentations/`](presentations/):
 
 | Deck | Focus | Slides |
 |------|-------|--------|
-| `01_Linux_CLI_Mastery.pdf` | Linux OS & CLI | ~68 |
-| `02_Python_for_Odoo.pdf` | Python for Odoo | ~103 |
-| `03_PostgreSQL_Database.pdf` | PostgreSQL & SQL | ~64 |
-| `04_Odoo_Core_Development.pdf` | Install, modules, fields, ORM | ~103 |
-| `05_Views_Security_QWeb.pdf` | Views, security, data, QWeb | ~114 |
-| `06_OWL_POS_APIs.pdf` | OWL, POS, XML-RPC | ~74 |
-| `07_Infrastructure_DevOps.pdf` | Docker, VPS, Nginx, workers | ~74 |
+| `01_Linux_CLI_Mastery.pdf` | Linux OS & CLI | ~65 |
+| `02_Python_for_Odoo.pdf` | Python for Odoo | ~58 |
+| `03_PostgreSQL_Database.pdf` | PostgreSQL & SQL | ~41 |
+| `04_Odoo_Core_Development.pdf` | Install, modules, fields, ORM | ~60 |
+| `05_Views_Security_QWeb.pdf` | Views, security, data, QWeb | ~54 |
+| `06_OWL_POS_APIs.pdf` | OWL, POS, XML-RPC | ~39 |
+| `07_Infrastructure_DevOps.pdf` | Docker, VPS, Nginx, workers | ~38 |
 
-**Total: ~600 teaching slides** packed to reduce empty whitespace.
+**Total: ~355 concise teaching slides**
+
+Atomic slide source content: `scripts/training_pdf/content/slides_*.py`
 
 ## Regenerate
 
