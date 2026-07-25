@@ -74,7 +74,7 @@ class ProgressDot(Flowable):
         self.canv.line(0, y, x, y)
 
 
-def _footer(c, doc, left="Weblearns", mid="Cookie", right="Training"):
+def _footer(c, doc, left="Merit Advisory", mid="Training", right="Module"):
     ensure_fonts()
     c.saveState()
     # footer strip
@@ -120,9 +120,9 @@ def content_chrome(c, doc, meta=None):
     _footer(
         c,
         doc,
-        left=meta.get("left", "Weblearns"),
-        mid=meta.get("mid", "Cookie"),
-        right=meta.get("right", "Training"),
+        left=meta.get("left", "Merit Advisory"),
+        mid=meta.get("mid", "Training"),
+        right=meta.get("right", "Module"),
     )
     c.restoreState()
 
@@ -172,13 +172,9 @@ def agenda_bg(c, doc):
     c.saveState()
     c.setFillColor(BG)
     c.rect(0, 0, PAGE_W, PAGE_H, fill=1, stroke=0)
-    # left rail
+    # left rail only — no TOC watermark
     c.setFillColor(BLUE)
     c.rect(0, 0, 3.2, PAGE_H, fill=1, stroke=0)
-    # TOC watermark
-    c.setFillColor(WATERMARK)
-    c.setFont("NotoSC-Bold", 72)
-    c.drawRightString(PAGE_W - 8, 28, "TOC")
     _footer(c, doc, right="Agenda")
     c.restoreState()
 
@@ -213,10 +209,10 @@ def make_doc(path, series, title, total_slides=100, meta=None):
         topMargin=MT,
         bottomMargin=MB,
         title=title,
-        author="Weblearns Academy",
+        author="Merit Advisory",
     )
     doc.total_slides = total_slides
-    doc.cookie_meta = meta or {"left": "Weblearns", "mid": "Cookie", "right": series}
+    doc.cookie_meta = meta or {"left": "Merit Advisory", "mid": "Training", "right": series}
 
     body = Frame(ML, MB, PAGE_W - ML - MR, PAGE_H - MT - MB, id="body")
     full = Frame(14, MB, PAGE_W - 28, PAGE_H - MT - MB, id="full")
@@ -456,13 +452,23 @@ def two_col(left_flowables, right_flowables, gap=6):
 
 
 class Deck:
-    def __init__(self, path, series, title, subtitle, author_lines=None, total_estimate=120, section_name="Training"):
+    def __init__(
+        self,
+        path,
+        series,
+        title,
+        subtitle,
+        author_lines=None,
+        total_estimate=120,
+        section_name="Training",
+        eyebrow=None,
+    ):
         self.doc = make_doc(
             path,
             series,
             title,
             total_slides=total_estimate,
-            meta={"left": "Weblearns", "mid": "Cookie", "right": section_name},
+            meta={"left": "Merit Advisory", "mid": "Training", "right": section_name},
         )
         self.s = slide_styles()
         self.story = []
@@ -470,16 +476,17 @@ class Deck:
         self.title = title
         self.subtitle = subtitle
         self.section_name = section_name
+        self.eyebrow = eyebrow or "LECTURE SLIDES"
         self.author_lines = author_lines or [
-            "Weblearns Academy",
+            "Merit Advisory",
             "Odoo Full-Stack Developer Program",
-            "Senior Developer Lecture Materials",
+            "Beginner-friendly lecture materials",
         ]
         self._frame_num = 0
 
     def title_slide(self):
         self.story.append(NextPageTemplate("Title"))
-        self.story.append(Paragraph("A SMALL THEME FOR MODERN SLIDES", self.s["brand"]))
+        self.story.append(Paragraph(self.eyebrow.upper(), self.s["brand"]))
         self.story.append(Paragraph(self.title, self.s["title_main"]))
         self.story.append(Paragraph(self.subtitle, self.s["title_sub"]))
         self.story.append(Spacer(1, 2))
@@ -489,19 +496,32 @@ class Deck:
             style = self.s["meta_line"] if i < 2 else self.s["meta_muted"]
             self.story.append(Paragraph(line, style))
 
-    def agenda_slide(self, items):
+    def agenda_slide(self, items, title="Agenda", eyebrow="TODAY"):
         self.story.append(NextPageTemplate("Agenda"))
         self.story.append(PageBreak())
-        self.story.append(Spacer(1, 8))
-        self.story.append(Paragraph("ROADMAP", self.s["eyebrow"]))
-        self.story.append(Paragraph("Agenda", self.s["h"]))
-        self.story.append(Spacer(1, 8))
+        self.story.append(Spacer(1, 6))
+        self.story.append(Paragraph(eyebrow.upper(), self.s["eyebrow"]))
+        self.story.append(Paragraph(title, self.s["h"]))
+        self.story.append(Spacer(1, 6))
         for i, item in enumerate(items, start=1):
+            # Support "title — detail" agenda rows
+            if isinstance(item, (tuple, list)) and len(item) == 2:
+                label, detail = item
+                text = f"<b>{label}</b>  —  {detail}"
+            else:
+                text = str(item)
             row = Table(
-                [[Paragraph(str(i), self.s["agenda_num"]), Paragraph(item, self.s["agenda_item"])]],
-                colWidths=[16, 280],
+                [[Paragraph(str(i), self.s["agenda_num"]), Paragraph(text, self.s["agenda_item"])]],
+                colWidths=[16, 360],
             )
-            row.setStyle(TableStyle([("VALIGN", (0, 0), (-1, -1), "TOP"), ("LEFTPADDING", (0, 0), (-1, -1), 0)]))
+            row.setStyle(
+                TableStyle(
+                    [
+                        ("VALIGN", (0, 0), (-1, -1), "TOP"),
+                        ("LEFTPADDING", (0, 0), (-1, -1), 0),
+                    ]
+                )
+            )
             self.story.append(row)
 
     def section(self, number, title, subtitle=""):
@@ -509,10 +529,22 @@ class Deck:
         self.story.append(PageBreak())
         self.story.append(Spacer(1, 70))
         row = Table(
-            [[Paragraph(str(number), self.s["section_num"]), Paragraph(title, self.s["section_title"])]],
+            [
+                [
+                    Paragraph(str(number), self.s["section_num"]),
+                    Paragraph(title, self.s["section_title"]),
+                ]
+            ],
             colWidths=[40, 320],
         )
-        row.setStyle(TableStyle([("VALIGN", (0, 0), (-1, -1), "MIDDLE"), ("LEFTPADDING", (0, 0), (-1, -1), 0)]))
+        row.setStyle(
+            TableStyle(
+                [
+                    ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+                    ("LEFTPADDING", (0, 0), (-1, -1), 0),
+                ]
+            )
+        )
         self.story.append(row)
         if subtitle:
             self.story.append(Spacer(1, 6))
@@ -525,7 +557,7 @@ class Deck:
             self.story.append(el)
         builder(self.story, self.s)
 
-    def closing(self, line1="Practice the labs", line2="Then continue to the next module"):
+    def closing(self, line1="Practice the examples", line2="Then continue to the next section"):
         self.story.append(NextPageTemplate("Title"))
         self.story.append(PageBreak())
         self.story.append(Paragraph("NEXT STEP", self.s["brand"]))
@@ -534,11 +566,11 @@ class Deck:
         self.story.append(Spacer(1, 2))
         self.story.append(blue_rule(40))
         self.story.append(Spacer(1, 8))
-        self.story.append(Paragraph(self.series, self.s["meta_line"]))
+        self.story.append(Paragraph("Merit Advisory", self.s["meta_line"]))
+        self.story.append(Paragraph(self.series, self.s["meta_muted"]))
 
     def build(self):
-        # Overflow can create pages beyond explicit PageBreaks; pad the counter.
         breaks = sum(1 for x in self.story if isinstance(x, PageBreak)) + 1
-        self.doc.total_slides = max(int(breaks * 1.4) + 5, breaks + 8)
+        self.doc.total_slides = max(breaks + 2, 10)
         self.doc.build(self.story)
         return self.doc.filename
