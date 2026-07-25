@@ -7,18 +7,19 @@ import os
 import sys
 from datetime import datetime
 
-from reportlab.platypus import Paragraph, Spacer
+from reportlab.platypus import Paragraph, Spacer, KeepTogether
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
+WORKSPACE = os.path.dirname(ROOT)
 
 from training_pdf.lib.slide_builder import (  # noqa: E402
     Deck,
     ML,
     MR,
     bullets,
-    code_block,
-    two_col,
+    example_block,
+    slide_image,
 )
 from training_pdf.lib.styles import PAGE_W  # noqa: E402
 from training_pdf.content.slides_linux import SLIDES as LINUX  # noqa: E402
@@ -28,8 +29,9 @@ from training_pdf.content.slides_odoo_core import SLIDES as ODOO  # noqa: E402
 from training_pdf.content.slides_views_security import SLIDES as VIEWS  # noqa: E402
 from training_pdf.content.slides_owl_pos import SLIDES as OWL  # noqa: E402
 from training_pdf.content.slides_infra import SLIDES as INFRA  # noqa: E402
+from training_pdf.content.slide_images import image_for  # noqa: E402
 
-OUT_DIR = os.path.join(os.path.dirname(ROOT), "training_materials", "presentations")
+OUT_DIR = os.path.join(WORKSPACE, "training_materials", "presentations")
 
 
 DECKS = [
@@ -41,6 +43,7 @@ DECKS = [
         "subtitle": "Essential terminal commands for Odoo developers",
         "eyebrow": "Linux fundamentals for Odoo work",
         "slides": LINUX,
+        "use_images": True,
     },
     {
         "file": "02_Python_for_Odoo.pdf",
@@ -50,6 +53,7 @@ DECKS = [
         "subtitle": "Core Python concepts used every day in Odoo",
         "eyebrow": "Python essentials for Odoo development",
         "slides": PYTHON,
+        "use_images": True,
     },
     {
         "file": "03_PostgreSQL_Database.pdf",
@@ -59,6 +63,7 @@ DECKS = [
         "subtitle": "SQL, roles, indexes, and backup basics",
         "eyebrow": "PostgreSQL essentials for Odoo databases",
         "slides": POSTGRES,
+        "use_images": True,
     },
     {
         "file": "04_Odoo_Core_Development.pdf",
@@ -68,6 +73,7 @@ DECKS = [
         "subtitle": "Install, modules, fields, and ORM basics",
         "eyebrow": "Odoo backend development essentials",
         "slides": ODOO,
+        "use_images": True,
     },
     {
         "file": "05_Views_Security_QWeb.pdf",
@@ -77,6 +83,7 @@ DECKS = [
         "subtitle": "UI views, access rights, and report basics",
         "eyebrow": "Odoo views, security, and QWeb reports",
         "slides": VIEWS,
+        "use_images": False,
     },
     {
         "file": "06_OWL_POS_APIs.pdf",
@@ -86,6 +93,7 @@ DECKS = [
         "subtitle": "Frontend components, POS tweaks, and XML-RPC",
         "eyebrow": "OWL, Point of Sale, and integrations",
         "slides": OWL,
+        "use_images": False,
     },
     {
         "file": "07_Infrastructure_DevOps.pdf",
@@ -95,6 +103,7 @@ DECKS = [
         "subtitle": "Docker, VPS, Nginx, SSL, and workers",
         "eyebrow": "Deploy and operate Odoo in production",
         "slides": INFRA,
+        "use_images": False,
     },
 ]
 
@@ -104,7 +113,6 @@ def normalize_sections(raw_sections, chunk_size=7):
     sizes = [len(s.get("topics") or []) for s in raw_sections]
     mostly_atomic = sizes and (sum(1 for n in sizes if n <= 1) >= max(1, int(0.6 * len(sizes))))
     if not mostly_atomic:
-        # Keep provided grouping; renumber sequentially
         out = []
         for i, sec in enumerate(raw_sections, start=1):
             out.append(
@@ -124,7 +132,6 @@ def normalize_sections(raw_sections, chunk_size=7):
     for i in range(0, len(topics), chunk_size):
         chunk = topics[i : i + chunk_size]
         n = len(out) + 1
-        # Title from first topic, shortened
         first = chunk[0]["title"]
         last = chunk[-1]["title"]
         title = first.split(" - ")[0].split(" — ")[0]
@@ -134,30 +141,91 @@ def normalize_sections(raw_sections, chunk_size=7):
     return out
 
 
-def topic_slide(deck: Deck, section_no: int, topic_index: int, topic: dict):
-    """One clear beginner slide: short bullets + two examples."""
+def _clean_point(text: str) -> str:
+    """Prefer Linux terminology: directory over folder."""
+    t = text or ""
+    for a, b in [
+        ("executable folders", "executable directories"),
+        ("folder tree", "directory tree"),
+        ("home folder", "home directory"),
+        ("parent folder", "parent directory"),
+        ("current folder", "current directory"),
+        ("child folder", "child directory"),
+        ("sibling folder", "sibling directory"),
+        ("one folder", "one directory"),
+        (" folder ", " directory "),
+        (" folder.", " directory."),
+        (" folders ", " directories "),
+        (" folders.", " directories."),
+        ("Folder", "Directory"),
+    ]:
+        t = t.replace(a, b)
+    return t
+
+
+def topic_slide(deck: Deck, section_no: int, topic_index: int, topic: dict, use_images=False):
+    """
+    Beginner slide layout:
+      • professional bullets
+      code snapshot directly under the bullet it belongs to
+      OR a terminal/diagram image showing the real result
+    """
     number = f"{section_no}.{topic_index}"
-    title = topic["title"]
-    points = topic.get("points") or []
+    title = _clean_point(topic["title"])
+    points = [_clean_point(p) for p in (topic.get("points") or [])][:4]
     examples = topic.get("examples") or []
 
+    img_rel = image_for(topic.get("id") or "") if use_images else None
+    img_path = os.path.join(WORKSPACE, img_rel) if img_rel else None
+    has_image = bool(img_path and os.path.exists(img_path))
+    is_diagram = bool(img_rel and "diagrams/" in img_rel.replace("\\", "/"))
+
     def builder(story, s):
-        # Left: concise teaching points
-        left = bullets(s, points[:4])
-        # Right: two examples stacked
-        right = []
-        for ex in examples[:2]:
-            right.append(Paragraph(ex.get("label") or "Example", s["example_label"]))
-            code = (ex.get("code") or "").strip()
-            # Keep examples short for readability
-            lines = code.splitlines()
-            if len(lines) > 6:
-                code = "\n".join(lines[:6]) + "\n# ..."
-            right.append(code_block(s, code, width=(PAGE_W - ML - MR - 8) / 2))
-            right.append(Spacer(1, 3))
-        if not right:
-            right = [Paragraph("Follow along in your terminal.", s["body"])]
-        story.append(two_col(left, right))
+        width = PAGE_W - ML - MR
+
+        if has_image:
+            # Keep text + visual on one frame (image shows command + result).
+            bits = []
+            for point in points[:2]:
+                bits.append(
+                    Paragraph(
+                        f"<font color='#356AE6' size='9'><b>•</b></font>&nbsp;&nbsp;{point}",
+                        s["bullet"],
+                    )
+                )
+            bits.append(Spacer(1, 3))
+            img = slide_image(
+                img_path,
+                max_width=width,
+                max_height=118 if is_diagram else 98,
+            )
+            if img:
+                bits.append(img)
+            story.append(KeepTogether(bits))
+            return
+
+        # No image: bullet, then its example directly underneath (max 2 pairs for fit)
+        for i, point in enumerate(points[:2]):
+            story.append(
+                Paragraph(
+                    f"<font color='#356AE6' size='9'><b>•</b></font>&nbsp;&nbsp;{point}",
+                    s["bullet"],
+                )
+            )
+            if i < len(examples):
+                ex = examples[i]
+                code = (ex.get("code") or "").strip()
+                # Keep snapshots tiny on Cookie frames
+                lines = code.splitlines()
+                if len(lines) > 3:
+                    code = "\n".join(lines[:3]) + "\n# ..."
+                story.append(Spacer(1, 1))
+                if ex.get("label"):
+                    story.append(Paragraph(ex.get("label"), s["example_label"]))
+                from training_pdf.lib.slide_builder import code_block
+
+                story.append(code_block(s, code, width=width - 4))
+                story.append(Spacer(1, 3))
 
     deck.slide(number, title, builder)
 
@@ -186,7 +254,6 @@ def build_deck(spec):
 
     deck.title_slide()
 
-    # Improved agenda from actual sections
     agenda_items = []
     for sec in sections:
         n_topics = len(sec["topics"])
@@ -196,13 +263,15 @@ def build_deck(spec):
     deck.agenda_slide(agenda_items, title="Agenda", eyebrow="What we will cover")
 
     for sec in sections:
-        deck.section(
-            sec["section"],
-            f"Section {sec['section']}",
-            sec["title"],
-        )
+        deck.section(sec["section"], f"Section {sec['section']}", sec["title"])
         for idx, topic in enumerate(sec["topics"], start=1):
-            topic_slide(deck, sec["section"], idx, topic)
+            topic_slide(
+                deck,
+                sec["section"],
+                idx,
+                topic,
+                use_images=bool(spec.get("use_images")),
+            )
 
     deck.closing("Try the examples on your machine", "Then open the next module deck")
     return deck.build()

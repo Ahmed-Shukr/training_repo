@@ -17,7 +17,9 @@ Covers 160 lessons across Foundations → Odoo Core → Views/Security/QWeb → 
 Exact Cookie Beamer page size with concise beginner-friendly lecture slides:
 - **Branding:** Merit Advisory
 - **One topic per slide** (e.g. `pwd`, `cd`, Char field)
-- Short bullets + at least two examples
+- Short professional bullets
+- Terminal/result images (or code snapshots under the matching bullet)
+- Teaching diagrams for topics like Linux permissions
 - Agenda by Section 1..N (no TOC watermark, no objectives/method filler)
 
 Located in [`presentations/`](presentations/):
@@ -39,12 +41,14 @@ Atomic slide source content: `scripts/training_pdf/content/slides_*.py`
 ## Regenerate
 
 ```bash
-pip install reportlab
-python3 scripts/training_pdf/generate_documentation.py
+pip install reportlab pillow pypdf
+python3 scripts/training_pdf/assets_gen/generate_slide_images.py
 python3 scripts/training_pdf/generate_section_presentations.py
+python3 scripts/training_pdf/generate_documentation.py   # optional full docs
 ```
 
 Lesson source content lives in `scripts/training_pdf/content/`.
+Slide image assets live in `training_materials/slide_assets/`.
 
 ## Legacy short syllabus PDFs
 

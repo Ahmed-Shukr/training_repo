@@ -21,6 +21,7 @@ from reportlab.platypus import (
     TableStyle,
     Flowable,
 )
+import os
 
 from .styles import (
     ALERT,
@@ -233,15 +234,48 @@ def make_doc(path, series, title, total_slides=100, meta=None):
 
 
 def bullets(s, items, style="bullet"):
+    """Professional disc bullets (Cookie-friendly)."""
     out = []
     for item in items:
         out.append(
             Paragraph(
-                f"<font color='#356AE6'><b>–</b></font>&nbsp;&nbsp;{item}",
+                f"<font color='#356AE6' size='9'><b>•</b></font>&nbsp;&nbsp;{item}",
                 s[style],
             )
         )
     return out
+
+
+def example_block(s, label, code, width=None):
+    """Labeled code snapshot used under the bullet it belongs to."""
+    from reportlab.platypus import KeepTogether
+
+    bits = []
+    if label:
+        bits.append(Paragraph(label, s["example_label"]))
+    code = (code or "").strip("\n")
+    lines = code.splitlines()
+    if len(lines) > 7:
+        code = "\n".join(lines[:7]) + "\n# ..."
+    bits.append(code_block(s, code, width=width or (PAGE_W - ML - MR)))
+    return KeepTogether(bits)
+
+
+def slide_image(path, max_width=None, max_height=110):
+    """Return an Image flowable scaled to slide width/height budget."""
+    from reportlab.platypus import Image as RLImage
+
+    if not path or not os.path.exists(path):
+        return None
+    max_width = max_width or (PAGE_W - ML - MR)
+    img = RLImage(path)
+    # preserve aspect
+    iw, ih = img.imageWidth, img.imageHeight
+    scale = min(max_width / float(iw), max_height / float(ih), 1.0)
+    img.drawWidth = iw * scale
+    img.drawHeight = ih * scale
+    return img
+
 
 
 def numbered(s, items):
@@ -260,10 +294,10 @@ def code_block(s, text, width=None):
             [
                 ("BACKGROUND", (0, 0), (-1, -1), CODE_BG),
                 ("BOX", (0, 0), (-1, -1), 0.5, LINE),
-                ("LEFTPADDING", (0, 0), (-1, -1), 6),
-                ("RIGHTPADDING", (0, 0), (-1, -1), 6),
-                ("TOPPADDING", (0, 0), (-1, -1), 4),
-                ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
+                ("LEFTPADDING", (0, 0), (-1, -1), 5),
+                ("RIGHTPADDING", (0, 0), (-1, -1), 5),
+                ("TOPPADDING", (0, 0), (-1, -1), 2),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 2),
             ]
         )
     )

@@ -9,7 +9,7 @@ SLIDES = [
                 "id": "L-PWD",
                 "title": "pwd - Print Working Directory",
                 "points": [
-                    "Stands for Print Working Directory and shows the full path of your current folder.",
+                    "Stands for Print Working Directory and shows the full path of your current directory.",
                     "Use it before running file commands so you know exactly where you are.",
                     "In scripts, capture it when you need to reuse the current path.",
                 ],
@@ -20,11 +20,11 @@ SLIDES = [
             },
             {
                 "id": "L-CD-HOME",
-                "title": "cd - Go to your home folder",
+                "title": "cd - Go to your home directory",
                 "points": [
-                    "The cd command changes the folder your shell is working in.",
-                    "Running cd with no path takes you back to your home folder.",
-                    "The tilde character is a shortcut for your home folder.",
+                    "The cd command changes the directory your shell is working in.",
+                    "Running cd with no path takes you back to your home directory.",
+                    "The tilde character is a shortcut for your home directory.",
                 ],
                 "examples": [
                     {"label": "Return home", "code": "cd"},
@@ -33,10 +33,10 @@ SLIDES = [
             },
             {
                 "id": "L-CD-PARENT",
-                "title": "cd .. - Move up one folder",
+                "title": "cd .. - Move up one directory",
                 "points": [
-                    "Two dots mean the parent folder of your current location.",
-                    "Use cd .. when you need to move one level higher in the folder tree.",
+                    "Two dots mean the parent directory of your current location.",
+                    "Use cd .. when you need to move one level higher in the directory tree.",
                     "Check with pwd after moving if you are not sure where you landed.",
                 ],
                 "examples": [
@@ -61,26 +61,26 @@ SLIDES = [
                 "id": "L-CD-RELATIVE",
                 "title": "cd with relative paths",
                 "points": [
-                    "A relative path starts from the folder you are currently in.",
+                    "A relative path starts from the directory you are currently in.",
                     "Relative paths are short and useful while working inside a project.",
-                    "They can be risky if you forget your current folder.",
+                    "They can be risky if you forget your current directory.",
                 ],
                 "examples": [
-                    {"label": "Open a child folder", "code": "cd addons"},
-                    {"label": "Move to a sibling folder", "code": "cd ../custom_addons"},
+                    {"label": "Open a child directory", "code": "cd addons"},
+                    {"label": "Move to a sibling directory", "code": "cd ../custom_addons"},
                 ],
             },
             {
                 "id": "L-LS",
                 "title": "ls - List files",
                 "points": [
-                    "The ls command shows files and folders in the current location.",
+                    "The ls command shows files and directories in the current location.",
                     "Use it after cd to confirm what is available before opening or editing files.",
                     "Plain ls is quick when you only need names.",
                 ],
                 "examples": [
-                    {"label": "List current folder", "code": "ls"},
-                    {"label": "List a specific folder", "code": "ls /opt/odoo"},
+                    {"label": "List current directory", "code": "ls"},
+                    {"label": "List a specific directory", "code": "ls /opt/odoo"},
                 ],
             },
             {
@@ -102,7 +102,7 @@ SLIDES = [
                 "points": [
                     "The -a option shows hidden files that start with a dot.",
                     "The -h option makes sizes easier to read when used with -l.",
-                    "Use these flags to inspect shell files and large folders clearly.",
+                    "Use these flags to inspect shell files and large directories clearly.",
                 ],
                 "examples": [
                     {"label": "Show hidden files", "code": "ls -a"},
@@ -111,9 +111,9 @@ SLIDES = [
             },
             {
                 "id": "L-TREE",
-                "title": "tree - View folder structure",
+                "title": "tree - View directory structure",
                 "points": [
-                    "The tree command displays folders and files as a visual hierarchy.",
+                    "The tree command displays directories and files as a visual hierarchy.",
                     "It helps beginners understand project layouts faster than repeated ls commands.",
                     "Limit the depth when a project has many files.",
                 ],
@@ -126,19 +126,19 @@ SLIDES = [
     },
     {
         "section": 2,
-        "title": "Working with files and folders",
+        "title": "Working with files and directories",
         "topics": [
             {
                 "id": "L-MKDIR",
-                "title": "mkdir - Create folders",
+                "title": "mkdir - Create directories",
                 "points": [
                     "The mkdir command creates a new directory.",
-                    "Use -p when parent folders may not exist yet.",
-                    "Choose clear folder names so maintenance is easier later.",
+                    "Use -p when parent directorys may not exist yet.",
+                    "Choose clear directory names so maintenance is easier later.",
                 ],
                 "examples": [
-                    {"label": "Create one folder", "code": "mkdir reports"},
-                    {"label": "Create nested folders", "code": "mkdir -p backups/2026/July"},
+                    {"label": "Create one directory", "code": "mkdir reports"},
+                    {"label": "Create nested directories", "code": "mkdir -p backups/2026/July"},
                 ],
             },
             {
@@ -164,19 +164,19 @@ SLIDES = [
                 ],
                 "examples": [
                     {"label": "Copy a file", "code": "cp odoo.conf odoo.conf.bak"},
-                    {"label": "Copy into backup folder", "code": "cp /etc/odoo.conf ~/backups/odoo.conf"},
+                    {"label": "Copy into backup directory", "code": "cp /etc/odoo.conf ~/backups/odoo.conf"},
                 ],
             },
             {
                 "id": "L-CP-R",
-                "title": "cp -r - Copy folders",
+                "title": "cp -r - Copy directories",
                 "points": [
                     "The -r option copies directories recursively.",
-                    "Recursive copy includes files and folders inside the source folder.",
-                    "Confirm the destination before copying large project folders.",
+                    "Recursive copy includes files and directories inside the source directory.",
+                    "Confirm the destination before copying large project directories.",
                 ],
                 "examples": [
-                    {"label": "Copy an addon folder", "code": "cp -r custom_addons/sale_report backups/"},
+                    {"label": "Copy an addon directory", "code": "cp -r custom_addons/sale_report backups/"},
                     {"label": "Copy a config directory", "code": "cp -r /etc/nginx/sites-available ~/nginx-backup"},
                 ],
             },
@@ -184,7 +184,7 @@ SLIDES = [
                 "id": "L-MV-RENAME",
                 "title": "mv - Rename files",
                 "points": [
-                    "The mv command can rename a file in the same folder.",
+                    "The mv command can rename a file in the same directory.",
                     "Renaming does not create a second copy.",
                     "Use clear names so old and new versions are easy to identify.",
                 ],
@@ -197,9 +197,9 @@ SLIDES = [
                 "id": "L-MV-MOVE",
                 "title": "mv - Move files",
                 "points": [
-                    "The mv command also moves files into another folder.",
+                    "The mv command also moves files into another directory.",
                     "Moving changes the file path but keeps the same file content.",
-                    "Check the destination folder before moving production files.",
+                    "Check the destination directory before moving production files.",
                 ],
                 "examples": [
                     {"label": "Move a report", "code": "mv report.pdf archive/"},
@@ -221,14 +221,14 @@ SLIDES = [
             },
             {
                 "id": "L-RM-R",
-                "title": "rm -r - Remove folders carefully",
+                "title": "rm -r - Remove directories carefully",
                 "points": [
-                    "The -r option deletes folders and everything inside them.",
+                    "The -r option deletes directories and everything inside them.",
                     "Use recursive deletion only after confirming the exact path.",
-                    "On production systems, prefer moving a folder aside before deleting it.",
+                    "On production systems, prefer moving a directory aside before deleting it.",
                 ],
                 "examples": [
-                    {"label": "Remove a test folder", "code": "rm -r test-output"},
+                    {"label": "Remove a test directory", "code": "rm -r test-output"},
                     {"label": "Safer first step", "code": "mv old_addon old_addon.remove_after_backup"},
                 ],
             },
@@ -288,8 +288,8 @@ SLIDES = [
                 "id": "L-FIND",
                 "title": "find - Locate files",
                 "points": [
-                    "The find command searches folders by name, type, size, or time.",
-                    "Start with a specific folder so the search stays fast.",
+                    "The find command searches directories by name, type, size, or time.",
+                    "Start with a specific directory so the search stays fast.",
                     "Quote patterns that contain wildcard characters.",
                 ],
                 "examples": [
@@ -309,7 +309,7 @@ SLIDES = [
                 "points": [
                     "chmod changes read, write, and execute permissions.",
                     "Numeric modes use 4 for read, 2 for write, and 1 for execute.",
-                    "Common modes are 644 for files and 755 for executable folders.",
+                    "Common modes are 644 for files and 755 for executable directories.",
                 ],
                 "examples": [
                     {"label": "Set a normal file mode", "code": "chmod 644 odoo.conf"},
@@ -333,20 +333,20 @@ SLIDES = [
                 "id": "L-CHOWN",
                 "title": "chown - Change owner",
                 "points": [
-                    "chown changes which user owns a file or folder.",
+                    "chown changes which user owns a file or directory.",
                     "The owner controls permissions marked for user access.",
                     "Odoo files should usually be owned by the service user, not root.",
                 ],
                 "examples": [
                     {"label": "Change file owner", "code": "sudo chown odoo /etc/odoo.conf"},
-                    {"label": "Change folder owner recursively", "code": "sudo chown -R odoo /opt/odoo/custom_addons"},
+                    {"label": "Change directory owner recursively", "code": "sudo chown -R odoo /opt/odoo/custom_addons"},
                 ],
             },
             {
                 "id": "L-CHGRP",
                 "title": "chgrp - Change group",
                 "points": [
-                    "chgrp changes the group assigned to a file or folder.",
+                    "chgrp changes the group assigned to a file or directory.",
                     "Group permissions help teams share access without using one account.",
                     "Use groups to separate application access from administrator access.",
                 ],
@@ -687,15 +687,15 @@ SLIDES = [
             },
             {
                 "id": "L-DU",
-                "title": "du - Check folder size",
+                "title": "du - Check directory size",
                 "points": [
-                    "du shows how much space files and folders use.",
+                    "du shows how much space files and directories use.",
                     "Use -s for a summary and -h for readable sizes.",
-                    "It helps find which folder is filling a disk.",
+                    "It helps find which directory is filling a disk.",
                 ],
                 "examples": [
                     {"label": "Size of Odoo logs", "code": "du -sh /var/log/odoo"},
-                    {"label": "Largest items in current folder", "code": "du -h --max-depth=1 | sort -h"},
+                    {"label": "Largest items in current directory", "code": "du -h --max-depth=1 | sort -h"},
                 ],
             },
             {
