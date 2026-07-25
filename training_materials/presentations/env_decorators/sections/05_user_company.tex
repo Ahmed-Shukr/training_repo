@@ -1,0 +1,46 @@
+\section{User and Company}
+
+\begin{frame}[fragile]{\texttt{env.user}}
+	\begin{itemize}
+		\item \textbf{\texttt{env.user}} is the current \texttt{res.users} record.
+\begin{lstlisting}
+user = self.env.user
+print(user.name)
+print(user.login)
+print(user.has_group('base.group_system'))
+\end{lstlisting}
+		\item Useful for:
+		\begin{itemize}
+			\item checking groups / permissions in Python
+			\item writing the current user into a field
+			\item personalizing business logic
+		\end{itemize}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{\texttt{env.company} and \texttt{env.companies}}
+	\begin{itemize}
+		\item \textbf{\texttt{env.company}}: the active company.
+		\item \textbf{\texttt{env.companies}}: allowed companies in the current environment.
+\begin{lstlisting}
+company = self.env.company
+print(company.name)
+print(self.env.companies.mapped('name'))
+\end{lstlisting}
+		\item Multi-company rules often depend on these values.
+		\item Never hard-code company IDs when \texttt{env.company} is enough.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Practical User / Company Patterns}
+\begin{lstlisting}
+def create(self, vals):
+	vals.setdefault('company_id', self.env.company.id)
+	vals.setdefault('user_id', self.env.user.id)
+	return super().create(vals)
+\end{lstlisting}
+	\begin{itemize}
+		\item Set defaults from the environment.
+		\item Keep business documents linked to the correct company/user.
+	\end{itemize}
+\end{frame}

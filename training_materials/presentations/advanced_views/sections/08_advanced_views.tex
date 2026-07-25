@@ -1,0 +1,168 @@
+\section{Advanced Views}
+
+\begin{frame}{Beyond Form and List}
+	\begin{itemize}
+		\item Form and list/tree are only the beginning.
+		\item Advanced views help users analyze and organize records visually.
+		\item In this section:
+		\begin{itemize}
+			\item Kanban
+			\item Pivot
+			\item Graph
+			\item Calendar
+			\item Activity
+			\item Gantt
+			\item Search view reminders for all of them
+		\end{itemize}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Declaring Multiple View Modes}
+\begin{lstlisting}[style=xml]
+<record id="action_student" model="ir.actions.act_window">
+  <field name="name">Students</field>
+  <field name="res_model">student.student</field>
+  <field name="view_mode">kanban,list,form,pivot,graph,calendar,activity</field>
+</record>
+\end{lstlisting}
+	\begin{itemize}
+		\item The order in \texttt{view\_mode} controls the switcher order.
+		\item Each mode needs a corresponding view architecture.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Kanban View}
+	\begin{itemize}
+		\item Kanban shows records as cards, often grouped in columns.
+\begin{lstlisting}[style=xml]
+<kanban default_group_by="classroom_id" class="o_kanban_small_column">
+  <field name="name"/>
+  <field name="classroom_id"/>
+  <field name="age"/>
+  <templates>
+	<t t-name="card">
+	  <div class="fw-bold"><field name="name"/></div>
+	  <div>Age: <field name="age"/></div>
+	</t>
+  </templates>
+</kanban>
+\end{lstlisting}
+		\item Great for pipelines, classrooms, stages, and boards.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Kanban Tips}
+	\begin{itemize}
+		\item Use \texttt{default\_group\_by} for column grouping.
+		\item Keep cards compact: title + a few key fields.
+		\item Include fields used in the template as \texttt{<field/>} declarations.
+		\item In Odoo 17, card templates often use \texttt{t-name="card"}.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Pivot View}
+	\begin{itemize}
+		\item Pivot is for interactive spreadsheet-like analysis.
+\begin{lstlisting}[style=xml]
+<pivot string="Student Analysis">
+  <field name="classroom_id" type="row"/>
+  <field name="gender" type="col"/>
+  <field name="age" type="measure"/>
+</pivot>
+\end{lstlisting}
+		\item \texttt{type="row"} / \texttt{col"} define axes.
+		\item \texttt{type="measure"} defines aggregated values.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Graph View}
+	\begin{itemize}
+		\item Graph shows bar/line/pie charts.
+\begin{lstlisting}[style=xml]
+<graph string="Students by Classroom" type="bar">
+  <field name="classroom_id"/>
+  <field name="age" type="measure"/>
+</graph>
+\end{lstlisting}
+		\item Useful for dashboards and quick comparisons.
+		\item Common types: \texttt{bar}, \texttt{line}, \texttt{pie}.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Calendar View}
+	\begin{itemize}
+		\item Calendar places records on dates.
+\begin{lstlisting}[style=xml]
+<calendar string="Student Events"
+		  date_start="start_datetime"
+		  date_stop="end_datetime"
+		  color="classroom_id"
+		  mode="month">
+  <field name="name"/>
+  <field name="classroom_id"/>
+</calendar>
+\end{lstlisting}
+		\item Needs at least a start datetime/date field.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Activity View}
+	\begin{itemize}
+		\item Activity view focuses on scheduled activities and follow-ups.
+\begin{lstlisting}[style=xml]
+<activity string="Student Activities">
+  <field name="name"/>
+  <field name="activity_state"/>
+  <field name="activity_ids"/>
+</activity>
+\end{lstlisting}
+		\item Usually used with \texttt{mail.activity.mixin}.
+		\item Excellent for CRM-like follow-up workflows.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Gantt View}
+	\begin{itemize}
+		\item Gantt shows time ranges on a timeline (Enterprise in many Odoo setups).
+\begin{lstlisting}[style=xml]
+<gantt string="Classroom Schedule"
+	   date_start="start_datetime"
+	   date_stop="end_datetime"
+	   default_group_by="classroom_id"
+	   color="teacher_id">
+  <field name="name"/>
+</gantt>
+\end{lstlisting}
+		\item Ideal for planning, allocation, and scheduling.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Search View Support for Advanced Views}
+\begin{lstlisting}[style=xml]
+<search>
+  <field name="name"/>
+  <field name="classroom_id"/>
+  <filter string="Adults" name="adults" domain="[('age','&gt;=',18)]"/>
+  <group>
+	<filter string="Classroom" name="group_classroom"
+			context="{'group_by': 'classroom_id'}"/>
+	<filter string="Gender" name="group_gender"
+			context="{'group_by': 'gender'}"/>
+  </group>
+</search>
+\end{lstlisting}
+	\begin{itemize}
+		\item Group-by filters are especially important for pivot/graph/kanban.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Choosing the Right Advanced View}
+	\begin{itemize}
+		\item \textbf{Kanban}: boards / stages / cards
+		\item \textbf{Pivot}: analytical tables
+		\item \textbf{Graph}: charts and trends
+		\item \textbf{Calendar}: date-based events
+		\item \textbf{Activity}: follow-up management
+		\item \textbf{Gantt}: schedules and allocations
+	\end{itemize}
+\end{frame}

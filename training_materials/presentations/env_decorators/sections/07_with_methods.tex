@@ -1,0 +1,58 @@
+\section{\texttt{with\_*} Environment Methods}
+
+\begin{frame}[fragile]{\texttt{with\_user()}}
+	\begin{itemize}
+		\item Runs the next operations as another user.
+\begin{lstlisting}
+other_user = self.env['res.users'].browse(8)
+students = self.env['student.student'].with_user(other_user).search([])
+\end{lstlisting}
+		\item Useful for testing access rights or impersonation flows.
+		\item Access rights and record rules follow the selected user.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{\texttt{with\_company()} and \texttt{with\_companies()}}
+\begin{lstlisting}
+company = self.env['res.company'].browse(2)
+Student = self.env['student.student'].with_company(company)
+Student.create({'name': 'Ahmed', 'company_id': company.id})
+\end{lstlisting}
+	\begin{itemize}
+		\item Changes the active company in the environment.
+		\item Important in multi-company databases.
+		\item Prefer this over manually guessing company context.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{\texttt{with\_env()} and Chaining}
+\begin{lstlisting}
+new_env = self.env(user=other_user, context=dict(self.env.context, lang='so_SO'))
+students = self.env['student.student'].with_env(new_env).search([])
+\end{lstlisting}
+	\begin{itemize}
+		\item \texttt{with\_env()} replaces the whole environment.
+		\item You can also chain helpers:
+\begin{lstlisting}
+self.env['student.student'] \
+	.with_user(user) \
+	.with_company(company) \
+	.with_context(lang='en_US') \
+	.search([])
+\end{lstlisting}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Important Rule}
+	\begin{itemize}
+		\item Environment helpers return \textbf{new} recordsets.
+		\item They do not mutate the old one in place.
+\begin{lstlisting}
+a = self.env['student.student']
+b = a.sudo()
+print(a.env.su)  # False
+print(b.env.su)  # True
+\end{lstlisting}
+		\item Always keep using the returned value.
+	\end{itemize}
+\end{frame}

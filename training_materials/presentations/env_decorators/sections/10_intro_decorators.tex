@@ -1,0 +1,42 @@
+\section{Introduction to API Decorators}
+
+\slidebackground{backgrounds/wallpaper.jpg}
+
+\begin{frame}{What Are API Decorators?}
+	\begin{itemize}
+		\item In Odoo, methods are often decorated with \textbf{\texttt{@api....}} markers.
+		\item A decorator tells Odoo \textbf{how} the method should be called and when it should run.
+		\item Decorators are not just Python sugar -- they change ORM behavior.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Common Decorators We Will Cover}
+	\begin{columns}[T]
+		\begin{column}{0.5\textwidth}
+			\begin{itemize}
+				\item \texttt{@api.model}
+				\item \texttt{@api.model\_create\_multi}
+				\item \texttt{@api.depends}
+				\item \texttt{@api.onchange}
+			\end{itemize}
+		\end{column}
+		\begin{column}{0.5\textwidth}
+			\begin{itemize}
+				\item \texttt{@api.constrains}
+				\item \texttt{@api.ondelete}
+				\item \texttt{@api.autovacuum}
+				\item \texttt{@api.private} / \texttt{@api.readonly}
+			\end{itemize}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}{Why Decorators Matter}
+	\begin{itemize}
+		\item They decide whether a method is model-level or record-level.
+		\item They connect computed fields to their dependencies.
+		\item They validate data before it is saved.
+		\item They control UI onchange behavior in forms.
+		\item Using the wrong decorator creates subtle bugs.
+	\end{itemize}
+\end{frame}

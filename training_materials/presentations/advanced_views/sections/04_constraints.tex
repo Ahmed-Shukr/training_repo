@@ -1,0 +1,99 @@
+\section{Python and SQL Constraints}
+
+\begin{frame}{What Are Constraints?}
+	\begin{itemize}
+		\item Constraints protect data integrity.
+		\item Two main families in Odoo:
+		\begin{enumerate}
+			\item \textbf{Python constraints} (\texttt{@api.constrains})
+			\item \textbf{SQL constraints} (\texttt{\_sql\_constraints})
+		\end{enumerate}
+		\item Use Python for flexible business rules.
+		\item Use SQL for strong database-level guarantees.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Python Constraints}
+\begin{block}{Method Syntax}
+\begin{lstlisting}
+from odoo.exceptions import ValidationError
+
+@api.constrains('age')
+def _check_age(self):
+	for student in self:
+		if student.age < 5:
+			raise ValidationError("Student age must be at least 5.")
+\end{lstlisting}
+\end{block}
+	\begin{itemize}
+		\item Runs on create/write when listed fields change.
+		\item Can read other fields and related values.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Multi-Field Python Constraint}
+\begin{lstlisting}
+@api.constrains('start_date', 'end_date')
+def _check_period(self):
+	for rec in self:
+		if rec.start_date and rec.end_date and rec.end_date < rec.start_date:
+			raise ValidationError("End date must be after start date.")
+\end{lstlisting}
+	\begin{itemize}
+		\item Include every field that should trigger validation.
+		\item Raise \texttt{ValidationError}, not a generic exception.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{SQL Constraints}
+\begin{block}{Method Syntax}
+\begin{lstlisting}
+_sql_constraints = [
+	('name_unique', 'unique(name)', 'Student name must be unique.'),
+	('age_positive', 'CHECK(age >= 0)', 'Age must be positive.'),
+]
+\end{lstlisting}
+\end{block}
+	\begin{itemize}
+		\item Each tuple is: \texttt{(name, sql\_definition, error\_message)}.
+		\item Enforced by PostgreSQL.
+		\item Excellent for uniqueness and simple CHECK rules.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Python vs SQL Constraints}
+	\begin{itemize}
+		\item \textbf{Python}
+		\begin{itemize}
+			\item Flexible logic
+			\item Better dynamic messages
+			\item Can use related fields / ORM searches
+		\end{itemize}
+		\item \textbf{SQL}
+		\begin{itemize}
+			\item Strongest guarantee
+			\item Faster low-level checks
+			\item Limited to SQL expressions
+		\end{itemize}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Practical Example Together}
+\begin{lstlisting}
+class Student(models.Model):
+	_name = 'student.student'
+
+	email = fields.Char()
+	age = fields.Integer()
+
+	_sql_constraints = [
+		('email_unique', 'unique(email)', 'Email must be unique.'),
+	]
+
+	@api.constrains('age')
+	def _check_age(self):
+		for student in self:
+			if student.age and student.age > 100:
+				raise ValidationError("Age seems invalid.")
+\end{lstlisting}
+\end{frame}

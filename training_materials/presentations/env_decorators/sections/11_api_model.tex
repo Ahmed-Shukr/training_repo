@@ -1,0 +1,65 @@
+\section{\texttt{@api.model} and \texttt{@api.model\_create\_multi}}
+
+\begin{frame}[fragile]{\texttt{@api.model}}
+	\begin{itemize}
+		\item Marks a method as a \textbf{model-level} method.
+		\item \texttt{self} is an empty recordset of the model, not one specific record.
+\begin{block}{Method Syntax}
+\begin{lstlisting}
+@api.model
+def my_method(self, values):
+	return self.create(values)
+\end{lstlisting}
+\end{block}
+		\item Common for helpers that create/search without needing an existing record.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Breaking Down \texttt{@api.model}}
+\begin{lstlisting}
+@api.model
+def create_demo_student(self):
+	print(self)  # student.student()
+	return self.create({'name': 'Demo Student'})
+\end{lstlisting}
+	\begin{itemize}
+		\item Call it from the model:
+\begin{lstlisting}
+self.env['student.student'].create_demo_student()
+\end{lstlisting}
+		\item Do not expect \texttt{self.id} to exist inside a pure model method.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{\texttt{@api.model\_create\_multi}}
+	\begin{itemize}
+		\item Used for efficient multi-record creation.
+		\item The argument is a \textbf{list of dictionaries}.
+\begin{lstlisting}
+@api.model_create_multi
+def create(self, vals_list):
+	for vals in vals_list:
+		vals.setdefault('active', True)
+	return super().create(vals_list)
+\end{lstlisting}
+		\item Preferred modern override for \texttt{create()} in Odoo 17.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{\texttt{@api.model} vs Record Methods}
+	\begin{itemize}
+		\item Model method:
+\begin{lstlisting}
+@api.model
+def get_active_count(self):
+	return self.search_count([('active', '=', True)])
+\end{lstlisting}
+		\item Record method:
+\begin{lstlisting}
+def action_archive(self):
+	self.ensure_one()
+	self.active = False
+\end{lstlisting}
+		\item Choose based on whether you need existing records.
+	\end{itemize}
+\end{frame}

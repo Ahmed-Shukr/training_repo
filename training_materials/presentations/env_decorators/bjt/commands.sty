@@ -1,0 +1,167 @@
+%-------------------------------------------------------------
+%  Package : BJT Beamer Theme
+%  Author  : Baijayanta
+%  Version : 1.0
+%  Date    : 2026-07-17
+%
+%  Description:
+%    A clean, modern Beamer theme built on top of the
+%    Metropolis theme with customized colors, typography,
+%    and layout for academic presentations.
+%
+%  Repository:
+%    https://github.com/Baijayanta21/bjt-beamer-theme
+%
+%  License:
+%    Copyright (c) 2026 Baijayanta.
+%    Released under the MIT License.
+%-------------------------------------------------------------
+
+% for beamer theme extra commands
+
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{commands}
+
+
+% frame related shortcut
+
+% make a frame
+\NewDocumentCommand{\myframe}{ O{} m m }{%
+    \begin{frame}[#1]{#2}
+        #3
+    \end{frame}
+}
+
+% Usage:
+% \myframe[<frame-options>]{<frame-title>}{<frame-content>}
+% <frame-options> is optional (default: empty)
+% Examples:
+% \myframe{Introduction}{This is the first slide.}
+% \myframe[t]{Introduction}{Top-aligned slide.}
+%
+% \myframe[fragile]{Code}{
+%   \begin{verbatim}
+%   print("Hello")
+%   \end{verbatim}}
+%
+% \myframe[t,fragile]{Example}{Frame with multiple options.}
+
+% Empty slide
+\newcommand{\blankframe}{%
+    \begin{frame}[plain]
+    \end{frame}
+}
+
+% Usage:
+% \blankframe
+%
+% Inserts a blank Beamer frame with the `plain` option
+% (no headline, footline, or navigation elements).
+
+
+%==================================================
+
+% mathematical shortcuts 
+
+% Number Sets
+\newcommand{\R}{\mathbb{R}} % Real numbers
+\newcommand{\C}{\mathbb{C}} % Complex numbers
+\newcommand{\N}{\mathbb{N}} % Natural numbers
+\newcommand{\Z}{\mathbb{Z}} % Integers
+\newcommand{\Q}{\mathbb{Q}} % Rational numbers
+
+% Usage:
+% \R, \C, \N, \Z, \Q
+
+
+
+% Common Mathematical Operators
+\newcommand{\Lag}{\mathcal{L}}   % Lagrangian
+\newcommand{\Ham}{\mathcal{H}}   % Hamiltonian
+\newcommand{\Order}{\mathcal{O}} % Order / Big-O notation
+
+% Usage:
+% \Lag, \Ham, \Order  
+
+
+% Spherical Harmonics
+\newcommand{\Ylm}{Y_{\ell}^{m}}
+\newcommand{\Pl}{P_{\ell}}
+\newcommand{\Plm}{P_{\ell}^{m}}
+\newcommand{\Y}[2]{Y_{#1}^{#2}}
+
+% Usage:
+% \Y{\ell}{m}
+% -> Y_\ell^m
+
+
+% General Relativity (tensor package)
+% Requires: \usepackage{tensor}
+
+% Metric
+\newcommand{\Metric}[2]{\tensor{g}{_{#1#2}}}
+\newcommand{\InvMetric}[2]{\tensor{g}{^{#1#2}}}
+\newcommand{\MetricDet}{\sqrt{-g}}
+
+% Christoffel symbols
+\newcommand{\Christoffel}[3]{\tensor{\Gamma}{^{#1}_{#2#3}}}
+\newcommand{\dChristoffel}[4]{\tensor{\Gamma}{^{#1}_{#2#3,#4}}}
+
+% Curvature tensors
+\newcommand{\Riemann}[4]{\tensor{R}{^{#1}_{#2#3#4}}}
+\newcommand{\Ricci}[2]{\tensor{R}{_{#1#2}}}
+\newcommand{\RicciScalar}{R}
+\newcommand{\Einstein}[2]{\tensor{G}{_{#1#2}}}
+\newcommand{\Weyl}[4]{\tensor{C}{^{#1}_{#2#3#4}}}
+
+% Stress-energy tensor
+\newcommand{\StressEnergy}[2]{\tensor{T}{_{#1#2}}}
+
+% Electromagnetic tensor
+\newcommand{\FieldTensor}[2]{\tensor{F}{_{#1#2}}}
+\newcommand{\DualFieldTensor}[2]{\tensor{\tilde{F}}{_{#1#2}}}
+
+% Covariant derivative
+\newcommand{\CovD}[1]{\nabla_{#1}}
+\newcommand{\CovDu}[1]{\nabla^{#1}}
+
+% Lie derivative
+\newcommand{\Lie}[1]{\mathcal{L}_{#1}}
+
+% Einstein tensor equation pieces
+\newcommand{\Kronecker}[2]{\tensor{\delta}{^{#1}_{#2}}}
+\newcommand{\LeviCivita}[4]{\tensor{\varepsilon}{_{#1#2#3#4}}}
+
+% Usage 
+% \Metric{\mu}{\nu}
+% \InvMetric{\mu}{\nu}
+
+% \Christoffel{\mu}{\nu}{\rho}
+% \dChristoffel{\mu}{\nu}{\rho}{\sigma}
+
+% \Riemann{\mu}{\nu}{\rho}{\sigma}
+% \Ricci{\mu}{\nu}
+% \RicciScalar
+
+% \Einstein{\mu}{\nu}
+% \StressEnergy{\mu}{\nu}
+
+% \CovD{\mu}T^{\mu\nu}
+% \Lie{\xi}\Metric{\mu}{\nu}
+% \LeviCivita{\mu}{\nu}{\rho}{\sigma}
+
+% exponential
+\newcommand{\expo}[1]{\mathrm{e}^{#1}}
+% \expo{-x^2}
+
+% slide shortcut
+\newcommand{\pauseitem}{\pause\item}
+
+% \begin{itemize}
+% \item First
+% \pauseitem Second
+% \pauseitem Third
+% \end{itemize}
+
+\endinput

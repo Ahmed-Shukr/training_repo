@@ -1,0 +1,56 @@
+\section{\textbf{\texttt{sudo()}} Superuser Access}
+
+\begin{frame}[fragile]{What Is \texttt{sudo()}?}
+	\begin{itemize}
+		\item \textbf{\texttt{sudo()}} returns the same records in a superuser environment.
+		\item Superuser bypasses access rights and record rules.
+\begin{block}{Method Syntax}
+\begin{lstlisting}
+records.sudo()
+records.sudo(flag=True)
+records.sudo(False)  # leave sudo mode
+\end{lstlisting}
+\end{block}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{When to Use \texttt{sudo()}}
+	\begin{itemize}
+		\item System operations that normal users must trigger but cannot fully access.
+		\item Creating technical records (followers, logs, queues) in controlled code.
+		\item Cron / server actions that need broader access.
+	\end{itemize}
+\begin{lstlisting}
+# Controlled technical write
+self.sudo().write({'system_note': 'Processed by cron'})
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{When NOT to Use \texttt{sudo()}}
+	\begin{itemize}
+		\item Do not use \texttt{sudo()} just to ``make the error go away''.
+		\item Do not expose sudo results directly to untrusted UI input.
+		\item Prefer correct access rights and record rules when possible.
+	\end{itemize}
+\begin{lstlisting}
+# Dangerous pattern
+self.env['res.partner'].sudo().search([]).unlink()
+\end{lstlisting}
+	\begin{itemize}
+		\item Ask: does this really need superuser power?
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{\texttt{sudo()} vs \texttt{with\_user()}}
+	\begin{itemize}
+		\item \texttt{sudo()}: bypass security (superuser).
+		\item \texttt{with\_user(user)}: act as that user, still under that user's rights.
+	\end{itemize}
+\begin{lstlisting}
+# Bypass rights
+self.sudo().write({'state': 'done'})
+
+# Act as teacher user, respecting rights
+self.with_user(teacher).write({'state': 'done'})
+\end{lstlisting}
+\end{frame}

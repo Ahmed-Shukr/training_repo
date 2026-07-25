@@ -1,0 +1,38 @@
+%-------------------------------------------------------------
+%  Package : BJT Beamer Theme
+%  Author  : Baijayanta
+%  Version : 1.0
+%  Date    : 2026-07-17
+%
+%  Description:
+%    A clean, modern Beamer theme built on top of the
+%    Metropolis theme with customized colors, typography,
+%    and layout for academic presentations.
+%
+%  Repository:
+%    https://github.com/Baijayanta21/bjt-beamer-theme
+%
+%  License:
+%    Copyright (c) 2026 Baijayanta.
+%    Released under the MIT License.
+%-------------------------------------------------------------
+
+% for beamer innertheme
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{innertheme}
+
+% Base inner theme
+\useinnertheme{rectangles}
+
+% Blocks
+\setbeamertemplate{blocks}[rounded][shadow=true] % Rounded blocks with shadow
+
+% Captions
+\setbeamertemplate{caption}[numbered]            % Number figure/table captions
+
+% Lists
+\setbeamertemplate{itemize item}{\ensuremath{\checkmark}}
+\setbeamertemplate{itemize item}{$\blacktriangleright$}
+
+\endinput

@@ -1,0 +1,104 @@
+\section{Extension and Delegation Inheritance}
+
+\begin{frame}{Two Inheritance Styles}
+	\begin{itemize}
+		\item Odoo model inheritance has two major styles:
+		\begin{enumerate}
+			\item \textbf{Extension inheritance} with \texttt{\_inherit}
+			\item \textbf{Delegation inheritance} with \texttt{\_inherits}
+		\end{enumerate}
+		\item They solve different problems.
+		\item Understanding both is essential for clean module design.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Extension Inheritance (\texttt{\_inherit})}
+	\begin{itemize}
+		\item Extends an existing model in place.
+		\item Adds fields/methods to the same model/table.
+\begin{block}{Method Syntax}
+\begin{lstlisting}
+class Student(models.Model):
+	_inherit = 'student.student'
+
+	blood_group = fields.Char()
+\end{lstlisting}
+\end{block}
+		\item No new model name is required when you only extend.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Classical Extension Patterns}
+\begin{lstlisting}
+# 1) Extend existing model
+class ResPartner(models.Model):
+	_inherit = 'res.partner'
+	is_teacher = fields.Boolean()
+
+# 2) Prototype inheritance: new model based on another
+class StudentAlumni(models.Model):
+	_name = 'student.alumni'
+	_inherit = 'student.student'
+\end{lstlisting}
+	\begin{itemize}
+		\item \texttt{\_inherit} alone extends the original model.
+		\item \texttt{\_name} + \texttt{\_inherit} creates a new model copying the parent definition.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Delegation Inheritance (\texttt{\_inherits})}
+	\begin{itemize}
+		\item Creates a new model that \textbf{delegates} fields to a linked parent record.
+		\item Classic example: \texttt{res.users} delegates to \texttt{res.partner}.
+\begin{block}{Method Syntax}
+\begin{lstlisting}
+class StudentProfile(models.Model):
+	_name = 'student.profile'
+	_inherits = {'res.partner': 'partner_id'}
+
+	partner_id = fields.Many2one(
+		'res.partner', required=True, ondelete='cascade')
+	admission_no = fields.Char()
+\end{lstlisting}
+\end{block}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{How Delegation Works}
+\begin{lstlisting}
+profile = self.env['student.profile'].create({
+	'name': 'Ahmed Muhumed',      # goes to res.partner
+	'email': 'ahmed@example.com',  # goes to res.partner
+	'admission_no': 'A-001',       # local field
+})
+print(profile.name)   # delegated field
+print(profile.partner_id)
+\end{lstlisting}
+	\begin{itemize}
+		\item Delegated fields are readable/writable through the child model.
+		\item Data is stored in the parent table.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Extension vs Delegation}
+	\begin{itemize}
+		\item Use \textbf{extension} when you want to customize an existing model.
+		\item Use \textbf{delegation} when you want a new model that reuses another model's data compositionally.
+	\end{itemize}
+\begin{lstlisting}
+_inherit = 'student.student'              # extend
+_inherits = {'res.partner': 'partner_id'} # delegate
+\end{lstlisting}
+	\begin{itemize}
+		\item Do not confuse \texttt{\_inherit} with \texttt{\_inherits}.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Inheritance Best Practices}
+	\begin{itemize}
+		\item Prefer extension for small feature additions.
+		\item Call \texttt{super()} when overriding methods.
+		\item Keep delegated \texttt{Many2one} required with a clear \texttt{ondelete}.
+		\item Avoid deep inheritance chains that are hard to debug.
+	\end{itemize}
+\end{frame}

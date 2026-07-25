@@ -1,0 +1,89 @@
+\documentclass{bjt}
+% more options
+% \documentclass[12pt]{bjt}
+% by default 10pt, 16:9 aspect ratio
+
+\usepackage{listings}
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{bjt}{
+    language=Python,
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\rmfamily\footnotesize\slshape,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2,
+    frame=single,
+    framesep=2pt,
+    framerule=0.2pt,
+    rulecolor=\color{black},
+}
+
+\lstset{style=bjt}
+
+
+% Presentation information
+\newcommand{\Title}{Environment \& Decorators}                            % (EDIT HERE)
+\newcommand{\ShortTitle}{Env \& Decorators}                               % (EDIT HERE) short form for footer
+\newcommand{\Subtitle}{Odoo 17 Development Tutorials}                     % (EDIT HERE)
+\newcommand{\AuthorName}{Ahmed Muhumed}                                   % (EDIT HERE)
+\newcommand{\ShortAuthor}{Ahmed M.}                                       % (EDIT HERE) short form for footer
+\newcommand{\PresentationDate}{\today}                                    % (EDIT HERE)
+\serieslabel{Odoo Developer Program}                                      % (EDIT HERE)
+
+
+% Beamer metadata
+\title[\ShortTitle]{\Title}
+\subtitle{\Subtitle}
+\author[\ShortAuthor]{\AuthorName}
+\date{\PresentationDate}
+
+\usepackage[edges]{forest}
+
+\begin{document}
+
+\maketitleframe
+
+\begin{frame}{Outline}
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
+\tableofcontents[sections={1-8}]
+\end{column}
+\begin{column}{0.48\textwidth}
+\tableofcontents[sections={9-16}]
+\end{column}
+\end{columns}
+\end{frame}
+
+\input{sections/01_intro_env}
+\input{sections/02_what_is_env}
+\input{sections/03_env_components}
+\input{sections/04_accessing_models}
+\input{sections/05_user_company}
+\input{sections/06_context}
+\input{sections/07_with_methods}
+\input{sections/08_sudo}
+\input{sections/09_env_ref}
+\input{sections/10_intro_decorators}
+\input{sections/11_api_model}
+\input{sections/12_api_depends}
+\input{sections/13_api_onchange}
+\input{sections/14_api_constrains}
+\input{sections/15_other_decorators}
+\input{sections/16_summary}
+
+\end{document}

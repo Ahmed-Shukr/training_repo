@@ -1,0 +1,53 @@
+\section{\texttt{env.ref()} and XML IDs}
+
+\begin{frame}[fragile]{What Is \texttt{env.ref()}?}
+	\begin{itemize}
+		\item \textbf{\texttt{env.ref()}} finds a record by its XML / external ID.
+\begin{block}{Method Syntax}
+\begin{lstlisting}
+record = self.env.ref('module_name.xml_id')
+record = self.env.ref('module_name.xml_id', raise_if_not_found=False)
+\end{lstlisting}
+\end{block}
+		\item Extremely common for groups, stages, sequences, default records, and actions.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Practical Examples}
+\begin{lstlisting}
+admin_group = self.env.ref('base.group_system')
+student_action = self.env.ref('school_manager.action_student')
+draft_stage = self.env.ref('project.project_stage_0', raise_if_not_found=False)
+
+if self.env.user.has_group('base.group_system'):
+	# admin-only logic
+	pass
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Why Prefer XML IDs over Hard-Coded IDs?}
+	\begin{itemize}
+		\item Database IDs change between databases.
+		\item XML IDs are stable across installs when defined in data files.
+\begin{lstlisting}
+# Bad
+stage = self.env['project.task.type'].browse(3)
+
+# Good
+stage = self.env.ref('project.project_stage_0')
+\end{lstlisting}
+		\item Use \texttt{raise\_if\_not\_found=False} when the record may be optional.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Other Useful Environment Helpers}
+\begin{lstlisting}
+self.env.lang          # current language, e.g. 'en_US'
+self.env.is_superuser()
+self.env.is_admin()
+self.env.is_system()
+\end{lstlisting}
+	\begin{itemize}
+		\item These helpers make environment checks clearer and safer.
+	\end{itemize}
+\end{frame}

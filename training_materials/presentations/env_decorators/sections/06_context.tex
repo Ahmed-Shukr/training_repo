@@ -1,0 +1,63 @@
+\section{Context (\texttt{env.context})}
+
+\begin{frame}[fragile]{What Is the Context?}
+	\begin{itemize}
+		\item \textbf{\texttt{env.context}} is a dictionary of flags and values for the current operation.
+\begin{lstlisting}
+print(self.env.context)
+# example: {'lang': 'en_US', 'tz': 'Africa/Mogadishu', 'uid': 2}
+\end{lstlisting}
+		\item Context can change:
+		\begin{itemize}
+			\item language
+			\item default values
+			\item active test behavior
+			\item custom business flags
+		\end{itemize}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Reading Context Values}
+\begin{lstlisting}
+lang = self.env.context.get('lang')
+force_email = self.env.context.get('force_send_email')
+default_gender = self.env.context.get('default_gender')
+\end{lstlisting}
+	\begin{itemize}
+		\item Use \texttt{.get()} so missing keys do not crash your code.
+		\item Keys starting with \texttt{default\_} are used by \texttt{default\_get()}.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{\texttt{with\_context()} Method}
+\begin{block}{Method Syntax}
+\begin{lstlisting}
+records.with_context(key=value, ...)
+# or
+records.with_context({...})
+\end{lstlisting}
+\end{block}
+\begin{lstlisting}
+students = self.env['student.student'].with_context(
+	default_gender='female',
+	active_test=False,
+)
+\end{lstlisting}
+	\begin{itemize}
+		\item Returns a new recordset/environment with updated context.
+		\item Original environment is not modified.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Common Context Keys}
+	\begin{itemize}
+		\item \texttt{lang} -- language code
+		\item \texttt{tz} -- timezone
+		\item \texttt{active\_test} -- whether to hide inactive records
+		\item \texttt{default\_fieldname} -- default value for create forms
+		\item custom keys for your own business logic
+	\end{itemize}
+\begin{lstlisting}
+self.with_context(skip_student_validation=True).write(vals)
+\end{lstlisting}
+\end{frame}

@@ -1,0 +1,63 @@
+\section{\texttt{@api.constrains}}
+
+\begin{frame}[fragile]{What Is \texttt{@api.constrains}?}
+	\begin{itemize}
+		\item Used for \textbf{Python validation} when fields change.
+		\item Runs during \texttt{create()} / \texttt{write()} when watched fields are involved.
+\begin{block}{Method Syntax}
+\begin{lstlisting}
+@api.constrains('age')
+def _check_age(self):
+	for student in self:
+		if student.age < 0:
+			raise ValidationError("Age cannot be negative.")
+\end{lstlisting}
+\end{block}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Breaking Down Constraint Methods}
+\begin{lstlisting}
+from odoo.exceptions import ValidationError
+
+@api.constrains('email')
+def _check_email(self):
+	for student in self:
+		if student.email and '@' not in student.email:
+			raise ValidationError("Please provide a valid email.")
+\end{lstlisting}
+	\begin{itemize}
+		\item Always loop over \texttt{self}.
+		\item Raise \texttt{ValidationError} for business validation failures.
+		\item Constraints must be deterministic and side-effect free.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Multi-Field Constraints}
+\begin{lstlisting}
+@api.constrains('start_date', 'end_date')
+def _check_dates(self):
+	for rec in self:
+		if rec.start_date and rec.end_date and rec.end_date < rec.start_date:
+			raise ValidationError("End date must be after start date.")
+\end{lstlisting}
+	\begin{itemize}
+		\item List every field that should trigger the check.
+		\item If a field is missing from \texttt{@api.constrains}, changes to it may skip validation.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Python Constraints vs SQL Constraints}
+	\begin{itemize}
+		\item \texttt{@api.constrains}: flexible Python checks, rich error messages.
+		\item \texttt{\_sql\_constraints}: database-level checks/uniqueness, very strong.
+	\end{itemize}
+\begin{lstlisting}
+_sql_constraints = [
+	('email_unique', 'unique(email)', 'Email must be unique.'),
+]
+\end{lstlisting}
+	\begin{itemize}
+		\item Use both when needed.
+	\end{itemize}
+\end{frame}

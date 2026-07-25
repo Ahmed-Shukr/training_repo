@@ -1,0 +1,70 @@
+\section{\texttt{@api.depends}}
+
+\begin{frame}[fragile]{What Is \texttt{@api.depends}?}
+	\begin{itemize}
+		\item Used on \textbf{computed fields}.
+		\item Tells Odoo which fields trigger recomputation.
+\begin{block}{Method Syntax}
+\begin{lstlisting}
+age_group = fields.Char(compute='_compute_age_group')
+
+@api.depends('age')
+def _compute_age_group(self):
+	for student in self:
+		student.age_group = 'adult' if student.age >= 18 else 'minor'
+\end{lstlisting}
+\end{block}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Breaking Down Dependencies}
+\begin{lstlisting}
+@api.depends('birth_date')
+def _compute_age(self):
+	...
+
+@api.depends('line_ids.price', 'line_ids.quantity')
+def _compute_total(self):
+	...
+
+@api.depends('classroom_id.teacher_id.name')
+def _compute_teacher_name(self):
+	...
+\end{lstlisting}
+	\begin{itemize}
+		\item You can depend on related paths and one2many subfields.
+		\item Missing dependencies cause stale computed values.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Stored vs Non-Stored Computed Fields}
+\begin{lstlisting}
+# Recomputed on the fly
+display_label = fields.Char(compute='_compute_display_label')
+
+# Stored in database and recomputed when deps change
+total = fields.Float(compute='_compute_total', store=True)
+\end{lstlisting}
+	\begin{itemize}
+		\item \texttt{store=True} needs accurate \texttt{@api.depends}.
+		\item Non-stored fields are calculated when read.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Inverse and Related Notes}
+\begin{lstlisting}
+@api.depends('first_name', 'last_name')
+def _compute_name(self):
+	for rec in self:
+		rec.name = f"{rec.first_name} {rec.last_name}"
+
+def _inverse_name(self):
+	for rec in self:
+		parts = (rec.name or '').split(' ', 1)
+		rec.first_name = parts[0]
+		rec.last_name = parts[1] if len(parts) > 1 else ''
+\end{lstlisting}
+	\begin{itemize}
+		\item Inverse methods allow writing back into computed fields.
+	\end{itemize}
+\end{frame}

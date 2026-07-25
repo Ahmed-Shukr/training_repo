@@ -1,0 +1,70 @@
+\section{\texttt{@api.onchange}}
+
+\begin{frame}[fragile]{What Is \texttt{@api.onchange}?}
+	\begin{itemize}
+		\item Runs in the \textbf{UI form} when a field value changes.
+		\item Used to update other fields before the record is saved.
+\begin{block}{Method Syntax}
+\begin{lstlisting}
+@api.onchange('classroom_id')
+def _onchange_classroom_id(self):
+	if self.classroom_id:
+		self.teacher_id = self.classroom_id.teacher_id
+\end{lstlisting}
+\end{block}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Breaking Down Onchange Behavior}
+	\begin{itemize}
+		\item Onchange methods work on a temporary record in the form client.
+		\item They do \textbf{not} automatically run during pure Python \texttt{create()/write()} calls.
+		\item Return warnings or domain updates when needed:
+\begin{lstlisting}
+@api.onchange('age')
+def _onchange_age(self):
+	if self.age and self.age < 0:
+		return {
+			'warning': {
+				'title': 'Invalid Age',
+				'message': 'Age cannot be negative.',
+			}
+		}
+\end{lstlisting}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Returning Domain from Onchange}
+\begin{lstlisting}
+@api.onchange('school_id')
+def _onchange_school_id(self):
+	self.classroom_id = False
+	return {
+		'domain': {
+			'classroom_id': [('school_id', '=', self.school_id.id)]
+		}
+	}
+\end{lstlisting}
+	\begin{itemize}
+		\item Useful for dynamic dropdown filtering in forms.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{\texttt{@api.onchange} vs \texttt{@api.depends}}
+	\begin{itemize}
+		\item \texttt{@api.onchange}: UI helper before save.
+		\item \texttt{@api.depends}: computation/recompute logic in ORM.
+	\end{itemize}
+\begin{lstlisting}
+# UI convenience
+@api.onchange('classroom_id')
+def _onchange_classroom_id(self):
+	self.teacher_id = self.classroom_id.teacher_id
+
+# Real stored/computed business value
+@api.depends('classroom_id.teacher_id')
+def _compute_teacher_id(self):
+	for rec in self:
+		rec.teacher_id = rec.classroom_id.teacher_id
+\end{lstlisting}
+\end{frame}
