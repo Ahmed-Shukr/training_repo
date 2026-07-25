@@ -1,42 +1,40 @@
-% =========================================================
-% 17. mapped() ORM Method
-% =========================================================
-\section{\texttt{mapped()} ORM Method}
 
-\begin{frame}[standout]
-  \texttt{mapped()} ORM Method
-\end{frame}
+\section{\textbf{\texttt{mapped()}} ORM Method}
 
-\begin{frame}[fragile]{\texttt{MAPPED()} METHOD}
-  \begin{itemize}
-    \item The \texttt{mapped()} method extracts values or related records from a recordset.
-    \item It is used to map each record to a field, expression, or function result.
-    \item The return type depends on what you map to.
-  \end{itemize}
-  \begin{block}{Method Syntax}
+\begin{frame}[fragile]{\textbf{\texttt{mapped()}} Method}
+	\begin{itemize}
+		\item The \textbf{\texttt{mapped()}} method extracts values or related records from a recordset.
+		\item It is used to map each record to a field, expression, or function result.
+		\item The return type depends on what you map to.
+\begin{block}{Method Syntax}
 \begin{lstlisting}
 def mapped(self, func):
-    return super().mapped(func)
+	return super().mapped(func)
 \end{lstlisting}
-    Important parts: \texttt{self}, \texttt{func}.
-  \end{block}
+	\begin{itemize}
+		\item Important parts: \textbf{\texttt{self}}, \textbf{\texttt{func}}.
+	\end{itemize}
+\end{block}
+	\end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{BREAKING DOWN THE METHOD SIGNATURE}
-  \begin{itemize}
-    \item \texttt{self}: The source recordset.
-    \item \texttt{func}: A field path string, or a function / lambda.
-  \end{itemize}
+\begin{frame}[fragile]{Breaking Down the Method Signature}
+	\begin{block}{}
+		\begin{itemize}
+			\item \textbf{\texttt{self}}: The source recordset.
+			\item \textbf{\texttt{func}}: A field path string, or a function / lambda.
 \begin{lstlisting}
 students.mapped('name')
 students.mapped('classroom_id')
 students.mapped('classroom_id.name')
 students.mapped(lambda s: s.age * 2)
 \end{lstlisting}
+		\end{itemize}
+	\end{block}
 \end{frame}
 
-\begin{frame}[fragile]{WHAT DOES \texttt{MAPPED()} RETURN?}
-  Mapping a simple field returns a Python list:
+\begin{frame}[fragile]{What Does \texttt{mapped()} Return?}
+	Mapping a simple field returns a Python list:
 \begin{lstlisting}
 names = students.mapped('name')
 print(names)
@@ -44,7 +42,7 @@ print(names)
 \begin{lstlisting}
 ['Ahmed', 'Amina', 'Omar']
 \end{lstlisting}
-  Mapping a relational field returns a recordset:
+	Mapping a relational field returns a recordset:
 \begin{lstlisting}
 classes = students.mapped('classroom_id')
 print(classes)
@@ -54,41 +52,42 @@ school.classroom(3, 5)
 \end{lstlisting}
 \end{frame}
 
-\begin{frame}[fragile]{DOT-PATH MAPPING}
-  You can follow relational paths:
+\begin{frame}[fragile]{Dot-Path Mapping}
+	You can follow relational paths:
 \begin{lstlisting}
 class_names = students.mapped('classroom_id.name')
 teacher_names = students.mapped('classroom_id.teacher_id.name')
 \end{lstlisting}
-  \begin{itemize}
-    \item Odoo walks the relationship for each record.
-    \item Duplicate relational records are compressed in the resulting recordset.
-    \item This is cleaner than writing manual loops.
-  \end{itemize}
+	\begin{itemize}
+		\item Odoo walks the relationship for each record.
+		\item Duplicate relational records are compressed in the resulting recordset.
+		\item This is cleaner than writing manual loops.
+	\end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{MAPPING WITH A FUNCTION}
+\begin{frame}[fragile]{Mapping with a Function}
 \begin{lstlisting}
 labels = students.mapped(
-    lambda s: f"{s.name} ({s.age})"
+	lambda s: f"{s.name} ({s.age})"
 )
 ages = students.mapped(lambda s: s.age)
 total_age = sum(students.mapped('age'))
 \end{lstlisting}
-  \begin{itemize}
-    \item Function mapping always returns a list.
-    \item Very useful for reports, totals, and display labels.
-  \end{itemize}
+	\begin{itemize}
+		\item Function mapping always returns a list.
+		\item Very useful for reports, totals, and display labels.
+	\end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{METHOD CALL}
-  \textbf{Method Call}
+\begin{frame}[fragile]{Method Call}
+\begin{block}{Method Call}
 \begin{lstlisting}
 emails = students.mapped('email')
 classrooms = students.mapped('classroom_id')
 \end{lstlisting}
-  \begin{itemize}
-    \item Here, \texttt{.mapped(...)} is the method call.
-    \item Return type: \textbf{list} or \textbf{recordset}, depending on the mapped path.
-  \end{itemize}
+	\begin{itemize}
+		\item Here, \textbf{\texttt{.mapped(...)}} is the \textbf{method call}.
+		\item Return type: \textbf{list} or \textbf{recordset}, depending on the mapped path.
+	\end{itemize}
+\end{block}
 \end{frame}

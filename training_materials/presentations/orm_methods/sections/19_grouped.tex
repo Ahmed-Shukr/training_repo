@@ -1,90 +1,91 @@
-% =========================================================
-% 19. grouped() ORM Method
-% =========================================================
-\section{\texttt{grouped()} ORM Method}
 
-\begin{frame}[standout]
-  \texttt{grouped()} ORM Method
-\end{frame}
+\section{\textbf{\texttt{grouped()}} ORM Method}
 
-\begin{frame}[fragile]{\texttt{GROUPED()} METHOD}
-  \begin{itemize}
-    \item The \texttt{grouped()} method groups an existing recordset by a field or key.
-    \item It is available on recordsets in modern Odoo versions (including Odoo 17).
-    \item It returns a dictionary mapping each group key to a recordset.
-  \end{itemize}
-  \begin{block}{Method Syntax}
+\begin{frame}[fragile]{\textbf{\texttt{grouped()}} Method}
+	\begin{itemize}
+		\item The \textbf{\texttt{grouped()}} method groups an existing recordset by a field or key.
+		\item It is available on recordsets in modern Odoo versions (including Odoo 17).
+		\item It returns a dictionary mapping each group key to a recordset.
+\begin{block}{Method Syntax}
 \begin{lstlisting}
 def grouped(self, key):
-    return super().grouped(key)
+	return super().grouped(key)
 \end{lstlisting}
-    Important parts: \texttt{self}, \texttt{key}.
-  \end{block}
+	\begin{itemize}
+		\item Important parts: \textbf{\texttt{self}}, \textbf{\texttt{key}}.
+	\end{itemize}
+\end{block}
+	\end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{BREAKING DOWN THE METHOD SIGNATURE}
-  \begin{itemize}
-    \item \texttt{self}: The recordset to group.
-    \item \texttt{key}: A field name string, or a function that returns the group key.
-  \end{itemize}
+\begin{frame}[fragile]{Breaking Down the Method Signature}
+	\begin{block}{}
+		\begin{itemize}
+			\item \textbf{\texttt{self}}: The recordset to group.
+			\item \textbf{\texttt{key}}: A field name string, or a function that returns the group key.
 \begin{lstlisting}
 students.grouped('gender')
 students.grouped('classroom_id')
 students.grouped(lambda s: s.age // 10)  # age decade groups
 \end{lstlisting}
+		\end{itemize}
+	\end{block}
 \end{frame}
 
-\begin{frame}[fragile]{WHAT DOES \texttt{GROUPED()} RETURN?}
-  \begin{itemize}
-    \item It returns a dictionary.
-  \end{itemize}
+\begin{frame}[fragile]{What Does \texttt{grouped()} Return?}
+	\begin{block}{}
+		\begin{itemize}
+			\item It returns a dictionary.
 \begin{lstlisting}
 students = self.env['student.student'].search([])
 groups = students.grouped('gender')
 print(groups)
 \end{lstlisting}
-  Output is (example):
+			Output is (example):
 \begin{lstlisting}
 {
-    'male': student.student(15, 17),
-    'female': student.student(16, 22),
+	'male': student.student(15, 17),
+	'female': student.student(16, 22),
 }
 \end{lstlisting}
+		\end{itemize}
+	\end{block}
 \end{frame}
 
-\begin{frame}[fragile]{GROUPING BY A MANY2ONE FIELD}
+\begin{frame}[fragile]{Grouping by a Many2one Field}
 \begin{lstlisting}
 grouped_by_class = students.grouped('classroom_id')
 
 for classroom, class_students in grouped_by_class.items():
-    print(classroom.name, len(class_students))
+	print(classroom.name, len(class_students))
 \end{lstlisting}
-  \begin{itemize}
-    \item Keys are relational records (or empty record / falsy key when empty).
-    \item Values are recordsets of students in that group.
-  \end{itemize}
+	\begin{itemize}
+		\item Keys are relational records (or empty record / falsy key when empty).
+		\item Values are recordsets of students in that group.
+	\end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{PRACTICAL USE CASES}
-  \begin{itemize}
-    \item Build totals per group without writing SQL \texttt{GROUP BY}.
-    \item Split records before batch processing.
-    \item Prepare data for reports and dashboards.
-  \end{itemize}
+\begin{frame}[fragile]{Practical Use Cases}
+	\begin{itemize}
+		\item Build totals per group without writing SQL \texttt{GROUP BY}.
+		\item Split records before batch processing.
+		\item Prepare data for reports and dashboards.
 \begin{lstlisting}
 groups = students.grouped('gender')
 male_count = len(groups.get('male', self.env['student.student']))
 female_count = len(groups.get('female', self.env['student.student']))
 \end{lstlisting}
+	\end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{METHOD CALL}
-  \textbf{Method Call}
+\begin{frame}[fragile]{Method Call}
+\begin{block}{Method Call}
 \begin{lstlisting}
 groups = students.grouped('classroom_id')
 \end{lstlisting}
-  \begin{itemize}
-    \item Here, \texttt{.grouped(...)} is the method call.
-    \item Return type reminder: \textbf{dict[key $\rightarrow$ recordset]}.
-  \end{itemize}
+	\begin{itemize}
+		\item Here, \textbf{\texttt{.grouped(...)}} is the \textbf{method call}.
+		\item Return type reminder: \textbf{dict[key $\rightarrow$ recordset]}.
+	\end{itemize}
+\end{block}
 \end{frame}

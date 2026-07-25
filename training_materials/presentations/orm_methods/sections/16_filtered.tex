@@ -1,78 +1,77 @@
-% =========================================================
-% 16. filtered() ORM Method
-% =========================================================
-\section{\texttt{filtered()} ORM Method}
 
-\begin{frame}[standout]
-  \texttt{filtered()} ORM Method
-\end{frame}
+\section{\textbf{\texttt{filtered()}} ORM Method}
 
-\begin{frame}[fragile]{\texttt{FILTERED()} METHOD}
-  \begin{itemize}
-    \item The \texttt{filtered()} method filters an existing recordset in Python.
-    \item Unlike \texttt{search()}, it does \textbf{not} run a new SQL query by domain.
-    \item It returns a new recordset containing only records that match a condition.
-  \end{itemize}
-  \begin{block}{Method Syntax}
+\begin{frame}[fragile]{\textbf{\texttt{filtered()}} Method}
+	\begin{itemize}
+		\item The \textbf{\texttt{filtered()}} method filters an existing recordset in Python.
+		\item Unlike \texttt{search()}, it does \textbf{not} run a new SQL query by domain.
+		\item It returns a new recordset containing only records that match a condition.
+\begin{block}{Method Syntax}
 \begin{lstlisting}
 def filtered(self, func):
-    return super().filtered(func)
+	return super().filtered(func)
 \end{lstlisting}
-    Important parts: \texttt{self}, \texttt{func}.
-  \end{block}
+	\begin{itemize}
+		\item Important parts: \textbf{\texttt{self}}, \textbf{\texttt{func}}.
+	\end{itemize}
+\end{block}
+	\end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{BREAKING DOWN THE METHOD SIGNATURE}
-  \begin{itemize}
-    \item \texttt{self}: The starting recordset.
-    \item \texttt{func}: Either
-      \begin{itemize}
-        \item a function / lambda that returns True/False, or
-        \item a field name string (truthy check).
-      \end{itemize}
-  \end{itemize}
+\begin{frame}[fragile]{Breaking Down the Method Signature}
+	\begin{block}{}
+		\begin{itemize}
+			\item \textbf{\texttt{self}}: The starting recordset.
+			\item \textbf{\texttt{func}}: Either
+			\begin{itemize}
+				\item a function / lambda that returns True/False, or
+				\item a field name string (truthy check).
+			\end{itemize}
 \begin{lstlisting}
 students.filtered(lambda s: s.age >= 18)
 students.filtered('email')   # keep records with a truthy email
 \end{lstlisting}
+		\end{itemize}
+	\end{block}
 \end{frame}
 
-\begin{frame}[fragile]{WHAT DOES \texttt{FILTERED()} RETURN?}
-  \begin{itemize}
-    \item It returns a recordset.
-  \end{itemize}
+\begin{frame}[fragile]{What Does \texttt{filtered()} Return?}
+	\begin{block}{}
+		\begin{itemize}
+			\item It returns a recordset.
 \begin{lstlisting}
 students = self.env['student.student'].search([])
 adults = students.filtered(lambda s: s.age >= 18)
 print(adults)
 \end{lstlisting}
-  Output is (example):
+			Output is (example):
 \begin{lstlisting}
 student.student(15, 22)
 \end{lstlisting}
+		\end{itemize}
+	\end{block}
 \end{frame}
 
-\begin{frame}[fragile]{FILTERED WITH A LAMBDA}
+\begin{frame}[fragile]{Filtered with a Lambda}
 \begin{lstlisting}
 students = self.env['student.student'].browse([15, 16, 17])
 
 males = students.filtered(lambda s: s.gender == 'male')
 with_email = students.filtered(lambda s: bool(s.email))
 active_adults = students.filtered(
-    lambda s: s.active and s.age >= 18
+	lambda s: s.active and s.age >= 18
 )
 \end{lstlisting}
-  \begin{itemize}
-    \item The lambda receives one record at a time.
-    \item Return \texttt{True} to keep the record.
-  \end{itemize}
+	\begin{itemize}
+		\item The lambda receives one record at a time.
+		\item Return \texttt{True} to keep the record.
+	\end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{\texttt{FILTERED()} VS \texttt{SEARCH()}}
-  \begin{itemize}
-    \item Use \texttt{search()} when filtering from the whole table with a domain (SQL).
-    \item Use \texttt{filtered()} when you already have a recordset and need a local filter.
-  \end{itemize}
+\begin{frame}[fragile]{\texttt{filtered()} vs \texttt{search()}}
+	\begin{itemize}
+		\item Use \texttt{search()} when filtering from the whole table with a domain (SQL).
+		\item Use \texttt{filtered()} when you already have a recordset and need a local filter.
 \begin{lstlisting}
 # From database
 adults = self.env['student.student'].search([('age', '>=', 18)])
@@ -80,15 +79,17 @@ adults = self.env['student.student'].search([('age', '>=', 18)])
 # From an existing recordset
 adults = students.filtered(lambda s: s.age >= 18)
 \end{lstlisting}
+	\end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{METHOD CALL}
-  \textbf{Method Call}
+\begin{frame}[fragile]{Method Call}
+\begin{block}{Method Call}
 \begin{lstlisting}
 adults = students.filtered(lambda student: student.age >= 18)
 \end{lstlisting}
-  \begin{itemize}
-    \item Here, \texttt{.filtered(...)} is the method call.
-    \item Return type reminder: \textbf{recordset}.
-  \end{itemize}
+	\begin{itemize}
+		\item Here, \textbf{\texttt{.filtered(...)}} is the \textbf{method call}.
+		\item Return type reminder: \textbf{recordset}.
+	\end{itemize}
+\end{block}
 \end{frame}

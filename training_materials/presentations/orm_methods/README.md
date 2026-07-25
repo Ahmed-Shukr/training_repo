@@ -1,40 +1,29 @@
-# Odoo ORM Methods Presentation
+# Odoo ORM Methods Presentation (BJT Beamer)
 
-Beamer deck for **Odoo 17 Development Tutorials** by Ahmed Muhumed.
-
-## Contents
-
-1. Introduction to ORM Methods
-2. `create()`
-3. `write()`
-4. `unlink()`
-5. `copy()`
-6. `exists()`
-7. `search()`
-8. `read()`
-9. `search_read()`
-10. `search_count()`
-11. `name_create()`
-12. `default_get()`
-13. `name_search()`
-14. `get_view()`
-15. `ensure_one()`
-16. `filtered()`
-17. `mapped()`
-18. `sorted()`
-19. `grouped()`
-20. `fields_get()`
-21. `get_metadata()`
-
-Each method is covered in the same teaching depth as `create()`: definition, method syntax, signature breakdown, return value, practical examples, and method-call notes.
+Beamer deck for **Odoo 17 Development Tutorials** by Ahmed Muhumed, built with the **bjt** class.
 
 ## Build
 
 ```bash
 cd training_materials/presentations/orm_methods
 pdflatex -interaction=nonstopmode main.tex
+pdflatex -interaction=nonstopmode main.tex
 ```
 
-The compiled PDF is also copied to:
+Requires a TeX Live install with Beamer, Metropolis, Bookman, and Forest.
+
+## Structure
+
+- `main.tex` — bjt preamble, title/outline, and section inputs
+- `sections/` — Introduction, `create()`, and every remaining ORM method
+- `bjt.cls` + `bjt/` — Baijayanta Beamer theme (with local color / series-label tweaks)
+- `orm_architecture.png` — architecture figure
+- `backgrounds/wallpaper.jpg` — optional slide background used from Create onward
+
+Compiled PDF is also copied to:
 
 `training_materials/presentations/08_Odoo_ORM_Methods.pdf`
+
+## Methods covered
+
+`create`, `write`, `unlink`, `copy`, `exists`, `search`, `read`, `search_read`, `search_count`, `name_create`, `default_get`, `name_search`, `get_view`, `ensure_one`, `filtered`, `mapped`, `sorted`, `grouped`, `fields_get`, `get_metadata`

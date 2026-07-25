@@ -1,98 +1,94 @@
-% =========================================================
-% 15. ensure_one() ORM Method
-% =========================================================
-\section{\texttt{ensure\_one()} ORM Method}
 
-\begin{frame}[standout]
-  \texttt{ensure\_one()} ORM Method
-\end{frame}
+\section{\textbf{\texttt{ensure\_one()}} ORM Method}
 
-\begin{frame}[fragile]{\texttt{ENSURE\_ONE()} METHOD}
-  \begin{itemize}
-    \item The \texttt{ensure\_one()} method verifies that a recordset contains
-          \textbf{exactly one} record.
-    \item If the recordset is empty or contains multiple records, it raises an error.
-    \item It returns the same recordset when the check passes.
-  \end{itemize}
-  \begin{block}{Method Syntax}
+\begin{frame}[fragile]{\textbf{\texttt{ensure\_one()}} Method}
+	\begin{itemize}
+		\item The \textbf{\texttt{ensure\_one()}} method verifies that a recordset contains \textbf{exactly one} record.
+		\item If the recordset is empty or contains multiple records, it raises an error.
+		\item It returns the same recordset when the check passes.
+\begin{block}{Method Syntax}
 \begin{lstlisting}
 def ensure_one(self):
-    return super().ensure_one()
+	return super().ensure_one()
 \end{lstlisting}
-    Important parts: \texttt{ensure\_one}, \texttt{self}.
-  \end{block}
+	\begin{itemize}
+		\item Important parts: \textbf{\texttt{ensure\_one}}, \textbf{\texttt{self}}.
+	\end{itemize}
+\end{block}
+	\end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{BREAKING DOWN THE METHOD SIGNATURE}
-  \begin{itemize}
-    \item \texttt{ensure\_one}: Safety check method for singleton recordsets.
-    \item \texttt{self}: The recordset being validated.
-    \item No extra arguments are required.
-  \end{itemize}
+\begin{frame}[fragile]{Breaking Down the Method Signature}
+	\begin{block}{}
+		\begin{itemize}
+			\item \textbf{\texttt{ensure\_one}}: Safety check method for singleton recordsets.
+			\item \textbf{\texttt{self}}: The recordset being validated.
+			\item No extra arguments are required.
 \begin{lstlisting}
 student = self.env['student.student'].browse(15)
 student.ensure_one()
 \end{lstlisting}
-  \begin{itemize}
-    \item This succeeds because there is exactly one record.
-  \end{itemize}
+			\item This succeeds because there is exactly one record.
+		\end{itemize}
+	\end{block}
 \end{frame}
 
-\begin{frame}[fragile]{WHAT DOES \texttt{ENSURE\_ONE()} RETURN?}
-  \begin{itemize}
-    \item On success, it returns the same recordset.
-  \end{itemize}
+\begin{frame}[fragile]{What Does \texttt{ensure\_one()} Return?}
+	\begin{block}{}
+		\begin{itemize}
+			\item On success, it returns the same recordset.
 \begin{lstlisting}
 student = self.env['student.student'].browse(15)
 result = student.ensure_one()
 print(result)
 \end{lstlisting}
-  Output is:
+			Output is:
 \begin{lstlisting}
 student.student(15,)
 \end{lstlisting}
-  \begin{itemize}
-    \item On failure, it raises \texttt{ValueError}.
-  \end{itemize}
+			\item On failure, it raises \texttt{ValueError}.
+		\end{itemize}
+	\end{block}
 \end{frame}
 
-\begin{frame}[fragile]{WHEN IT FAILS}
-  Empty recordset:
+\begin{frame}[fragile]{When It Fails}
+	Empty recordset:
 \begin{lstlisting}
 students = self.env['student.student'].browse([])
 students.ensure_one()  # ValueError
 \end{lstlisting}
-  Multiple records:
+	Multiple records:
 \begin{lstlisting}
 students = self.env['student.student'].browse([15, 16])
 students.ensure_one()  # ValueError
 \end{lstlisting}
-  \begin{itemize}
-    \item Error message idea: ``Expected singleton''.
-  \end{itemize}
+	\begin{itemize}
+		\item Error message idea: ``Expected singleton''.
+	\end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{WHY IS \texttt{ENSURE\_ONE()} IMPORTANT?}
-  \begin{itemize}
-    \item Many methods are written for one record only (send email, print report, open wizard).
-    \item Accessing \texttt{record.name} on a multi-recordset can raise singleton errors later.
-    \item Calling \texttt{ensure\_one()} makes the expectation explicit and fails early.
-  \end{itemize}
+\begin{frame}[fragile]{Why Is \texttt{ensure\_one()} Important?}
+	\begin{itemize}
+		\item Many methods are written for one record only (send email, print report, open wizard).
+		\item Accessing \texttt{record.name} on a multi-recordset can raise singleton errors later.
+		\item Calling \texttt{ensure\_one()} makes the expectation explicit and fails early.
 \begin{lstlisting}
 def action_confirm(self):
-    self.ensure_one()
-    self.state = 'confirmed'
-    return True
+	self.ensure_one()
+	self.state = 'confirmed'
+	return True
 \end{lstlisting}
+	\end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{METHOD CALL}
-  \textbf{Method Call}
+\begin{frame}[fragile]{Method Call}
+\begin{block}{Method Call}
 \begin{lstlisting}
 self.ensure_one()
 \end{lstlisting}
-  \begin{itemize}
-    \item Here, \texttt{.ensure\_one()} is the method call.
-    \item Use it at the start of button actions and record-specific business methods.
-  \end{itemize}
+	\begin{itemize}
+		\item Here, \textbf{\texttt{.ensure\_one()}} is the \textbf{method call}.
+		\item Use it at the start of button actions and record-specific business methods.
+	\end{itemize}
+\end{block}
 \end{frame}

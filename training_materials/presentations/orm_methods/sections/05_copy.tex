@@ -1,117 +1,106 @@
-% =========================================================
-% 5. copy() ORM Method
-% =========================================================
-\section{\texttt{copy()} ORM Method}
 
-\begin{frame}[standout]
-  \texttt{copy()} ORM Method
-\end{frame}
+\section{\textbf{\texttt{copy()}} ORM Method}
 
-\begin{frame}[fragile]{\texttt{COPY()} METHOD}
-  \begin{itemize}
-    \item The \texttt{copy()} method is an ORM method used to \textbf{duplicate} an existing record.
-    \item It creates a new record by copying field values from the current record.
-    \item The method returns a recordset containing the newly created (duplicated) record.
-  \end{itemize}
-  \begin{block}{Method Syntax}
-    The standard syntax of the \texttt{copy()} method is:
+\begin{frame}[fragile]{\textbf{\texttt{copy()}} Method}
+	\begin{itemize}
+		\item The \textbf{\texttt{copy()}} method is an ORM method used to \textbf{duplicate} an existing record.
+		\item It creates a new record by copying field values from the current record.
+		\item The method returns a recordset containing the newly created (duplicated) record.
+\begin{block}{Method Syntax}
+	\begin{itemize}
+		\item The standard syntax of the copy() method is:
 \begin{lstlisting}
 def copy(self, default=None):
-    return super().copy(default)
+	return super().copy(default)
 \end{lstlisting}
-    This method has three important parts:
-    \begin{enumerate}
-      \item \texttt{copy}
-      \item \texttt{self}
-      \item \texttt{default}
-    \end{enumerate}
-  \end{block}
+		\item This method has three important parts:
+		\begin{enumerate}
+			\item \textbf{\texttt{copy}}
+			\item \textbf{\texttt{self}}
+			\item \textbf{\texttt{default}}
+		\end{enumerate}
+	\end{itemize}
+\end{block}
+	\end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{BREAKING DOWN THE METHOD SIGNATURE}
-  \begin{itemize}
-    \item \texttt{copy}: The ORM method responsible for duplicating records.
-    \item \texttt{self}: The source recordset to copy from.
-          In normal usage, \texttt{self} is usually \textbf{one} record.
-    \item \texttt{default}: An optional dictionary of values that override the copied values.
-  \end{itemize}
+\begin{frame}[fragile]{Breaking Down the Method Signature}
+	\begin{block}{}
+		\begin{itemize}
+			\item \textbf{\texttt{copy}}: The ORM method responsible for duplicating records.
+			\item \textbf{\texttt{self}}: The source recordset to copy from. In normal usage, \texttt{self} is usually \textbf{one} record.
+			\item \textbf{\texttt{default}}: An optional dictionary of values that override the copied values.
 \begin{lstlisting}
 default = {
-    'name': 'Ahmed Mohamed (Copy)',
+	'name': 'Ahmed Mohamed (Copy)',
 }
 \end{lstlisting}
-  \begin{itemize}
-    \item Keys in \texttt{default} replace the values that would otherwise be copied.
-    \item Fields not listed in \texttt{default} are copied from the original record
-          (unless marked \texttt{copy=False}).
-  \end{itemize}
+			\item Keys in \texttt{default} replace the values that would otherwise be copied.
+			\item Fields not listed in \texttt{default} are copied from the original record (unless marked \texttt{copy=False}).
+		\end{itemize}
+	\end{block}
 \end{frame}
 
-\begin{frame}[fragile]{WHAT DOES \texttt{COPY()} RETURN?}
-  \begin{itemize}
-    \item The \texttt{copy()} method returns a new recordset.
-  \end{itemize}
+\begin{frame}[fragile]{What Does \texttt{copy()} Return?}
+	\begin{block}{}
+		\begin{itemize}
+			\item The \textbf{\texttt{copy()}} method returns a new recordset.
 \begin{lstlisting}
 student = self.env['student.student'].browse(15)
 new_student = student.copy()
 print(new_student)
 \end{lstlisting}
-  Output is (example):
+			Output is (example):
 \begin{lstlisting}
 student.student(28,)
 \end{lstlisting}
-  \begin{itemize}
-    \item A new database row is created.
-    \item The original record remains unchanged.
-  \end{itemize}
+			\item A new database row is created.
+			\item The original record remains unchanged.
+		\end{itemize}
+	\end{block}
 \end{frame}
 
-\begin{frame}[fragile]{USING THE \texttt{DEFAULT} ARGUMENT}
-  \begin{itemize}
-    \item You can change some values while copying.
-  \end{itemize}
+\begin{frame}[fragile]{Using the \texttt{default} Argument}
+	\begin{itemize}
+		\item You can change some values while copying.
 \begin{lstlisting}
 student = self.env['student.student'].browse(15)
 new_student = student.copy({
-    'name': 'Amina Mohamed',
-    'email': 'amina@example.com',
+	'name': 'Amina Mohamed',
+	'email': 'amina@example.com',
 })
 \end{lstlisting}
-  \begin{itemize}
-    \item Everything else is copied from student 15.
-    \item This is useful for ``Duplicate'' buttons in the UI.
-  \end{itemize}
+		\item Everything else is copied from student 15.
+		\item This is useful for ``Duplicate'' buttons in the UI.
+	\end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{WHICH FIELDS ARE COPIED?}
-  \begin{itemize}
-    \item By default, most stored fields are copied.
-    \item A field can opt out of copying:
-  \end{itemize}
+\begin{frame}[fragile]{Which Fields Are Copied?}
+	\begin{itemize}
+		\item By default, most stored fields are copied.
+		\item A field can opt out of copying:
 \begin{lstlisting}
 email = fields.Char(copy=False)
 registration_code = fields.Char(copy=False)
 \end{lstlisting}
-  \begin{itemize}
-    \item Fields with \texttt{copy=False} become empty / default on the new record.
-    \item One2many lines may also be copied depending on the field definition.
-    \item Unique constraints may force you to override values through \texttt{default}.
-  \end{itemize}
+		\item Fields with \texttt{copy=False} become empty / default on the new record.
+		\item One2many lines may also be copied depending on the field definition.
+		\item Unique constraints may force you to override values through \texttt{default}.
+	\end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{METHOD CALL AND OVERRIDE PATTERN}
-  \textbf{Method Call}
+\begin{frame}[fragile]{Method Call and Override Pattern}
+\begin{block}{Method Call}
 \begin{lstlisting}
 new_student = student.copy({'name': 'Ahmed (Copy)'})
 \end{lstlisting}
-  \textbf{Common Override Pattern}
+\end{block}
+\begin{block}{Common Override Pattern}
 \begin{lstlisting}
 def copy(self, default=None):
-    default = dict(default or {})
-    default.setdefault('name', f"{self.name} (Copy)")
-    return super().copy(default)
+	default = dict(default or {})
+	default.setdefault('name', f"{self.name} (Copy)")
+	return super().copy(default)
 \end{lstlisting}
-  \begin{itemize}
-    \item Overrides are useful when duplicated names must stay unique.
-  \end{itemize}
+\end{block}
 \end{frame}

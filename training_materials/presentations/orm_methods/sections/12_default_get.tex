@@ -1,106 +1,102 @@
-% =========================================================
-% 12. default_get() ORM Method
-% =========================================================
-\section{\texttt{default\_get()} ORM Method}
 
-\begin{frame}[standout]
-  \texttt{default\_get()} ORM Method
-\end{frame}
+\section{\textbf{\texttt{default\_get()}} ORM Method}
 
-\begin{frame}[fragile]{\texttt{DEFAULT\_GET()} METHOD}
-  \begin{itemize}
-    \item The \texttt{default\_get()} method returns the \textbf{default values}
-          used when creating a new record in the UI or through the ORM.
-    \item It collects defaults from field definitions, context, and company settings.
-    \item The method returns a dictionary of field values.
-  \end{itemize}
-  \begin{block}{Method Syntax}
+\begin{frame}[fragile]{\textbf{\texttt{default\_get()}} Method}
+	\begin{itemize}
+		\item The \textbf{\texttt{default\_get()}} method returns the \textbf{default values} used when creating a new record in the UI or through the ORM.
+		\item It collects defaults from field definitions, context, and company settings.
+		\item The method returns a dictionary of field values.
+\begin{block}{Method Syntax}
 \begin{lstlisting}
 @api.model
 def default_get(self, fields_list):
-    return super().default_get(fields_list)
+	return super().default_get(fields_list)
 \end{lstlisting}
-    Important parts: \texttt{fields\_list}.
-  \end{block}
+	\begin{itemize}
+		\item Important part: \textbf{\texttt{fields\_list}}.
+	\end{itemize}
+\end{block}
+	\end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{BREAKING DOWN THE METHOD SIGNATURE}
-  \begin{itemize}
-    \item \texttt{@api.model}: Model-level method.
-    \item \texttt{self}: The model requesting defaults.
-    \item \texttt{fields\_list}: List of field names for which defaults are needed.
-  \end{itemize}
+\begin{frame}[fragile]{Breaking Down the Method Signature}
+	\begin{block}{}
+		\begin{itemize}
+			\item \textbf{\texttt{@api.model}}: Model-level method.
+			\item \textbf{\texttt{self}}: The model requesting defaults.
+			\item \textbf{\texttt{fields\_list}}: List of field names for which defaults are needed.
 \begin{lstlisting}
 fields_list = ['name', 'gender', 'active', 'company_id']
 \end{lstlisting}
-  \begin{itemize}
-    \item The UI calls this when you click \textbf{New} on a form.
-  \end{itemize}
+			\item The UI calls this when you click \textbf{New} on a form.
+		\end{itemize}
+	\end{block}
 \end{frame}
 
-\begin{frame}[fragile]{WHAT DOES \texttt{DEFAULT\_GET()} RETURN?}
-  \begin{itemize}
-    \item It returns a dictionary of default values.
-  \end{itemize}
+\begin{frame}[fragile]{What Does \texttt{default\_get()} Return?}
+	\begin{block}{}
+		\begin{itemize}
+			\item It returns a dictionary of default values.
 \begin{lstlisting}
 defaults = self.env['student.student'].default_get([
-    'name', 'gender', 'active',
+	'name', 'gender', 'active',
 ])
 print(defaults)
 \end{lstlisting}
-  Output is (example):
+			Output is (example):
 \begin{lstlisting}
 {'active': True, 'gender': 'male'}
 \end{lstlisting}
-  \begin{itemize}
-    \item Only fields that have defaults appear in the dictionary.
-    \item Missing keys mean ``no default''.
-  \end{itemize}
+			\item Only fields that have defaults appear in the dictionary.
+			\item Missing keys mean ``no default''.
+		\end{itemize}
+	\end{block}
 \end{frame}
 
-\begin{frame}[fragile]{WHERE DEFAULTS COME FROM}
-  \begin{enumerate}
-    \item Field-level default:
+\begin{frame}[fragile]{Where Defaults Come From}
+	\begin{enumerate}
+		\item Field-level default:
 \begin{lstlisting}
 active = fields.Boolean(default=True)
 gender = fields.Selection(..., default='male')
 \end{lstlisting}
-    \item Context default:
+		\item Context default:
 \begin{lstlisting}
 self.env['student.student'].with_context(
-    default_gender='female'
+	default_gender='female'
 ).default_get(['gender'])
 \end{lstlisting}
-    \item Custom logic inside an overridden \texttt{default\_get()}.
-  \end{enumerate}
+		\item Custom logic inside an overridden \texttt{default\_get()}.
+	\end{enumerate}
 \end{frame}
 
-\begin{frame}[fragile]{OVERRIDE PATTERN}
+\begin{frame}[fragile]{Override Pattern}
 \begin{lstlisting}
 @api.model
 def default_get(self, fields_list):
-    defaults = super().default_get(fields_list)
-    if 'name' in fields_list:
-        defaults['name'] = 'New Student'
-    if 'active' in fields_list:
-        defaults['active'] = True
-    return defaults
+	defaults = super().default_get(fields_list)
+	if 'name' in fields_list:
+		defaults['name'] = 'New Student'
+	if 'active' in fields_list:
+		defaults['active'] = True
+	return defaults
 \end{lstlisting}
-  \begin{itemize}
-    \item Always call \texttt{super()} first, then adjust the dictionary.
-    \item Only set keys that were requested in \texttt{fields\_list}.
-  \end{itemize}
+	\begin{itemize}
+		\item Always call \texttt{super()} first, then adjust the dictionary.
+		\item Only set keys that were requested in \texttt{fields\_list}.
+	\end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{METHOD CALL}
-  \textbf{Method Call}
+\begin{frame}[fragile]{Method Call}
+\begin{block}{Method Call}
 \begin{lstlisting}
 vals = self.env['student.student'].default_get([
-    'name', 'birth_date', 'gender', 'active',
+	'name', 'birth_date', 'gender', 'active',
 ])
 \end{lstlisting}
-  \begin{itemize}
-    \item Here, \texttt{.default\_get(...)} is the method call.
-    \item Return type reminder: \textbf{dict}.
-  \end{itemize}
+	\begin{itemize}
+		\item Here, \textbf{\texttt{.default\_get(...)}} is the \textbf{method call}.
+		\item Return type reminder: \textbf{dict}.
+	\end{itemize}
+\end{block}
 \end{frame}

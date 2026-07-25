@@ -1,112 +1,106 @@
-% =========================================================
-% 8. read() ORM Method
-% =========================================================
-\section{\texttt{read()} ORM Method}
 
-\begin{frame}[standout]
-  \texttt{read()} ORM Method
-\end{frame}
+\section{\textbf{\texttt{read()}} ORM Method}
 
-\begin{frame}[fragile]{\texttt{READ()} METHOD}
-  \begin{itemize}
-    \item The \texttt{read()} method is an ORM method used to \textbf{fetch field values}
-          from a recordset as plain Python dictionaries.
-    \item It is commonly used by the web client and RPC calls.
-    \item The method returns a \textbf{list of dictionaries}, not a recordset.
-  \end{itemize}
-  \begin{block}{Method Syntax}
-    The standard syntax of the \texttt{read()} method is:
+\begin{frame}[fragile]{\textbf{\texttt{read()}} Method}
+	\begin{itemize}
+		\item The \textbf{\texttt{read()}} method is an ORM method used to \textbf{fetch field values} from a recordset as plain Python dictionaries.
+		\item It is commonly used by the web client and RPC calls.
+		\item The method returns a \textbf{list of dictionaries}, not a recordset.
+\begin{block}{Method Syntax}
+	\begin{itemize}
+		\item The standard syntax of the read() method is:
 \begin{lstlisting}
 def read(self, fields=None, load='_classic_read'):
-    return super().read(fields=fields, load=load)
+	return super().read(fields=fields, load=load)
 \end{lstlisting}
-    Important parts: \texttt{self}, \texttt{fields}, \texttt{load}.
-  \end{block}
+		\item Important parts: \textbf{\texttt{self}}, \textbf{\texttt{fields}}, \textbf{\texttt{load}}.
+	\end{itemize}
+\end{block}
+	\end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{BREAKING DOWN THE METHOD SIGNATURE}
-  \begin{itemize}
-    \item \texttt{self}: The recordset whose values you want to read.
-    \item \texttt{fields}: An optional list of field names to fetch.
-  \end{itemize}
+\begin{frame}[fragile]{Breaking Down the Method Signature}
+	\begin{block}{}
+		\begin{itemize}
+			\item \textbf{\texttt{self}}: The recordset whose values you want to read.
+			\item \textbf{\texttt{fields}}: An optional list of field names to fetch.
 \begin{lstlisting}
 fields = ['name', 'age', 'email']
 \end{lstlisting}
-  \begin{itemize}
-    \item If \texttt{fields} is omitted, Odoo reads all readable fields.
-    \item Reading only needed fields is faster and cleaner.
-    \item \texttt{load}: Controls how relational values are returned
-          (classic read vs plain IDs).
-  \end{itemize}
+			\item If \texttt{fields} is omitted, Odoo reads all readable fields.
+			\item Reading only needed fields is faster and cleaner.
+			\item \textbf{\texttt{load}}: Controls how relational values are returned (classic read vs plain IDs).
+		\end{itemize}
+	\end{block}
 \end{frame}
 
-\begin{frame}[fragile]{WHAT DOES \texttt{READ()} RETURN?}
-  \begin{itemize}
-    \item \texttt{read()} returns a list of dictionaries.
-  \end{itemize}
+\begin{frame}[fragile]{What Does \texttt{read()} Return?}
+	\begin{block}{}
+		\begin{itemize}
+			\item \texttt{read()} returns a list of dictionaries.
 \begin{lstlisting}
 student = self.env['student.student'].browse(15)
 data = student.read(['name', 'age'])
 print(data)
 \end{lstlisting}
-  Output is (example):
+			Output is (example):
 \begin{lstlisting}
 [{'id': 15, 'name': 'Ahmed', 'age': 22}]
 \end{lstlisting}
-  \begin{itemize}
-    \item Each dictionary represents one record.
-    \item The key \texttt{id} is always included.
-  \end{itemize}
+			\item Each dictionary represents one record.
+			\item The key \texttt{id} is always included.
+		\end{itemize}
+	\end{block}
 \end{frame}
 
-\begin{frame}[fragile]{READING MANY RECORDS}
+\begin{frame}[fragile]{Reading Many Records}
 \begin{lstlisting}
 students = self.env['student.student'].browse([15, 16])
 data = students.read(['name', 'email'])
 \end{lstlisting}
-  Output is (example):
+	Output is (example):
 \begin{lstlisting}
 [
-    {'id': 15, 'name': 'Ahmed', 'email': 'ahmed@example.com'},
-    {'id': 16, 'name': 'Amina', 'email': 'amina@example.com'},
+	{'id': 15, 'name': 'Ahmed', 'email': 'ahmed@example.com'},
+	{'id': 16, 'name': 'Amina', 'email': 'amina@example.com'},
 ]
 \end{lstlisting}
-  \begin{itemize}
-    \item Useful when you need serializable data (JSON / RPC / API).
-    \item For normal business logic inside Odoo, prefer recordset access:
-          \texttt{student.name}.
-  \end{itemize}
+	\begin{itemize}
+		\item Useful when you need serializable data (JSON / RPC / API).
+		\item For normal business logic inside Odoo, prefer recordset access: \texttt{student.name}.
+	\end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{\texttt{READ()} VS RECORDSET ACCESS}
-  \begin{enumerate}
-    \item \textbf{Recordset access} (preferred in Python business code):
+\begin{frame}[fragile]{\texttt{read()} vs Recordset Access}
+	\begin{enumerate}
+		\item \textbf{Recordset access} (preferred in Python business code):
 \begin{lstlisting}
 name = student.name
 age = student.age
 \end{lstlisting}
-    \item \textbf{read()} (preferred for RPC / exporting dict data):
+		\item \textbf{read()} (preferred for RPC / exporting dict data):
 \begin{lstlisting}
 data = student.read(['name', 'age'])[0]
 \end{lstlisting}
-  \end{enumerate}
-  \begin{itemize}
-    \item Recordset access keeps ORM features (prefetch, cache, relational browsing).
-    \item \texttt{read()} gives simple data structures.
-  \end{itemize}
+	\end{enumerate}
+	\begin{itemize}
+		\item Recordset access keeps ORM features (prefetch, cache, relational browsing).
+		\item \texttt{read()} gives simple data structures.
+	\end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{METHOD CALL}
-  \textbf{Method Call}
+\begin{frame}[fragile]{Method Call}
+\begin{block}{Method Call}
 \begin{lstlisting}
 data = self.env['student.student'].browse(15).read([
-    'name',
-    'birth_date',
-    'gender',
+	'name',
+	'birth_date',
+	'gender',
 ])
 \end{lstlisting}
-  \begin{itemize}
-    \item Here, \texttt{.read(...)} is the method call.
-    \item Return type reminder: \textbf{list of dicts}, not a recordset.
-  \end{itemize}
+	\begin{itemize}
+		\item Here, \textbf{\texttt{.read(...)}} is the \textbf{method call}.
+		\item Return type reminder: \textbf{list of dicts}, not a recordset.
+	\end{itemize}
+\end{block}
 \end{frame}

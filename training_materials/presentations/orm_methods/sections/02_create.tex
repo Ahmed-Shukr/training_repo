@@ -1,137 +1,134 @@
-% =========================================================
-% 2. Create() ORM Method
-% =========================================================
-\section{\texttt{Create()} ORM Method}
+\slidebackground{backgrounds/wallpaper.jpg}
+\section{\textbf{\texttt{Create()}} ORM Method}
 
-\begin{frame}[standout]
-  \texttt{Create()} ORM Method
-\end{frame}
+\begin{frame}[fragile]{\textbf{\texttt{Create()}} Method}
+	\begin{itemize}
+		\item The create() method is an ORM (Object Relational Mapping) method used to create one or more new records in an Odoo model.
+		\item The create() method returns a \textbf{recordset} containing the newly created record.
 
-\begin{frame}[fragile]{\texttt{CREATE()} METHOD}
-  \begin{itemize}
-    \item The \texttt{create()} method is an ORM (Object Relational Mapping) method used to
-          create one or more new records in an Odoo model.
-    \item The \texttt{create()} method returns a \textbf{recordset} containing the newly created record.
-  \end{itemize}
-  \begin{block}{Method Syntax}
-    The standard syntax of the \texttt{create()} method is:
-\begin{lstlisting}
+\begin{block}{Method Syntax}
+	\begin{itemize}
+		\item The standard syntax of the create() method is:
+	\begin{lstlisting}
 @api.model
 def create(self, vals):
-    return super().create(vals)
+	return super().create(vals)
 \end{lstlisting}
-    This method has four important parts:
-    \begin{enumerate}
-      \item \texttt{@api.model}
-      \item \texttt{create}
-      \item \texttt{self}
-      \item \texttt{vals}
-    \end{enumerate}
-  \end{block}
+	\item This method has four important parts:
+	\begin{enumerate}
+		\item \textbf{\texttt{@api.model}}
+		\item \textbf{\texttt{create}}
+		\item \textbf{\texttt{self}}
+		\item \textbf{\texttt{vals}}
+	\end{enumerate}
+		\end{itemize}
+\end{block}
+	\end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{BREAKING DOWN THE METHOD SIGNATURE}
-  \begin{itemize}
-    \item \texttt{@api.model}: Indicates that the method is executed at the model level. The
-          \texttt{@api.model} decorator tells Odoo that the method belongs to the model, not to
-          an existing record.
-    \item \texttt{create}: The ORM method responsible for creating records.
-    \item \texttt{self}: The model (\texttt{student.student}), not a specific student record.
-          If we are using \texttt{student.student} model, \texttt{self} does not represent a student record.
-          Instead, \texttt{self} represents the model \texttt{student.student}.
-  \end{itemize}
-\begin{lstlisting}
+\begin{frame}[fragile]{Breaking Down the Method Signature}
+	\begin{block}{}
+		\begin{itemize}
+			\item \textbf{\texttt{@api.model}}: Indicates that the method is executed at the model level. The @api.model decorator tells Odoo that the method belongs to the model, not to an existing record.
+			\item \textbf{\texttt{create}}: The ORM method responsible for creating records.
+			\item \textbf{\texttt{self}}: The model (\texttt{student.student}), not a specific student record. If we are using \texttt{student.student} model, self does not represent a student record. Instead, \texttt{self}, represents the model \texttt{student.student}.
+			\begin{lstlisting}
 print(self)
 \end{lstlisting}
-  Output is:
-\begin{lstlisting}
+			Output is:
+			\begin{lstlisting}
 student.student()
 \end{lstlisting}
+		\end{itemize}
+	\end{block}
 \end{frame}
 
-\begin{frame}[fragile]{BREAKING DOWN THE METHOD SIGNATURE}
-  \begin{itemize}
-    \item \texttt{vals}: A dictionary containing the values to be stored in the database.
-  \end{itemize}
-\begin{lstlisting}
+\begin{frame}[fragile]{Breaking Down the Method Signature}
+	\begin{block}{}
+		\begin{itemize}
+			\item \textbf{\texttt{vals}}: A dictionary containing the values to be stored in the database.
+			\begin{lstlisting}
 name = fields.Char()
 birth_date = fields.Date()
 gender = fields.Selection(...)
 \end{lstlisting}
-\begin{lstlisting}
+			\begin{lstlisting}
 vals = {
-    'name': 'Ahmed Mohamed',
-    'birth_date': date(2005, 5, 10),
-    'gender': 'male',
+	'name': 'Ahmed Mohamed',
+	'birth_date': date(2005, 5, 10),
+	'gender': 'male',
 }
 \end{lstlisting}
-  \begin{itemize}
-    \item Each key corresponds to a field name in your model, and
-    \item Each value is the data to store.
-    \item The ORM maps each key to its corresponding field.
-  \end{itemize}
+		\begin{itemize}
+			\item Each \textbf{key} corresponds to a field name in your model, and
+			\item Each \textbf{value} is the data to store.
+			\item The ORM maps each key to its corresponding field.
+		\end{itemize}
+		\end{itemize}
+	\end{block}
 \end{frame}
 
-\begin{frame}[fragile]{WHAT DOES \texttt{CREATE()} RETURN?}
-  \begin{itemize}
-    \item The \texttt{create()} method returns a recordset.
-  \end{itemize}
-\begin{lstlisting}
+\begin{frame}[fragile]{What Does \texttt{create()} Return?}
+	\begin{block}{}
+		\begin{itemize}
+			\item The \textbf{\texttt{create()}} method returns a recordset.
+			\begin{lstlisting}
 student = self.env['student.student'].create({
-    'name': 'Ahmed',
+	'name': 'Ahmed',
 })
 \end{lstlisting}
-  \begin{itemize}
-    \item Now, if we try to print the student using \texttt{print(student)}, we are getting this:
-  \end{itemize}
-\begin{lstlisting}
+\item Now, if we try to print the \textbf{\texttt{student}} using \textbf{\texttt{print(student)}}, we are getting this
+		\end{itemize}
+	\begin{lstlisting}
 student.student(15,)
 \end{lstlisting}
+	\end{block}
 \end{frame}
 
-\begin{frame}[fragile]{\texttt{@API.MODEL} VS \texttt{@API.MODEL\_CREATE\_MULTI}}
-  There are two common decorators for \texttt{create()}.
-  \begin{enumerate}
-    \item \texttt{@api.model}: Used for creating a single record.
-\begin{lstlisting}
+\begin{frame}[fragile]{\textbf{\texttt{@api.model}} vs \textbf{\texttt{@api.model\_create\_multi}}}
+ There are two common decorators for create().
+	\begin{enumerate}
+		\item \textbf{\texttt{@api.model}}: Used for creating a single record.
+		\begin{lstlisting}
 @api.model
 def create(self, vals):
 \end{lstlisting}
-          \texttt{vals} is a dictionary.
-\begin{lstlisting}
+		\begin{itemize}
+			\item \textbf{\texttt{vals}} is a dictionary.
+			\begin{lstlisting}
 student = self.env['student.student'].create({
-    'name': 'Ahmed Mohamed',
+	'name': 'Ahmed Mohamed',
 })
 \end{lstlisting}
-    \item \texttt{@api.model\_create\_multi}: Used for creating multiple records efficiently.
-\begin{lstlisting}
+		\end{itemize}
+	\item \textbf{\texttt{@api.model\_create\_multi}}: Used for creating multiple records efficiently.
+	\begin{lstlisting}
 @api.model_create_multi
 def create(self, vals_list):
 \end{lstlisting}
-  \end{enumerate}
+	\end{enumerate}
 \end{frame}
 
-\begin{frame}[fragile]{\texttt{@API.MODEL} VS \texttt{@API.MODEL\_CREATE\_MULTI}}
-  \begin{itemize}
-    \item \texttt{vals\_list} is a list of dictionaries, i.e.,
-  \end{itemize}
-\begin{lstlisting}
+\begin{frame}[fragile]{\textbf{\texttt{@api.model}} vs \textbf{\texttt{@api.model\_create\_multi}}}
+	\begin{itemize}
+		\item \textbf{\texttt{vals\_list}} is a list of dictionaries, i.e.,
+		\begin{lstlisting}
 [
-    {'name': 'Ahmed'},
-    {'name': 'Amina'},
+	{'name': 'Ahmed'},
+	{'name': 'Amina'},
 ]
 \end{lstlisting}
-  \textbf{Method Call}
-  \begin{itemize}
-    \item A method call is when we execute the method.
-  \end{itemize}
-\begin{lstlisting}
+	\end{itemize}
+\begin{block}{Method Call}
+	\begin{itemize}
+		\item A method call is when we \textbf{execute} the method.
+		\begin{lstlisting}
 student = self.env['student.student'].create({
-    'name': 'Ahmed Mohamed',
-    'email': 'ahmed@example.com',
+	'name': 'Ahmed Mohamed',
+	'email': 'ahmed@example.com',
 })
 \end{lstlisting}
-  \begin{itemize}
-    \item Here, \texttt{.create(...)} is the method call.
-  \end{itemize}
+		\item Here, \textbf{\texttt{.create(\{...\})}} is the \textbf{method call}.
+	\end{itemize}
+\end{block}
 \end{frame}
