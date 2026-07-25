@@ -1,0 +1,149 @@
+% Odoo ORM Methods — Odoo 17 Development Tutorials
+% Ahmed Muhumed — July 25, 2026
+\documentclass[10pt,aspectratio=169]{beamer}
+
+\usetheme[progressbar=frametitle,numbering=fraction]{metropolis}
+
+\usepackage{booktabs}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{multicol}
+\usepackage{hyperref}
+
+% Match the existing deck palette
+\definecolor{ormnavy}{HTML}{0F1C2E}
+\definecolor{ormteal}{HTML}{0A7A8F}
+\definecolor{ormaccent}{HTML}{E8A838}
+\definecolor{codebg}{HTML}{F3F4F6}
+\definecolor{softgray}{HTML}{808080}
+
+\setbeamercolor{palette primary}{bg=ormnavy,fg=white}
+\setbeamercolor{frametitle}{bg=ormnavy,fg=white}
+\setbeamercolor{title separator}{fg=ormaccent}
+\setbeamercolor{progress bar}{fg=ormteal,bg=ormnavy!20}
+\setbeamercolor{alerted text}{fg=ormteal}
+\setbeamercolor{itemize item}{fg=ormteal}
+\setbeamercolor{itemize subitem}{fg=ormnavy}
+\setbeamercolor{enumerate item}{fg=ormnavy}
+\setbeamercolor{block title}{bg=ormteal!18,fg=ormnavy}
+\setbeamercolor{block body}{bg=ormteal!7,fg=black}
+\setbeamercolor{background canvas}{bg=white}
+
+\setbeamertemplate{itemize item}{\color{ormteal}$\blacktriangleright$}
+\setbeamertemplate{itemize subitem}{\color{ormnavy}$\square$}
+
+\setbeamerfont{title}{size=\Large,series=\bfseries}
+\setbeamerfont{frametitle}{size=\large,series=\bfseries}
+
+\setbeamertemplate{frame footer}{Ahmed M.\hspace{1.2em}ORM Methods}
+
+\lstset{
+  language=Python,
+  basicstyle=\ttfamily\scriptsize,
+  keywordstyle=\color{ormnavy}\bfseries,
+  stringstyle=\color{ormteal},
+  commentstyle=\color{softgray}\itshape,
+  numbers=left,
+  numberstyle=\tiny\color{softgray},
+  numbersep=6pt,
+  backgroundcolor=\color{codebg},
+  frame=single,
+  rulecolor=\color{ormteal!30},
+  breaklines=true,
+  showstringspaces=false,
+  tabsize=4,
+  xleftmargin=0.5em,
+  framexleftmargin=0.8em,
+  aboveskip=0.35em,
+  belowskip=0.25em,
+}
+
+\title{ORM Methods}
+\subtitle{Odoo 17 Development Tutorials}
+\author{Ahmed Muhumed}
+\date{July 25, 2026}
+
+\begin{document}
+
+% ---------- Title ----------
+\begin{frame}[plain]
+\begin{tikzpicture}[remember picture,overlay]
+  \fill[ormnavy] (current page.north west) rectangle (current page.south east);
+  \fill[ormteal] (current page.north west) rectangle ([xshift=0.32cm]current page.south west);
+  \fill[ormaccent] ([yshift=-3.55cm]current page.north west) ++(0.04cm,0) rectangle ++(0.24cm,-0.24cm);
+\end{tikzpicture}
+\vspace{1.6em}
+{\color{softgray}\small ODOO DEVELOPER PROGRAM\par}
+\vspace{0.55em}
+{\Huge\bfseries\color{white} ORM Methods\par}
+\vspace{0.35em}
+{\color{ormaccent}\rule{3.2cm}{1.2pt}\par}
+\vspace{0.45em}
+{\large\color{white} Odoo 17 Development Tutorials\par}
+\vspace{1.0em}
+{\color{softgray} Ahmed Muhumed\par}
+\vspace{0.12em}
+{\color{softgray}\small July 25, 2026\par}
+\end{frame}
+
+\begin{frame}{OUTLINE}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \tableofcontents[sections={1-11}]
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \tableofcontents[sections={12-21}]
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\input{sections/01_introduction}
+\input{sections/02_create}
+\input{sections/03_write}
+\input{sections/04_unlink}
+\input{sections/05_copy}
+\input{sections/06_exists}
+\input{sections/07_search}
+\input{sections/08_read}
+\input{sections/09_search_read}
+\input{sections/10_search_count}
+\input{sections/11_name_create}
+\input{sections/12_default_get}
+\input{sections/13_name_search}
+\input{sections/14_get_view}
+\input{sections/15_ensure_one}
+\input{sections/16_filtered}
+\input{sections/17_mapped}
+\input{sections/18_sorted}
+\input{sections/19_grouped}
+\input{sections/20_fields_get}
+\input{sections/21_get_metadata}
+
+\begin{frame}{SUMMARY}
+  \begin{itemize}
+    \item The Odoo ORM lets you work with PostgreSQL through Python recordsets.
+    \item \textbf{create / write / unlink / copy} manage the life cycle of records.
+    \item \textbf{search / read / search\_read / search\_count} query and fetch data.
+    \item \textbf{name\_create / name\_search / default\_get / get\_view / fields\_get / get\_metadata}
+          support UI and metadata workflows.
+    \item \textbf{exists / ensure\_one / filtered / mapped / sorted / grouped}
+          help you work safely and clearly with recordsets.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]
+\begin{tikzpicture}[remember picture,overlay]
+  \fill[ormnavy] (current page.north west) rectangle (current page.south east);
+\end{tikzpicture}
+\centering
+\vspace{2.2em}
+{\Large\bfseries\color{white} Thank You\par}
+\vspace{0.7em}
+{\normalsize\color{softgray} Questions?\par}
+\vspace{1.1em}
+{\small\color{softgray} Ahmed Muhumed\\[0.25em] Odoo 17 Development Tutorials}
+\end{frame}
+
+\end{document}

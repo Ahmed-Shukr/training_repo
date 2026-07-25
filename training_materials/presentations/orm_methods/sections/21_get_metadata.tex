@@ -1,0 +1,91 @@
+% =========================================================
+% 21. get_metadata() ORM Method
+% =========================================================
+\section{\texttt{get\_metadata()} ORM Method}
+
+\begin{frame}[standout]
+  \texttt{get\_metadata()} ORM Method
+\end{frame}
+
+\begin{frame}[fragile]{\texttt{GET\_METADATA()} METHOD}
+  \begin{itemize}
+    \item The \texttt{get\_metadata()} method returns technical metadata about records.
+    \item It includes information such as XML IDs, create/write audit fields,
+          and whether the record is a noupdate data record.
+    \item It is mostly used by technical tools and the UI debug / metadata dialogs.
+  \end{itemize}
+  \begin{block}{Method Syntax}
+\begin{lstlisting}
+def get_metadata(self):
+    return super().get_metadata()
+\end{lstlisting}
+    Important parts: \texttt{get\_metadata}, \texttt{self}.
+  \end{block}
+\end{frame}
+
+\begin{frame}[fragile]{BREAKING DOWN THE METHOD SIGNATURE}
+  \begin{itemize}
+    \item \texttt{self}: The recordset to inspect.
+    \item No values dictionary is required.
+    \item Works on one or many records; returns one metadata dict per record.
+  \end{itemize}
+\begin{lstlisting}
+student = self.env['student.student'].browse(15)
+meta = student.get_metadata()
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{WHAT DOES \texttt{GET\_METADATA()} RETURN?}
+  \begin{itemize}
+    \item It returns a \textbf{list of dictionaries}.
+  \end{itemize}
+\begin{lstlisting}
+meta = self.env['student.student'].browse(15).get_metadata()
+print(meta)
+\end{lstlisting}
+  Output is (example):
+\begin{lstlisting}
+[{
+    'id': 15,
+    'xmlid': False,
+    'noupdate': False,
+    'create_uid': (1, 'Administrator'),
+    'create_date': '2026-07-01 08:12:33',
+    'write_uid': (2, 'Ahmed Muhumed'),
+    'write_date': '2026-07-20 14:05:10',
+}]
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}{IMPORTANT METADATA KEYS}
+  \begin{itemize}
+    \item \texttt{id} -- database ID
+    \item \texttt{xmlid} -- external ID if the record came from XML/data files
+    \item \texttt{noupdate} -- whether upgrades should skip updating this data record
+    \item \texttt{create\_uid} / \texttt{create\_date} -- who created it and when
+    \item \texttt{write\_uid} / \texttt{write\_date} -- who last modified it and when
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{WHEN TO USE \texttt{GET\_METADATA()}}
+  \begin{itemize}
+    \item Debugging module data and external IDs.
+    \item Checking whether a record is system/data XML versus user-created.
+    \item Inspecting create/write audit information quickly.
+  \end{itemize}
+\begin{lstlisting}
+for row in self.env['student.student'].browse([15, 16]).get_metadata():
+    print(row['id'], row['xmlid'], row['write_date'])
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{METHOD CALL}
+  \textbf{Method Call}
+\begin{lstlisting}
+metadata = self.env['student.student'].browse(15).get_metadata()
+\end{lstlisting}
+  \begin{itemize}
+    \item Here, \texttt{.get\_metadata()} is the method call.
+    \item Return type reminder: \textbf{list of dicts}.
+  \end{itemize}
+\end{frame}

@@ -1,0 +1,111 @@
+% =========================================================
+% 13. name_search() ORM Method
+% =========================================================
+\section{\texttt{name\_search()} ORM Method}
+
+\begin{frame}[standout]
+  \texttt{name\_search()} ORM Method
+\end{frame}
+
+\begin{frame}[fragile]{\texttt{NAME\_SEARCH()} METHOD}
+  \begin{itemize}
+    \item The \texttt{name\_search()} method searches records by name / display name.
+    \item It powers many2one dropdown search-as-you-type behavior.
+    \item It returns a list of \texttt{(id, display\_name)} tuples.
+  \end{itemize}
+  \begin{block}{Method Syntax}
+\begin{lstlisting}
+@api.model
+def name_search(self, name='', args=None,
+                operator='ilike', limit=100):
+    return super().name_search(name=name, args=args,
+                               operator=operator, limit=limit)
+\end{lstlisting}
+  \end{block}
+\end{frame}
+
+\begin{frame}[fragile]{BREAKING DOWN THE METHOD SIGNATURE}
+  \begin{itemize}
+    \item \texttt{name}: Text typed by the user.
+    \item \texttt{args}: Extra domain restrictions.
+    \item \texttt{operator}: Comparison operator, usually \texttt{ilike}.
+    \item \texttt{limit}: Maximum number of suggestions.
+  \end{itemize}
+\begin{lstlisting}
+name = 'ahm'
+args = [('active', '=', True)]
+operator = 'ilike'
+limit = 8
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{WHAT DOES \texttt{NAME\_SEARCH()} RETURN?}
+  \begin{itemize}
+    \item It returns a list of tuples: \texttt{(id, display\_name)}.
+  \end{itemize}
+\begin{lstlisting}
+result = self.env['student.student'].name_search('ahm')
+print(result)
+\end{lstlisting}
+  Output is (example):
+\begin{lstlisting}
+[
+    (15, 'Ahmed Mohamed'),
+    (22, 'Ahmed Ali'),
+]
+\end{lstlisting}
+  \begin{itemize}
+    \item Perfect format for many2one selection lists.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{HOW MANY2ONE USES \texttt{NAME\_SEARCH()}}
+  \begin{itemize}
+    \item User opens a many2one field and types text.
+    \item Odoo calls \texttt{name\_search()} with that text.
+    \item Matching records appear in the dropdown.
+  \end{itemize}
+\begin{lstlisting}
+self.env['student.student'].name_search(
+    name='amina',
+    args=[('active', '=', True)],
+    operator='ilike',
+    limit=10,
+)
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{SEARCHING EXTRA FIELDS}
+  By default, name search focuses on the name / display name.
+  You can extend it:
+\begin{lstlisting}
+@api.model
+def name_search(self, name='', args=None,
+                operator='ilike', limit=100):
+    args = args or []
+    domain = ['|',
+              ('name', operator, name),
+              ('email', operator, name)]
+    records = self.search(domain + args, limit=limit)
+    return [(rec.id, rec.display_name) for rec in records]
+\end{lstlisting}
+  \begin{itemize}
+    \item Now users can find a student by name or email.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{METHOD CALL}
+  \textbf{Method Call}
+\begin{lstlisting}
+matches = self.env['student.student'].name_search(
+    name='ahmed',
+    args=[('gender', '=', 'male')],
+    operator='ilike',
+    limit=5,
+)
+\end{lstlisting}
+  \begin{itemize}
+    \item Here, \texttt{.name\_search(...)} is the method call.
+    \item Return type reminder: \textbf{list of (id, display\_name)}.
+  \end{itemize}
+\end{frame}

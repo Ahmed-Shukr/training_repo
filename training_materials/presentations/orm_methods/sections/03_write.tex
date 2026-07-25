@@ -1,0 +1,134 @@
+% =========================================================
+% 3. write() ORM Method
+% =========================================================
+\section{\texttt{write()} ORM Method}
+
+\begin{frame}[standout]
+  \texttt{write()} ORM Method
+\end{frame}
+
+\begin{frame}[fragile]{\texttt{WRITE()} METHOD}
+  \begin{itemize}
+    \item The \texttt{write()} method is an ORM method used to \textbf{update} one or more
+          existing records in an Odoo model.
+    \item Unlike \texttt{create()}, \texttt{write()} works on an existing recordset.
+    \item The \texttt{write()} method returns a boolean value: \texttt{True} when the write succeeds.
+  \end{itemize}
+  \begin{block}{Method Syntax}
+    The standard syntax of the \texttt{write()} method is:
+\begin{lstlisting}
+def write(self, vals):
+    return super().write(vals)
+\end{lstlisting}
+    This method has three important parts:
+    \begin{enumerate}
+      \item \texttt{write}
+      \item \texttt{self}
+      \item \texttt{vals}
+    \end{enumerate}
+  \end{block}
+\end{frame}
+
+\begin{frame}[fragile]{BREAKING DOWN THE METHOD SIGNATURE}
+  \begin{itemize}
+    \item \texttt{write}: The ORM method responsible for updating records.
+    \item \texttt{self}: A recordset of one or more records that will be updated.
+          If we browse student ID 15, \texttt{self} represents that student record.
+  \end{itemize}
+\begin{lstlisting}
+student = self.env['student.student'].browse(15)
+print(student)
+\end{lstlisting}
+  Output is:
+\begin{lstlisting}
+student.student(15,)
+\end{lstlisting}
+  \begin{itemize}
+    \item If \texttt{self} contains many records, \texttt{write()} updates \textbf{all} of them
+          with the same values.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{BREAKING DOWN THE METHOD SIGNATURE}
+  \begin{itemize}
+    \item \texttt{vals}: A dictionary containing the field values to update.
+  \end{itemize}
+\begin{lstlisting}
+vals = {
+    'name': 'Ahmed Muhumed',
+    'email': 'ahmed@example.com',
+    'age': 23,
+}
+\end{lstlisting}
+  \begin{itemize}
+    \item Each key is a field name on the model.
+    \item Each value is the new data to store.
+    \item Fields that are not listed in \texttt{vals} stay unchanged.
+    \item The ORM maps each key to its corresponding database column.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{WHAT DOES \texttt{WRITE()} RETURN?}
+  \begin{itemize}
+    \item The \texttt{write()} method returns \texttt{True} on success.
+  \end{itemize}
+\begin{lstlisting}
+student = self.env['student.student'].browse(15)
+result = student.write({
+    'name': 'Ahmed Muhumed',
+})
+print(result)
+\end{lstlisting}
+  Output is:
+\begin{lstlisting}
+True
+\end{lstlisting}
+  \begin{itemize}
+    \item The record itself is updated in the database.
+    \item You can continue using the same recordset after writing.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{UPDATING ONE RECORD VS MANY RECORDS}
+  \begin{enumerate}
+    \item \textbf{One record:}
+\begin{lstlisting}
+student = self.env['student.student'].browse(15)
+student.write({'age': 23})
+\end{lstlisting}
+    \item \textbf{Many records (same values for all):}
+\begin{lstlisting}
+students = self.env['student.student'].browse([15, 16, 17])
+students.write({'active': True})
+\end{lstlisting}
+  \end{enumerate}
+  \begin{itemize}
+    \item One \texttt{write()} call on a multi-recordset is more efficient than looping
+          and writing each record separately.
+    \item Inverse and computed fields may also be recomputed after \texttt{write()}.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{METHOD CALL AND OVERRIDE PATTERN}
+  \textbf{Method Call}
+  \begin{itemize}
+    \item A method call is when we execute the method.
+  \end{itemize}
+\begin{lstlisting}
+student.write({
+    'name': 'Ahmed Muhumed',
+    'email': 'ahmed@example.com',
+})
+\end{lstlisting}
+  \begin{itemize}
+    \item Here, \texttt{.write(...)} is the method call.
+  \end{itemize}
+  \textbf{Common Override Pattern}
+\begin{lstlisting}
+def write(self, vals):
+    # custom logic before saving
+    if 'email' in vals:
+        vals['email'] = vals['email'].lower()
+    return super().write(vals)
+\end{lstlisting}
+\end{frame}

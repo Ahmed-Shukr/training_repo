@@ -1,0 +1,103 @@
+% =========================================================
+% 11. name_create() ORM Method
+% =========================================================
+\section{\texttt{name\_create()} ORM Method}
+
+\begin{frame}[standout]
+  \texttt{name\_create()} ORM Method
+\end{frame}
+
+\begin{frame}[fragile]{\texttt{NAME\_CREATE()} METHOD}
+  \begin{itemize}
+    \item The \texttt{name\_create()} method creates a record using only a display name.
+    \item It is used by many2one fields when the user types a new value and quick-creates it.
+    \item Internally, it usually calls \texttt{create()} with the \texttt{name} field.
+  \end{itemize}
+  \begin{block}{Method Syntax}
+\begin{lstlisting}
+@api.model
+def name_create(self, name):
+    return super().name_create(name)
+\end{lstlisting}
+    Important parts: \texttt{@api.model}, \texttt{name}.
+  \end{block}
+\end{frame}
+
+\begin{frame}[fragile]{BREAKING DOWN THE METHOD SIGNATURE}
+  \begin{itemize}
+    \item \texttt{@api.model}: Runs at the model level.
+    \item \texttt{self}: The model on which the new record is created.
+    \item \texttt{name}: A string that becomes the record's name / display name.
+  \end{itemize}
+\begin{lstlisting}
+name = "Ahmed Mohamed"
+\end{lstlisting}
+  \begin{itemize}
+    \item No full \texttt{vals} dictionary is required by the caller.
+    \item Extra required fields must be handled by defaults or an override.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{WHAT DOES \texttt{NAME\_CREATE()} RETURN?}
+  \begin{itemize}
+    \item It returns a tuple: \texttt{(id, display\_name)}.
+  \end{itemize}
+\begin{lstlisting}
+result = self.env['student.student'].name_create('Ahmed Mohamed')
+print(result)
+\end{lstlisting}
+  Output is (example):
+\begin{lstlisting}
+(29, 'Ahmed Mohamed')
+\end{lstlisting}
+  \begin{itemize}
+    \item First value: database ID of the new record.
+    \item Second value: display name shown in the UI.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{HOW THE UI USES \texttt{NAME\_CREATE()}}
+  \begin{itemize}
+    \item In a many2one field, the user types a name that does not exist.
+    \item Odoo offers ``Create \ldots'' / quick create.
+    \item Selecting that option calls \texttt{name\_create()}.
+  \end{itemize}
+\begin{lstlisting}
+# Conceptual flow
+# typed value: "Grade 12"
+self.env['school.class'].name_create('Grade 12')
+\end{lstlisting}
+  \begin{itemize}
+    \item This is why many2one quick-create only needs a name.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{OVERRIDE PATTERN}
+  When a model has more required fields than \texttt{name}:
+\begin{lstlisting}
+@api.model
+def name_create(self, name):
+    record = self.create({
+        'name': name,
+        'active': True,
+        'gender': 'other',
+    })
+    return record.id, record.display_name
+\end{lstlisting}
+  \begin{itemize}
+    \item Override \texttt{name\_create()} when quick-create must fill extra values.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{METHOD CALL}
+  \textbf{Method Call}
+\begin{lstlisting}
+record_id, display_name = self.env['student.student'].name_create(
+    'Ahmed Mohamed'
+)
+\end{lstlisting}
+  \begin{itemize}
+    \item Here, \texttt{.name\_create(...)} is the method call.
+    \item Return type reminder: \textbf{tuple (id, display\_name)}.
+  \end{itemize}
+\end{frame}

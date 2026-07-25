@@ -1,0 +1,110 @@
+% =========================================================
+% 6. exists() ORM Method
+% =========================================================
+\section{\texttt{exists()} ORM Method}
+
+\begin{frame}[standout]
+  \texttt{exists()} ORM Method
+\end{frame}
+
+\begin{frame}[fragile]{\texttt{EXISTS()} METHOD}
+  \begin{itemize}
+    \item The \texttt{exists()} method checks whether the records in a recordset
+          still exist in the database.
+    \item It is useful when a recordset may contain deleted or invalid IDs.
+    \item The method returns a recordset containing only the records that still exist.
+  \end{itemize}
+  \begin{block}{Method Syntax}
+    The standard syntax of the \texttt{exists()} method is:
+\begin{lstlisting}
+def exists(self):
+    return super().exists()
+\end{lstlisting}
+    This method has two important parts:
+    \begin{enumerate}
+      \item \texttt{exists}
+      \item \texttt{self}
+    \end{enumerate}
+  \end{block}
+\end{frame}
+
+\begin{frame}[fragile]{BREAKING DOWN THE METHOD SIGNATURE}
+  \begin{itemize}
+    \item \texttt{exists}: The ORM method that filters a recordset to real DB rows.
+    \item \texttt{self}: The recordset you want to validate.
+  \end{itemize}
+\begin{lstlisting}
+students = self.env['student.student'].browse([15, 16, 9999])
+print(students)
+\end{lstlisting}
+  Output is:
+\begin{lstlisting}
+student.student(15, 16, 9999)
+\end{lstlisting}
+  \begin{itemize}
+    \item \texttt{browse()} does not check the database immediately.
+    \item ID \texttt{9999} may not exist, but it is still inside the recordset.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{WHAT DOES \texttt{EXISTS()} RETURN?}
+  \begin{itemize}
+    \item \texttt{exists()} returns a recordset of only the records that exist.
+  \end{itemize}
+\begin{lstlisting}
+students = self.env['student.student'].browse([15, 16, 9999])
+real_students = students.exists()
+print(real_students)
+\end{lstlisting}
+  Output is (example):
+\begin{lstlisting}
+student.student(15, 16)
+\end{lstlisting}
+  \begin{itemize}
+    \item ID \texttt{9999} was removed because it is not in the database.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{CHECKING A SINGLE RECORD}
+  \begin{itemize}
+    \item You can also test one record in an \texttt{if} statement.
+  \end{itemize}
+\begin{lstlisting}
+student = self.env['student.student'].browse(15)
+if student.exists():
+    print("Student is still in the database")
+else:
+    print("Student was deleted")
+\end{lstlisting}
+  \begin{itemize}
+    \item An empty recordset is falsy in boolean context.
+    \item This pattern avoids crashing when a record was already unlinked.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{WHEN SHOULD YOU USE \texttt{EXISTS()}?}
+  \begin{itemize}
+    \item After long-running operations where records may have been deleted.
+    \item When you received IDs from the UI, RPC, or another model.
+    \item Before writing or unlinking a recordset that might be stale.
+  \end{itemize}
+\begin{lstlisting}
+records = self.env['student.student'].browse(ids).exists()
+records.write({'active': True})
+\end{lstlisting}
+  \begin{itemize}
+    \item \texttt{exists()} is a safety method: it does not create or update data.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{METHOD CALL}
+  \textbf{Method Call}
+\begin{lstlisting}
+real_students = students.exists()
+\end{lstlisting}
+  \begin{itemize}
+    \item Here, \texttt{.exists()} is the method call.
+    \item No dictionary argument is required.
+    \item The return value is always a recordset (possibly empty).
+  \end{itemize}
+\end{frame}

@@ -1,0 +1,112 @@
+% =========================================================
+% 9. search_read() ORM Method
+% =========================================================
+\section{\texttt{search\_read()} ORM Method}
+
+\begin{frame}[standout]
+  \texttt{search\_read()} ORM Method
+\end{frame}
+
+\begin{frame}[fragile]{\texttt{SEARCH\_READ()} METHOD}
+  \begin{itemize}
+    \item The \texttt{search\_read()} method combines \texttt{search()} and \texttt{read()}
+          in one call.
+    \item It finds records with a domain, then returns their field values as dictionaries.
+    \item It is heavily used by the Odoo web client.
+  \end{itemize}
+  \begin{block}{Method Syntax}
+\begin{lstlisting}
+@api.model
+def search_read(self, domain=None, fields=None,
+                offset=0, limit=None, order=None):
+    return super().search_read(domain=domain, fields=fields,
+                               offset=offset, limit=limit, order=order)
+\end{lstlisting}
+  \end{block}
+\end{frame}
+
+\begin{frame}[fragile]{BREAKING DOWN THE METHOD SIGNATURE}
+  \begin{itemize}
+    \item \texttt{domain}: Filter conditions (same format as \texttt{search()}).
+    \item \texttt{fields}: List of field names to return.
+    \item \texttt{offset}: Number of records to skip.
+    \item \texttt{limit}: Maximum number of records.
+    \item \texttt{order}: Sort expression.
+  \end{itemize}
+\begin{lstlisting}
+domain = [('active', '=', True)]
+fields = ['name', 'age', 'email']
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{WHAT DOES \texttt{SEARCH\_READ()} RETURN?}
+  \begin{itemize}
+    \item It returns a \textbf{list of dictionaries}.
+  \end{itemize}
+\begin{lstlisting}
+data = self.env['student.student'].search_read(
+    [('age', '>=', 18)],
+    ['name', 'age'],
+    limit=2,
+    order='age desc',
+)
+print(data)
+\end{lstlisting}
+  Output is (example):
+\begin{lstlisting}
+[
+    {'id': 22, 'name': 'Amina', 'age': 25},
+    {'id': 15, 'name': 'Ahmed', 'age': 22},
+]
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{\texttt{SEARCH\_READ()} VS \texttt{SEARCH()} + \texttt{READ()}}
+  Equivalent ideas:
+\begin{lstlisting}
+# Two calls
+records = self.env['student.student'].search(domain, limit=10)
+data = records.read(['name', 'age'])
+
+# One call
+data = self.env['student.student'].search_read(
+    domain, ['name', 'age'], limit=10,
+)
+\end{lstlisting}
+  \begin{itemize}
+    \item \texttt{search\_read()} is convenient and often more efficient for RPC.
+    \item Inside server business logic, \texttt{search()} + recordset access is usually clearer.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{WHEN TO USE \texttt{SEARCH\_READ()}}
+  \begin{itemize}
+    \item Building API responses.
+    \item Returning table/list data to the UI.
+    \item Exporting selected fields without keeping a recordset around.
+  \end{itemize}
+\begin{lstlisting}
+rows = self.env['student.student'].search_read(
+    [('gender', '=', 'female')],
+    ['name', 'email', 'birth_date'],
+    order='name asc',
+)
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{METHOD CALL}
+  \textbf{Method Call}
+\begin{lstlisting}
+rows = self.env['student.student'].search_read(
+    [('active', '=', True)],
+    fields=['name', 'age'],
+    offset=0,
+    limit=50,
+    order='id desc',
+)
+\end{lstlisting}
+  \begin{itemize}
+    \item Here, \texttt{.search\_read(...)} is the method call.
+    \item Remember: return type is a list of dicts.
+  \end{itemize}
+\end{frame}

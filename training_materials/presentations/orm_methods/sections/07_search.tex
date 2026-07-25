@@ -1,0 +1,115 @@
+% =========================================================
+% 7. search() ORM Method
+% =========================================================
+\section{\texttt{search()} ORM Method}
+
+\begin{frame}[standout]
+  \texttt{search()} ORM Method
+\end{frame}
+
+\begin{frame}[fragile]{\texttt{SEARCH()} METHOD}
+  \begin{itemize}
+    \item The \texttt{search()} method is an ORM method used to \textbf{find records}
+          that match a domain (filter condition).
+    \item It is one of the most used ORM methods in Odoo.
+    \item The method returns a recordset of matching records.
+  \end{itemize}
+  \begin{block}{Method Syntax}
+    The standard syntax of the \texttt{search()} method is:
+\begin{lstlisting}
+@api.model
+def search(self, domain, offset=0, limit=None, order=None):
+    return super().search(domain, offset=offset, limit=limit, order=order)
+\end{lstlisting}
+    Important parts: \texttt{domain}, \texttt{offset}, \texttt{limit}, \texttt{order}.
+  \end{block}
+\end{frame}
+
+\begin{frame}[fragile]{BREAKING DOWN THE METHOD SIGNATURE}
+  \begin{itemize}
+    \item \texttt{@api.model}: Search runs at model level (not on one existing record).
+    \item \texttt{self}: Represents the model, e.g.\ \texttt{student.student()}.
+    \item \texttt{domain}: A list of conditions used to filter records.
+  \end{itemize}
+\begin{lstlisting}
+domain = [('age', '>=', 18), ('gender', '=', 'male')]
+\end{lstlisting}
+  \begin{itemize}
+    \item Each condition is a tuple: \texttt{(field\_name, operator, value)}.
+    \item Multiple conditions are combined with AND by default.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{BREAKING DOWN DOMAIN OPERATORS}
+  Common operators used inside a domain:
+  \begin{itemize}
+    \item \texttt{=} equal
+    \item \texttt{!=} not equal
+    \item \texttt{>} \texttt{>=} \texttt{<} \texttt{<=} comparisons
+    \item \texttt{like} / \texttt{ilike} text search (\texttt{ilike} is case-insensitive)
+    \item \texttt{in} / \texttt{not in} membership
+    \item \texttt{child\_of} hierarchical search
+  \end{itemize}
+\begin{lstlisting}
+[('name', 'ilike', 'ahmed')]
+[('id', 'in', [15, 16, 17])]
+['|', ('gender', '=', 'male'), ('age', '<', 18)]
+\end{lstlisting}
+  \begin{itemize}
+    \item \texttt{'|'} means OR, \texttt{'\&'} means AND, \texttt{'!'} means NOT.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{OFFSET, LIMIT, AND ORDER}
+  \begin{itemize}
+    \item \texttt{offset}: Skip the first N records (used for pagination).
+    \item \texttt{limit}: Return at most N records.
+    \item \texttt{order}: SQL-like ordering string.
+  \end{itemize}
+\begin{lstlisting}
+students = self.env['student.student'].search(
+    [('active', '=', True)],
+    offset=10,
+    limit=5,
+    order='name asc, id desc',
+)
+\end{lstlisting}
+  \begin{itemize}
+    \item This returns active students 11--15 when sorted by name.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{WHAT DOES \texttt{SEARCH()} RETURN?}
+  \begin{itemize}
+    \item The \texttt{search()} method returns a recordset.
+  \end{itemize}
+\begin{lstlisting}
+students = self.env['student.student'].search([
+    ('name', 'ilike', 'ahmed'),
+])
+print(students)
+\end{lstlisting}
+  Output is (example):
+\begin{lstlisting}
+student.student(15, 22, 31)
+\end{lstlisting}
+  \begin{itemize}
+    \item If nothing matches, it returns an empty recordset: \texttt{student.student()}.
+    \item An empty recordset is falsy in an \texttt{if} condition.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{METHOD CALL AND PRACTICAL EXAMPLE}
+  \textbf{Method Call}
+\begin{lstlisting}
+students = self.env['student.student'].search([
+    ('age', '>=', 18),
+    ('active', '=', True),
+], limit=20, order='age desc')
+\end{lstlisting}
+  \begin{itemize}
+    \item Here, \texttt{.search(...)} is the method call.
+    \item Always prefer domains over building raw SQL for normal queries.
+    \item Record rules and access rights are applied automatically.
+  \end{itemize}
+\end{frame}

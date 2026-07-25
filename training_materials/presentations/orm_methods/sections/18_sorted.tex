@@ -1,0 +1,89 @@
+% =========================================================
+% 18. sorted() ORM Method
+% =========================================================
+\section{\texttt{sorted()} ORM Method}
+
+\begin{frame}[standout]
+  \texttt{sorted()} ORM Method
+\end{frame}
+
+\begin{frame}[fragile]{\texttt{SORTED()} METHOD}
+  \begin{itemize}
+    \item The \texttt{sorted()} method returns a recordset ordered in Python.
+    \item It sorts an existing recordset; it does not query the database again.
+    \item The method returns a new sorted recordset.
+  \end{itemize}
+  \begin{block}{Method Syntax}
+\begin{lstlisting}
+def sorted(self, key=None, reverse=False):
+    return super().sorted(key=key, reverse=reverse)
+\end{lstlisting}
+    Important parts: \texttt{key}, \texttt{reverse}.
+  \end{block}
+\end{frame}
+
+\begin{frame}[fragile]{BREAKING DOWN THE METHOD SIGNATURE}
+  \begin{itemize}
+    \item \texttt{self}: The recordset to sort.
+    \item \texttt{key}: A field name string, or a function that returns the sort value.
+    \item \texttt{reverse}: \texttt{False} for ascending, \texttt{True} for descending.
+  \end{itemize}
+\begin{lstlisting}
+students.sorted('name')
+students.sorted(key=lambda s: s.age, reverse=True)
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{WHAT DOES \texttt{SORTED()} RETURN?}
+  \begin{itemize}
+    \item It returns a recordset in the new order.
+  \end{itemize}
+\begin{lstlisting}
+students = self.env['student.student'].browse([17, 15, 16])
+ordered = students.sorted('name')
+print(ordered)
+\end{lstlisting}
+  Output is (example):
+\begin{lstlisting}
+student.student(15, 16, 17)
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{SORTING BY FIELD OR LAMBDA}
+\begin{lstlisting}
+by_name = students.sorted('name')
+by_age_desc = students.sorted('age', reverse=True)
+by_email = students.sorted(key=lambda s: s.email or '')
+by_class_then_name = students.sorted(
+    key=lambda s: (s.classroom_id.name or '', s.name or '')
+)
+\end{lstlisting}
+  \begin{itemize}
+    \item Use a lambda when you need multi-key or computed sorting.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{\texttt{SORTED()} VS \texttt{SEARCH(... ORDER=)}}
+  \begin{itemize}
+    \item \texttt{search(..., order='age desc')} sorts in SQL while fetching.
+    \item \texttt{sorted()} sorts an already loaded recordset in Python.
+  \end{itemize}
+\begin{lstlisting}
+# SQL ordering
+students = self.env['student.student'].search([], order='age desc')
+
+# Python ordering
+students = students.sorted('age', reverse=True)
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{METHOD CALL}
+  \textbf{Method Call}
+\begin{lstlisting}
+ordered_students = students.sorted(key='age', reverse=True)
+\end{lstlisting}
+  \begin{itemize}
+    \item Here, \texttt{.sorted(...)} is the method call.
+    \item Return type reminder: \textbf{recordset}.
+  \end{itemize}
+\end{frame}

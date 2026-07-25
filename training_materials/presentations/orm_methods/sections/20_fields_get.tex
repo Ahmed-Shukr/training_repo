@@ -1,0 +1,103 @@
+% =========================================================
+% 20. fields_get() ORM Method
+% =========================================================
+\section{\texttt{fields\_get()} ORM Method}
+
+\begin{frame}[standout]
+  \texttt{fields\_get()} ORM Method
+\end{frame}
+
+\begin{frame}[fragile]{\texttt{FIELDS\_GET()} METHOD}
+  \begin{itemize}
+    \item The \texttt{fields\_get()} method returns \textbf{metadata} about model fields.
+    \item It describes field type, string/label, required, selection values, relation, etc.
+    \item The web client uses it to understand how fields should behave in the UI.
+  \end{itemize}
+  \begin{block}{Method Syntax}
+\begin{lstlisting}
+@api.model
+def fields_get(self, allfields=None, attributes=None):
+    return super().fields_get(allfields=allfields, attributes=attributes)
+\end{lstlisting}
+  \end{block}
+\end{frame}
+
+\begin{frame}[fragile]{BREAKING DOWN THE METHOD SIGNATURE}
+  \begin{itemize}
+    \item \texttt{allfields}: Optional list of field names to inspect.
+          If omitted, metadata for all fields is returned.
+    \item \texttt{attributes}: Optional list of attribute names to include
+          (for example \texttt{string}, \texttt{type}, \texttt{required}).
+  \end{itemize}
+\begin{lstlisting}
+self.env['student.student'].fields_get(['name', 'gender'])
+self.env['student.student'].fields_get(
+    ['age'], attributes=['string', 'type', 'required']
+)
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{WHAT DOES \texttt{FIELDS\_GET()} RETURN?}
+  \begin{itemize}
+    \item It returns a dictionary of dictionaries.
+  \end{itemize}
+\begin{lstlisting}
+info = self.env['student.student'].fields_get(['name', 'gender'])
+print(info)
+\end{lstlisting}
+  Output is (example):
+\begin{lstlisting}
+{
+  'name': {'type': 'char', 'string': 'Name', 'required': True, ...},
+  'gender': {
+      'type': 'selection',
+      'string': 'Gender',
+      'selection': [('male', 'Male'), ('female', 'Female')],
+      ...
+  },
+}
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}{USEFUL METADATA KEYS}
+  Common keys you will see:
+  \begin{itemize}
+    \item \texttt{type} -- field type (\texttt{char}, \texttt{many2one}, \ldots)
+    \item \texttt{string} -- field label
+    \item \texttt{required} -- whether the field is required
+    \item \texttt{readonly} -- whether the field is read-only
+    \item \texttt{help} -- help text
+    \item \texttt{selection} -- values for selection fields
+    \item \texttt{relation} -- comodel name for relational fields
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{PRACTICAL EXAMPLE}
+\begin{lstlisting}
+meta = self.env['student.student'].fields_get(
+    ['name', 'classroom_id', 'gender'],
+    attributes=['string', 'type', 'required', 'relation', 'selection'],
+)
+
+print(meta['classroom_id']['type'])      # many2one
+print(meta['classroom_id']['relation'])  # school.classroom
+print(meta['gender']['selection'])
+\end{lstlisting}
+  \begin{itemize}
+    \item Very useful for dynamic UI, generic exports, and technical debugging.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{METHOD CALL}
+  \textbf{Method Call}
+\begin{lstlisting}
+fields_info = self.env['student.student'].fields_get(
+    allfields=['name', 'age', 'email'],
+    attributes=['string', 'type', 'required'],
+)
+\end{lstlisting}
+  \begin{itemize}
+    \item Here, \texttt{.fields\_get(...)} is the method call.
+    \item Return type reminder: \textbf{dict}.
+  \end{itemize}
+\end{frame}

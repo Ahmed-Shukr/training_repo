@@ -1,0 +1,97 @@
+% =========================================================
+% 14. get_view() ORM Method
+% =========================================================
+\section{\texttt{get\_view()} ORM Method}
+
+\begin{frame}[standout]
+  \texttt{get\_view()} ORM Method
+\end{frame}
+
+\begin{frame}[fragile]{\texttt{GET\_VIEW()} METHOD}
+  \begin{itemize}
+    \item The \texttt{get\_view()} method returns the architecture and metadata of a view
+          for a model (form, list/tree, kanban, search, \ldots).
+    \item The web client uses it to know how to render a screen.
+    \item In Odoo 17, \texttt{get\_view()} replaces older multi-view helpers such as
+          \texttt{fields\_view\_get()} in many flows.
+  \end{itemize}
+  \begin{block}{Method Syntax}
+\begin{lstlisting}
+@api.model
+def get_view(self, view_id=None, view_type='form', **options):
+    return super().get_view(view_id=view_id, view_type=view_type, **options)
+\end{lstlisting}
+  \end{block}
+\end{frame}
+
+\begin{frame}[fragile]{BREAKING DOWN THE METHOD SIGNATURE}
+  \begin{itemize}
+    \item \texttt{view\_id}: Optional specific view XML ID / database ID.
+    \item \texttt{view\_type}: Type of view to load: \texttt{'form'}, \texttt{'list'},
+          \texttt{'kanban'}, \texttt{'search'}, \ldots
+    \item \texttt{options}: Extra options used by the client / ORM.
+  \end{itemize}
+\begin{lstlisting}
+view_type = 'form'
+view_id = None  # let Odoo choose the default form view
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{WHAT DOES \texttt{GET\_VIEW()} RETURN?}
+  \begin{itemize}
+    \item It returns a dictionary of view information.
+  \end{itemize}
+\begin{lstlisting}
+info = self.env['student.student'].get_view(view_type='form')
+print(info.keys())
+\end{lstlisting}
+  Common keys include:
+  \begin{itemize}
+    \item \texttt{id} -- view record ID
+    \item \texttt{name} -- view name
+    \item \texttt{type} -- view type
+    \item \texttt{arch} -- the XML architecture
+    \item \texttt{models} -- field/model metadata needed by the view
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{PRACTICAL EXAMPLE}
+\begin{lstlisting}
+form_view = self.env['student.student'].get_view(view_type='form')
+list_view = self.env['student.student'].get_view(view_type='list')
+
+print(form_view['type'])   # form
+print(list_view['type'])   # list
+print(form_view['arch'])   # XML architecture string/element
+\end{lstlisting}
+  \begin{itemize}
+    \item Developers rarely call this in business methods.
+    \item It is essential for UI, studio-like tools, and technical debugging.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{WHEN IS \texttt{GET\_VIEW()} USEFUL?}
+  \begin{itemize}
+    \item Understanding which view Odoo will open for a model.
+    \item Building custom clients that render Odoo views.
+    \item Debugging inherited / extended view architecture.
+    \item Inspecting the final combined XML after view inheritance.
+  \end{itemize}
+\begin{lstlisting}
+info = self.env['student.student'].get_view(view_type='search')
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{METHOD CALL}
+  \textbf{Method Call}
+\begin{lstlisting}
+view_info = self.env['student.student'].get_view(
+    view_id=None,
+    view_type='form',
+)
+\end{lstlisting}
+  \begin{itemize}
+    \item Here, \texttt{.get\_view(...)} is the method call.
+    \item Return type reminder: \textbf{dict} of view metadata.
+  \end{itemize}
+\end{frame}
