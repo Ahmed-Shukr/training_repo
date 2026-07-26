@@ -1,0 +1,37 @@
+\section{Summary}
+
+\begin{frame}{Summary}
+	\begin{itemize}
+		\item \textbf{Sequences} generate professional running numbers through \texttt{ir.sequence}.
+		\item \textbf{XML data} loads structured module records and configuration.
+		\item \textbf{CSV data} is ideal for bulk tabular rows and access rights.
+		\item \textbf{Demo data} provides optional sample records for training/testing.
+		\item \textbf{Email templates} standardize dynamic outgoing messages with QWeb.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Practical Checklist}
+	\begin{itemize}
+		\item Need STU/0001? $\rightarrow$ create \texttt{ir.sequence} + \texttt{next\_by\_code()}
+		\item Need install-time master data? $\rightarrow$ XML in \texttt{data}
+		\item Need bulk simple rows / ACL? $\rightarrow$ CSV
+		\item Need sample training records? $\rightarrow$ files in \texttt{demo}
+		\item Need welcome/reminder mail? $\rightarrow$ \texttt{mail.template} + \texttt{send\_mail()}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Suggested Module Layout}
+\begin{lstlisting}
+school_manager/
+  data/
+    ir_sequence_data.xml
+    mail_template_data.xml
+  demo/
+    student_demo.xml
+  security/
+    ir.model.access.csv
+  models/
+    student_student.py
+  __manifest__.py
+\end{lstlisting}
+\end{frame}

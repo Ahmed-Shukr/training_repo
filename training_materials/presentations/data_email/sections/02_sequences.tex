@@ -1,0 +1,114 @@
+\section{Sequences}
+
+\slidebackground{backgrounds/wallpaper.jpg}
+
+\begin{frame}[fragile]{What Is a Sequence?}
+	\begin{itemize}
+		\item A \textbf{sequence} generates the next number for a document or record.
+		\item In Odoo, sequences are stored in \textbf{\texttt{ir.sequence}}.
+		\item Examples:
+		\begin{itemize}
+			\item Students: \texttt{STU/0001}
+			\item Invoices: \texttt{INV/2026/00012}
+			\item Tickets: \texttt{TKT/78}
+		\end{itemize}
+\begin{block}{Core Idea}
+	Python asks the sequence for the next value, then stores it on the record.
+\end{block}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Defining a Sequence in XML}
+\begin{lstlisting}[style=xml]
+<record id="seq_student_student" model="ir.sequence">
+  <field name="name">Student Sequence</field>
+  <field name="code">student.student</field>
+  <field name="prefix">STU/</field>
+  <field name="padding">4</field>
+  <field name="number_next">1</field>
+  <field name="number_increment">1</field>
+  <field name="company_id" eval="False"/>
+</record>
+\end{lstlisting}
+	\begin{itemize}
+		\item \texttt{code} is how Python finds the sequence.
+		\item \texttt{padding} controls leading zeros (\texttt{0001}).
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Breaking Down Sequence Fields}
+	\begin{itemize}
+		\item \textbf{\texttt{name}}: label shown in Settings
+		\item \textbf{\texttt{code}}: technical key used in \texttt{next\_by\_code()}
+		\item \textbf{\texttt{prefix}} / \textbf{\texttt{suffix}}: text around the number
+		\item \textbf{\texttt{padding}}: number width
+		\item \textbf{\texttt{number\_next}}: next integer to use
+		\item \textbf{\texttt{number\_increment}}: usually \texttt{1}
+		\item \textbf{\texttt{company\_id}}: set for per-company sequences
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Using a Sequence in Python}
+\begin{block}{Method Syntax}
+\begin{lstlisting}
+@api.model_create_multi
+def create(self, vals_list):
+	for vals in vals_list:
+		if not vals.get('code'):
+			vals['code'] = self.env['ir.sequence'].next_by_code(
+				'student.student'
+			) or '/'
+	return super().create(vals_list)
+\end{lstlisting}
+\end{block}
+	\begin{itemize}
+		\item \texttt{next\_by\_code('student.student')} returns the next formatted value.
+		\item If the sequence is missing, it returns \texttt{False}.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Date-Aware Prefixes}
+\begin{lstlisting}[style=xml,escapeinside=``]
+<field name="prefix">STU/`\%(year)s`/</field>
+<field name="padding">5</field>
+<field name="use_date_range">True</field>
+\end{lstlisting}
+	\begin{itemize}
+		\item Common placeholders:
+		\begin{itemize}
+			\item \texttt{\%(year)s}
+			\item \texttt{\%(month)s}
+			\item \texttt{\%(day)s}
+			\item \texttt{\%(doy)s}
+		\end{itemize}
+		\item \texttt{use\_date\_range} helps restart numbering by period when configured.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Practical Student Example}
+\begin{lstlisting}
+code = fields.Char(string='Student Code', copy=False, readonly=True)
+
+@api.model_create_multi
+def create(self, vals_list):
+	seq = self.env['ir.sequence']
+	for vals in vals_list:
+		if vals.get('code'):
+			continue
+		vals['code'] = seq.next_by_code('student.student') or '/'
+	return super().create(vals_list)
+\end{lstlisting}
+	\begin{itemize}
+		\item Keep generated codes \texttt{readonly} and \texttt{copy=False}.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Sequence Best Practices}
+	\begin{itemize}
+		\item One business document type $\rightarrow$ one sequence code.
+		\item Never hard-code incremental numbers in Python.
+		\item Decide early if the sequence is global or per company.
+		\item Put sequence XML in \texttt{data/} and list it in the manifest.
+		\item Protect important codes with uniqueness constraints when needed.
+	\end{itemize}
+\end{frame}

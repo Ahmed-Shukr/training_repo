@@ -1,0 +1,113 @@
+\section{Email Templates}
+
+\begin{frame}[fragile]{What Is an Email Template?}
+	\begin{itemize}
+		\item An \textbf{email template} is a reusable mail design stored in \texttt{mail.template}.
+		\item It can render subject/body with QWeb and record values.
+		\item Used for welcome mails, resets, invoices, reminders, and notifications.
+\begin{block}{Model}
+\begin{lstlisting}
+mail.template
+\end{lstlisting}
+\end{block}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Defining an Email Template in XML}
+\begin{lstlisting}[style=xml]
+<record id="mail_template_student_welcome" model="mail.template">
+  <field name="name">Student: Welcome Email</field>
+  <field name="model_id" ref="model_student_student"/>
+  <field name="subject">Welcome ${object.name}</field>
+  <field name="email_from">{{ (object.company_id.email or user.email) }}</field>
+  <field name="email_to">{{ object.email }}</field>
+  <field name="body_html" type="html">
+	<p>Hello <t t-out="object.name"/>,</p>
+	<p>Welcome to our school system.</p>
+  </field>
+</record>
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Breaking Down Template Fields}
+	\begin{itemize}
+		\item \textbf{\texttt{name}}: template label
+		\item \textbf{\texttt{model\_id}}: model this template applies to
+		\item \textbf{\texttt{subject}}: email subject (dynamic)
+		\item \textbf{\texttt{email\_from}} / \textbf{\texttt{email\_to}}: addresses
+		\item \textbf{\texttt{body\_html}}: HTML body, often QWeb
+		\item Optional: \texttt{report\_template\_ids}, attachments, language, etc.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Sending a Template from Python}
+\begin{block}{Method Syntax}
+\begin{lstlisting}
+def action_send_welcome_email(self):
+	template = self.env.ref(
+		'school_manager.mail_template_student_welcome'
+	)
+	for student in self:
+		template.send_mail(student.id, force_send=True)
+	return True
+\end{lstlisting}
+\end{block}
+	\begin{itemize}
+		\item \texttt{send\_mail(res\_id)} renders and sends for that record.
+		\item \texttt{force\_send=True} sends immediately instead of only queueing.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{QWeb in Email Bodies}
+\begin{lstlisting}[style=xml]
+<field name="body_html" type="html">
+  <div>
+	<p>Dear <t t-out="object.name"/>,</p>
+	<p>Your code is
+	  <strong><t t-out="object.code"/></strong>.
+	</p>
+	<p t-if="object.classroom_id">
+	  Classroom:
+	  <t t-out="object.classroom_id.name"/>
+	</p>
+  </div>
+</field>
+\end{lstlisting}
+	\begin{itemize}
+		\item \texttt{object} is the current record.
+		\item Use \texttt{t-out} in modern Odoo QWeb.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Opening Composer with a Template}
+\begin{lstlisting}
+def action_share_by_email(self):
+	self.ensure_one()
+	template = self.env.ref(
+		'school_manager.mail_template_student_welcome'
+	)
+	return {
+		'type': 'ir.actions.act_window',
+		'name': 'Send Email',
+		'res_model': 'mail.compose.message',
+		'view_mode': 'form',
+		'target': 'new',
+		'context': {
+			'default_model': 'student.student',
+			'default_res_ids': self.ids,
+			'default_template_id': template.id,
+			'default_composition_mode': 'comment',
+		},
+	}
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}{Email Template Best Practices}
+	\begin{itemize}
+		\item Keep one template per clear business event.
+		\item Use XML IDs and \texttt{env.ref()} instead of hard-coded IDs.
+		\item Prefer QWeb dynamic fields over hardcoded names.
+		\item Test rendering with real demo records.
+		\item Put templates under \texttt{data/} and load them from the manifest.
+	\end{itemize}
+\end{frame}

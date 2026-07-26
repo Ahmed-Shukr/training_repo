@@ -23,16 +23,53 @@
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{outertheme}
 
-% Outer theme (currently diabled)
-%\useoutertheme[subsection=false]{miniframes}
-
 % Navigation
 \setbeamertemplate{navigation symbols}{} % Remove navigation icons
 
-% Footline (disabled)
-%\setbeamertemplate{footline}[frame number]
+% Colors used by the custom footer (safe if already defined)
+\providecommand{\bjtnavy}{}
+\providecommand{\bjtaccent}{}
+\definecolor{bjtnavy}{HTML}{0F1C2E}
+\definecolor{bjtteal}{HTML}{0A7A8F}
+\definecolor{bjtaccent}{HTML}{E8A838}
+\definecolor{bjtfootmuted}{HTML}{B8C0C8}
 
-% Metropolis-specific customizations
+\setbeamercolor{footline}{fg=white,bg=bjtnavy}
+\setbeamercolor{page number in head/foot}{fg=bjtnavy,bg=bjtaccent}
+\setbeamercolor{progress bar}{fg=bjtaccent,bg=bjtnavy!25}
+
+% Custom footer matching Ahmed's training deck:
+% [Ahmed M.] [Short Title] .............. [Section] [ n / N ]
+\setbeamertemplate{footline}{%
+  \leavevmode%
+  \begin{tikzpicture}[baseline=(current bounding box.north)]
+    \pgfmathsetmacro{\progress}{max(\insertframenumber-1,0)/max(\inserttotalframenumber-1,1)}
+    \fill[bjtnavy] (0,0) rectangle (\paperwidth,0.42cm);
+    \fill[bjtaccent] ({\paperwidth-1.85cm},0) rectangle (\paperwidth,0.42cm);
+    % progress line above footer
+    \draw[bjtnavy!35, line width=0.7pt]
+      (0.35cm,0.50cm) -- ({\paperwidth-1.95cm},0.50cm);
+    \draw[bjtaccent, line width=1.1pt]
+      (0.35cm,0.50cm) -- ({0.35cm+\progress*(\paperwidth-2.3cm)},0.50cm);
+    \fill[bjtaccent]
+      ({0.35cm+\progress*(\paperwidth-2.3cm)},0.50cm) circle (1.35pt);
+    % left labels
+    \node[anchor=west, text=white, font=\scriptsize\rmfamily]
+      at (0.28cm,0.20cm) {\insertshortauthor};
+    \node[anchor=west, text=white, font=\scriptsize\rmfamily]
+      at (2.05cm,0.20cm) {\insertshorttitle};
+    % section (muted)
+    \node[anchor=east, text=bjtfootmuted, font=\scriptsize\rmfamily]
+      at ({\paperwidth-2.05cm},0.20cm)
+      {\insertsection};
+    % page fraction in accent box
+    \node[anchor=center, text=bjtnavy, font=\scriptsize\bfseries\rmfamily]
+      at ({\paperwidth-0.92cm},0.20cm)
+      {\insertframenumber\,/\,\inserttotalframenumber};
+  \end{tikzpicture}%
+}
+
+% Keep metropolis section-page progress thin
 \makeatletter
 \setlength{\metropolis@progressonsectionpage@linewidth}{1.75pt}
 \makeatother

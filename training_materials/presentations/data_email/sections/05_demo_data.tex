@@ -1,0 +1,80 @@
+\section{Demo Data}
+
+\begin{frame}[fragile]{What Is Demo Data?}
+	\begin{itemize}
+		\item \textbf{Demo data} is sample data loaded only when the database is created with demo enabled.
+		\item Ideal for training, screenshots, and local testing.
+\begin{block}{Manifest Entry}
+\begin{lstlisting}
+'demo': [
+	'demo/classroom_demo.xml',
+	'demo/student_demo.xml',
+],
+\end{lstlisting}
+\end{block}
+		\item Demo files are \textbf{not} loaded in normal production installs without demo.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Demo vs Data}
+	\begin{itemize}
+		\item \texttt{data}: required for the module to work (security, sequences, core config).
+		\item \texttt{demo}: optional samples for learning/testing.
+	\end{itemize}
+\begin{lstlisting}
+'data': [
+	'security/ir.model.access.csv',
+	'data/ir_sequence_data.xml',
+],
+'demo': [
+	'demo/student_demo.xml',
+],
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Demo XML Example}
+\begin{lstlisting}[style=xml]
+<odoo>
+  <record id="demo_classroom_a" model="school.classroom">
+	<field name="name">Grade 12-A</field>
+  </record>
+
+  <record id="demo_student_ahmed" model="student.student">
+	<field name="name">Ahmed Muhumed</field>
+	<field name="email">ahmed@example.com</field>
+	<field name="classroom_id" ref="demo_classroom_a"/>
+  </record>
+</odoo>
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Demo CSV Example}
+\begin{lstlisting}
+id,name,age,gender,classroom_id/id
+demo_student_amina,Amina Ali,21,female,demo_classroom_a
+demo_student_omar,Omar Hassan,19,male,demo_classroom_a
+\end{lstlisting}
+	\begin{itemize}
+		\item Demo can be XML, CSV, or both.
+		\item Keep demo IDs prefixed with \texttt{demo\_} for clarity.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{When to Use Demo Data}
+	\begin{itemize}
+		\item Training databases for students.
+		\item Local developer testing without manual form filling.
+		\item Showcasing an app with realistic sample records.
+		\item UI/view testing with enough records for kanban/graph/pivot.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Demo Data Best Practices}
+	\begin{itemize}
+		\item Never put required production config only in \texttt{demo}.
+		\item Keep demo realistic but small and understandable.
+		\item Use clear names and emails.
+		\item Make demo depend on already loaded models/security.
+		\item Recreate the DB with demo checked to verify loading.
+	\end{itemize}
+\end{frame}

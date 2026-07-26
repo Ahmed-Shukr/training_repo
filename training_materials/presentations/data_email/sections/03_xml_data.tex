@@ -1,0 +1,117 @@
+\section{XML Data Importing}
+
+\begin{frame}[fragile]{What Is XML Data Importing?}
+	\begin{itemize}
+		\item XML data files load records when a module is installed or updated.
+		\item Perfect for:
+		\begin{itemize}
+			\item configuration data
+			\item sequences
+			\item email templates
+			\item menus/actions/security
+			\item master data that must exist in every database
+		\end{itemize}
+\begin{block}{Manifest Entry}
+\begin{lstlisting}
+'data': [
+	'data/ir_sequence_data.xml',
+	'data/student_data.xml',
+],
+\end{lstlisting}
+\end{block}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Basic XML Record Structure}
+\begin{lstlisting}[style=xml]
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <record id="student_demo_ahmed" model="student.student">
+	<field name="name">Ahmed Muhumed</field>
+	<field name="email">ahmed@example.com</field>
+	<field name="age">22</field>
+	<field name="gender">male</field>
+  </record>
+</odoo>
+\end{lstlisting}
+	\begin{itemize}
+		\item \texttt{id}: XML / external ID inside the module.
+		\item \texttt{model}: target model technical name.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Breaking Down Important XML Features}
+\begin{lstlisting}[style=xml]
+<!-- Many2one by XML ID -->
+<field name="classroom_id" ref="classroom_grade_12"/>
+
+<!-- Boolean / numbers with eval -->
+<field name="active" eval="True"/>
+<field name="age" eval="18"/>
+
+<!-- Search existing record -->
+<field name="country_id" search="[('code', '=', 'SO')]"/>
+\end{lstlisting}
+	\begin{itemize}
+		\item \texttt{ref}: link to another XML ID.
+		\item \texttt{eval}: Python expression for non-string values.
+		\item \texttt{search}: find a record by domain.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{noupdate and Forcecreate}
+\begin{lstlisting}[style=xml]
+<odoo noupdate="1">
+  <record id="seq_student_student" model="ir.sequence">
+	<field name="name">Student Sequence</field>
+	<field name="code">student.student</field>
+	<field name="prefix">STU/</field>
+	<field name="padding">4</field>
+  </record>
+</odoo>
+\end{lstlisting}
+	\begin{itemize}
+		\item \texttt{noupdate="1"}: do not overwrite the record on later module updates.
+		\item Useful for sequences and data users may customize.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Function Calls and Delete in XML}
+\begin{lstlisting}[style=xml]
+<function model="student.student" name="action_activate_all"/>
+
+<delete model="student.student" search="[('name', '=', 'Temporary')]"/>
+\end{lstlisting}
+	\begin{itemize}
+		\item \texttt{<function>} can call a model method during loading.
+		\item \texttt{<delete>} removes matching records.
+		\item Use carefully; prefer normal records for most data.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{XML Data Loading Order}
+\begin{lstlisting}
+'data': [
+	'security/school_security.xml',
+	'security/ir.model.access.csv',
+	'data/ir_sequence_data.xml',
+	'data/classroom_data.xml',
+	'data/student_data.xml',
+	'views/student_views.xml',
+],
+\end{lstlisting}
+	\begin{itemize}
+		\item Load dependencies first (security, parents, referenced records).
+		\item A wrong order causes missing XML ID / access errors.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{XML Data Best Practices}
+	\begin{itemize}
+		\item Use stable, descriptive XML IDs.
+		\item Keep one concern per file when possible.
+		\item Use \texttt{noupdate="1"} for user-customizable config.
+		\item Prefer \texttt{ref} over hard-coded database IDs.
+		\item Always list files in \texttt{\_\_manifest\_\_.py}.
+	\end{itemize}
+\end{frame}

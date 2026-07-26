@@ -1,0 +1,97 @@
+\section{CSV Data Importing}
+
+\begin{frame}[fragile]{What Is CSV Data Importing?}
+	\begin{itemize}
+		\item CSV files can also load records during module install/update.
+		\item Best for tabular, repetitive data such as:
+		\begin{itemize}
+			\item access rights (\texttt{ir.model.access.csv})
+			\item simple master lists
+			\item bulk demo rows
+		\end{itemize}
+\begin{block}{Manifest Entry}
+\begin{lstlisting}
+'data': [
+	'security/ir.model.access.csv',
+	'data/student_level_data.csv',
+],
+\end{lstlisting}
+\end{block}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{CSV File Structure}
+\begin{lstlisting}
+id,name,code,active
+student_level_beginner,Beginner,BEG,True
+student_level_intermediate,Intermediate,INT,True
+student_level_advanced,Advanced,ADV,True
+\end{lstlisting}
+	\begin{itemize}
+		\item First row = field names.
+		\item \texttt{id} column = XML / external ID (without module prefix in file).
+		\item Other columns map to model fields.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{How Odoo Knows the Model}
+	\begin{itemize}
+		\item For most CSV files, the model is deduced from the filename / import conventions used by the module loader.
+		\item Classic and most common case:
+\begin{lstlisting}
+security/ir.model.access.csv
+\end{lstlisting}
+		\item Access rights CSV targets \texttt{ir.model.access}.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Access Rights CSV Example}
+\begin{lstlisting}
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_student_user,student.user,model_student_student,base.group_user,1,0,0,0
+access_student_manager,student.manager,model_student_student,school.group_school_manager,1,1,1,1
+\end{lstlisting}
+	\begin{itemize}
+		\item \texttt{model\_id:id} and \texttt{group\_id:id} use XML IDs.
+		\item \texttt{1}/\texttt{0} mean True/False for permissions.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Relational Values in CSV}
+\begin{lstlisting}
+id,name,classroom_id/id,gender
+student_ahmed,Ahmed Muhumed,classroom_grade_12,male
+student_amina,Amina Ali,classroom_grade_12,female
+\end{lstlisting}
+	\begin{itemize}
+		\item \texttt{classroom\_id/id} writes a many2one through an XML ID.
+		\item This is cleaner than numeric database IDs.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{XML vs CSV}
+	\begin{itemize}
+		\item Use \textbf{XML} when you need:
+		\begin{itemize}
+			\item complex structures
+			\item \texttt{noupdate}, \texttt{function}, rich field options
+			\item menus/views/templates
+		\end{itemize}
+		\item Use \textbf{CSV} when you need:
+		\begin{itemize}
+			\item simple bulk rows
+			\item access rights tables
+			\item easy spreadsheet editing
+		\end{itemize}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{CSV Best Practices}
+	\begin{itemize}
+		\item Keep headers exact field names.
+		\item Always provide an \texttt{id} column for stable external IDs.
+		\item Prefer \texttt{field/id} for many2one relations.
+		\item Validate CSV in a clean database install.
+		\item Do not mix too much complex logic into CSV; switch to XML when needed.
+	\end{itemize}
+\end{frame}
