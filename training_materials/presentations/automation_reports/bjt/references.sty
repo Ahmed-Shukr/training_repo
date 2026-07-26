@@ -1,0 +1,40 @@
+%-------------------------------------------------------------
+%  Package : BJT Beamer Theme
+%  Author  : Baijayanta
+%  Version : 1.0
+%  Date    : 2026-07-17
+%
+%  Description:
+%    A clean, modern Beamer theme built on top of the
+%    Metropolis theme with customized colors, typography,
+%    and layout for academic presentations.
+%
+%  Repository:
+%    https://github.com/Baijayanta21/bjt-beamer-theme
+%
+%  License:
+%    Copyright (c) 2026 Baijayanta.
+%    Released under the MIT License.
+%-------------------------------------------------------------
+
+% for beamer references
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{references}
+
+% bibilography References
+\NewDocumentCommand{\referencesframe}{O{unsrt} m}{%
+    \begin{frame}[allowframebreaks]{References}
+        \bibliographystyle{#1}
+        \bibliography{#2}
+    \end{frame}
+}
+
+% Usage:
+% \referencesframe[<bib-style>]{<bib-file-name>}
+% \referencesframe % by default unsrt style and references.bib
+% bib style is not mandatory if file name provided
+% \referencesframe{bjt-ref.bib}             % insert only bib file name
+% \referencesframe[abbrvnat]{bjt-ref.bib}   % insert bib file name and bib style
+
+\endinput

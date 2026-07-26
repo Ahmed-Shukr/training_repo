@@ -1,0 +1,37 @@
+%-------------------------------------------------------------
+%  Package : BJT Beamer Theme
+%  Author  : Baijayanta
+%  Version : 1.0
+%  Date    : 2026-07-17
+%
+%  Description:
+%    A clean, modern Beamer theme built on top of the
+%    Metropolis theme with customized colors, typography,
+%    and layout for academic presentations.
+%
+%  Repository:
+%    https://github.com/Baijayanta21/bjt-beamer-theme
+%
+%  License:
+%    Copyright (c) 2026 Baijayanta.
+%    Released under the MIT License.
+%-------------------------------------------------------------
+
+% for beamer backup slides (appendix)
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{backup}
+
+% Backup Slides
+\newcounter{finalframe}
+
+\newcommand{\backupbegin}{
+    \setcounter{finalframe}{\value{framenumber}}
+}
+
+\newcommand{\backupend}{
+    \addtocounter{framenumber}{-\value{framenumber}}
+    \addtocounter{framenumber}{\value{finalframe}}
+}
+
+\endinput

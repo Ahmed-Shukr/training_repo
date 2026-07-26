@@ -1,0 +1,54 @@
+%-------------------------------------------------------------
+%  Package : BJT Beamer Theme
+%  Author  : Baijayanta
+%  Version : 1.0
+%  Date    : 2026-07-17
+%
+%  Description:
+%    A clean, modern Beamer theme built on top of the
+%    Metropolis theme with customized colors, typography,
+%    and layout for academic presentations.
+%
+%  Repository:
+%    https://github.com/Baijayanta21/bjt-beamer-theme
+%
+%  License:
+%    Copyright (c) 2026 Baijayanta.
+%    Released under the MIT License.
+%-------------------------------------------------------------
+
+% for beamer background
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{backgrounds}
+
+% slide background settings
+%--------------------------------------------------------------------
+
+\newcommand{\slidebackground}[2][0.10]{%
+    \def\slidebackgroundopacity{#1}%
+    \def\insertslidebackground{#2}%
+}
+
+% Usage:
+% \slidebackground[<opacity>]{<image-file-name>}
+% opacity is optional, by default set to 0.1
+% \slidebackground{wallpaper.jpg}           % only file name
+% \slidebackground[0.25]{wallpaper.jpg}     % file name and opacity
+
+% by default no slide background 
+\def\insertslidebackground{}
+\def\slidebackgroundopacity{0.10}
+
+\usebackgroundtemplate{%
+\begin{tikzpicture}[remember picture,overlay]
+\ifx\insertslidebackground\@empty
+    % No background image draw something else
+\else
+    \node[opacity=\slidebackgroundopacity] at (current page.center) {\includegraphics[width=\paperwidth,height=\paperheight]{\insertslidebackground}};
+    \fill[black, opacity=0.05] (current page.north west) rectangle (current page.south east);
+\fi
+
+\end{tikzpicture}}
+
+\endinput

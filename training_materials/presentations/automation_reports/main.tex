@@ -1,0 +1,90 @@
+\documentclass{bjt}
+% more options
+% \documentclass[12pt]{bjt}
+% by default 10pt, 16:9 aspect ratio
+
+\usepackage{listings}
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{bjt}{
+    language=Python,
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\rmfamily\footnotesize\slshape,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2,
+    frame=single,
+    framesep=2pt,
+    framerule=0.2pt,
+    rulecolor=\color{black},
+}
+
+\lstset{style=bjt}
+
+\lstdefinestyle{xml}{
+    language={},
+    backgroundcolor=\color{backcolour},
+    basicstyle=\rmfamily\footnotesize\slshape,
+    numbers=left,
+    numberstyle=\tiny\color{codegray},
+    numbersep=5pt,
+    breaklines=true,
+    keepspaces=true,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    frame=single,
+    framesep=2pt,
+    framerule=0.2pt,
+    rulecolor=\color{black},
+    columns=fullflexible,
+}
+
+
+% Presentation information
+\newcommand{\Title}{Automation and Reports (QWeb)}                        % (EDIT HERE)
+\newcommand{\ShortTitle}{Automation \& Reports}                           % (EDIT HERE) short form for footer
+\newcommand{\Subtitle}{Odoo 17 Development Tutorials}                     % (EDIT HERE)
+\newcommand{\AuthorName}{Ahmed Muhumed}                                   % (EDIT HERE)
+\newcommand{\ShortAuthor}{Ahmed M.}                                       % (EDIT HERE) short form for footer
+\newcommand{\PresentationDate}{\today}                                    % (EDIT HERE)
+\serieslabel{Odoo Developer Program}                                      % (EDIT HERE)
+
+
+% Beamer metadata
+\title[\ShortTitle]{\Title}
+\subtitle{\Subtitle}
+\author[\ShortAuthor]{\AuthorName}
+\date{\PresentationDate}
+
+\usepackage[edges]{forest}
+
+\begin{document}
+
+\maketitleframe
+
+\begin{frame}{Outline}
+\tableofcontents
+\end{frame}
+
+\input{sections/01_intro}
+\input{sections/02_ir_cron}
+\input{sections/03_qweb_templates}
+\input{sections/04_report_actions}
+\input{sections/05_summary}
+
+\end{document}
