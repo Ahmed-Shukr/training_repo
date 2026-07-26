@@ -1,0 +1,89 @@
+\section{More on Access Rights}
+
+\begin{frame}[fragile]{What Are Access Rights?}
+	\begin{itemize}
+		\item Access rights define model-level permissions in \texttt{ir.model.access}.
+		\item For each group + model, you allow or deny:
+		\begin{itemize}
+			\item \texttt{perm\_read}
+			\item \texttt{perm\_write}
+			\item \texttt{perm\_create}
+			\item \texttt{perm\_unlink}
+		\end{itemize}
+\begin{block}{Usual File}
+\begin{lstlisting}
+security/ir.model.access.csv
+\end{lstlisting}
+\end{block}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Access Rights CSV in Detail}
+\begin{lstlisting}
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_student_user,student.user,model_student_student,school_manager.group_school_user,1,0,0,0
+access_student_officer,student.officer,model_student_student,school_manager.group_school_officer,1,1,1,0
+access_student_manager,student.manager,model_student_student,school_manager.group_school_manager,1,1,1,1
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Breaking Down CSV Columns}
+	\begin{itemize}
+		\item \textbf{\texttt{id}}: external ID of the access line
+		\item \textbf{\texttt{name}}: label
+		\item \textbf{\texttt{model\_id:id}}: model XML ID (\texttt{model\_student\_student})
+		\item \textbf{\texttt{group\_id:id}}: group XML ID
+		\item \textbf{\texttt{perm\_*}}: \texttt{1} allow, \texttt{0} deny
+	\end{itemize}
+\begin{lstlisting}
+model_student_student
+\end{lstlisting}
+	\begin{itemize}
+		\item Odoo creates that XML ID from model \texttt{student.student}.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Global Access vs Group Access}
+\begin{lstlisting}
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_student_all,student.all,model_student_student,,1,0,0,0
+\end{lstlisting}
+	\begin{itemize}
+		\item Empty \texttt{group\_id} means the right applies to everyone.
+		\item Use sparingly; prefer explicit group rights.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Access Rights for Transient / Wizard Models}
+\begin{lstlisting}
+access_assign_wizard_user,assign.wizard.user,model_student_assign_wizard,school_manager.group_school_user,1,1,1,1
+\end{lstlisting}
+	\begin{itemize}
+		\item Wizards also need ACL lines.
+		\item Users often need create/write/read on transient models to open and submit wizards.
+		\item Forgetting wizard ACL is a common ``Access Error'' cause.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Testing Access in Practice}
+\begin{lstlisting}
+# Switch to a non-admin user in shell / tests
+Student = self.env['student.student'].with_user(teacher)
+Student.check_access_rights('read')
+Student.check_access_rights('unlink')  # may raise
+\end{lstlisting}
+	\begin{itemize}
+		\item Always verify rights with a normal user, not only admin.
+		\item Admin/superuser can hide ACL mistakes.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Access Rights Best Practices}
+	\begin{itemize}
+		\item Give least privilege needed for each role.
+		\item Managers get unlink; normal users usually do not.
+		\item Load security XML groups before the ACL CSV.
+		\item Add ACL for every custom model, including wizards.
+		\item Document your role matrix (User/Officer/Manager $\times$ CRUD).
+	\end{itemize}
+\end{frame}

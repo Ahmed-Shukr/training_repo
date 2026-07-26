@@ -1,0 +1,90 @@
+\section{UI Visibility}
+
+\begin{frame}{What Is UI Visibility?}
+	\begin{itemize}
+		\item UI visibility controls what the user \textbf{sees} in the interface.
+		\item Even if a user has model access, you may hide:
+		\begin{itemize}
+			\item menus
+			\item buttons
+			\item fields
+			\item pages / groups inside forms
+		\end{itemize}
+		\item Visibility is usually based on groups.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Restricting Menus by Groups}
+\begin{lstlisting}[style=xml]
+<menuitem id="menu_student_root"
+		  name="Students"
+		  groups="school_manager.group_school_user"/>
+
+<menuitem id="menu_school_config"
+		  name="Configuration"
+		  parent="menu_student_root"
+		  groups="school_manager.group_school_manager"/>
+\end{lstlisting}
+	\begin{itemize}
+		\item Users outside the group do not see the menu.
+		\item Configuration menus usually belong to managers only.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Hiding Buttons and Fields}
+\begin{lstlisting}[style=xml]
+<button name="action_approve"
+		type="object"
+		string="Approve"
+		groups="school_manager.group_school_manager"/>
+
+<field name="internal_note"
+	   groups="school_manager.group_school_manager"/>
+\end{lstlisting}
+	\begin{itemize}
+		\item \texttt{groups=} on view nodes is the most common UI restriction.
+		\item Hidden UI is not enough by itself -- still protect with ACL/record rules.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Invisible / Readonly Modifiers}
+\begin{lstlisting}[style=xml]
+<field name="approved_by"
+	   readonly="1"
+	   groups="school_manager.group_school_manager"/>
+
+<field name="salary_level"
+	   invisible="state != 'done'"
+	   groups="school_manager.group_school_manager"/>
+\end{lstlisting}
+	\begin{itemize}
+		\item \texttt{groups}: who can see the node at all
+		\item \texttt{invisible} / \texttt{readonly}: dynamic UI behavior
+		\item In Odoo 17, prefer Python-like modifier expressions.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Restricting Actions}
+\begin{lstlisting}[style=xml]
+<record id="action_student" model="ir.actions.act_window">
+  <field name="name">Students</field>
+  <field name="res_model">student.student</field>
+  <field name="view_mode">list,form</field>
+  <field name="groups_id" eval="[(4, ref('group_school_user'))]"/>
+</record>
+\end{lstlisting}
+	\begin{itemize}
+		\item Actions and menus can both be group-restricted.
+		\item This prevents opening screens through direct action links.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{UI Visibility Best Practices}
+	\begin{itemize}
+		\item Hide advanced controls from normal users.
+		\item Keep forms clean: show only what each role needs.
+		\item Never rely on hidden buttons as your only security.
+		\item Combine UI groups + access rights + record rules.
+		\item Test each role with a real non-admin user.
+	\end{itemize}
+\end{frame}

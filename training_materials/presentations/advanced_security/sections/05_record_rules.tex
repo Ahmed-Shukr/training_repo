@@ -1,0 +1,110 @@
+\section{Record Rules}
+
+\begin{frame}[fragile]{What Are Record Rules?}
+	\begin{itemize}
+		\item Record rules provide \textbf{row-level security}.
+		\item Stored in \texttt{ir.rule}.
+		\item They filter which records a group can read/write/create/unlink.
+\begin{block}{Core Idea}
+	Access rights say ``you may read students''.\\
+	Record rules say ``but only students in your classroom''.
+\end{block}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Basic Record Rule XML}
+\begin{lstlisting}[style=xml]
+<record id="student_personal_rule" model="ir.rule">
+  <field name="name">Students: own classroom only</field>
+  <field name="model_id" ref="model_student_student"/>
+  <field name="domain_force">[('classroom_id.teacher_id.user_id', '=', user.id)]</field>
+  <field name="groups" eval="[(4, ref('group_school_user'))]"/>
+  <field name="perm_read" eval="True"/>
+  <field name="perm_write" eval="True"/>
+  <field name="perm_create" eval="True"/>
+  <field name="perm_unlink" eval="False"/>
+</record>
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Breaking Down Record Rule Fields}
+	\begin{itemize}
+		\item \textbf{\texttt{name}}: clear description of the rule
+		\item \textbf{\texttt{model\_id}}: target model
+		\item \textbf{\texttt{domain\_force}}: domain filter
+		\item \textbf{\texttt{groups}}: which groups the rule applies to
+		\item \textbf{\texttt{perm\_*}}: on which operations the rule applies
+		\item If \texttt{groups} is empty, the rule is global
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Useful Domain Variables}
+\begin{lstlisting}[style=xml]
+<field name="domain_force">[('user_id', '=', user.id)]</field>
+<field name="domain_force">[('company_id', 'in', company_ids)]</field>
+<field name="domain_force">['|', ('teacher_id', '=', False), ('teacher_id.user_id', '=', user.id)]</field>
+\end{lstlisting}
+	\begin{itemize}
+		\item Common variables in rule domains:
+		\begin{itemize}
+			\item \texttt{user}
+			\item \texttt{company\_id}
+			\item \texttt{company\_ids}
+			\item \texttt{time} / helpers depending on version/context
+		\end{itemize}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Global Rules vs Group Rules}
+	\begin{itemize}
+		\item \textbf{Group rule}: applies only to listed groups.
+		\item \textbf{Global rule}: no groups set; applies to everyone.
+	\end{itemize}
+\begin{lstlisting}[style=xml]
+<!-- Global example: everyone restricted by company -->
+<record id="student_company_rule" model="ir.rule">
+  <field name="name">Students: multi-company</field>
+  <field name="model_id" ref="model_student_student"/>
+  <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+</record>
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{How Rules Combine}
+	\begin{itemize}
+		\item For the same model:
+		\begin{itemize}
+			\item Global rules are combined with AND
+			\item Group rules for the user are combined with OR, then AND-ed with globals
+		\end{itemize}
+		\item Practical meaning:
+		\begin{itemize}
+			\item Global rules always restrict
+			\item Group rules can open alternative allowed sets for that role
+		\end{itemize}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Record Rules vs Access Rights}
+	\begin{itemize}
+		\item No read access right $\rightarrow$ model blocked completely.
+		\item Read access + record rule $\rightarrow$ only matching rows are visible.
+	\end{itemize}
+\begin{lstlisting}
+# User can read model, but sees only allowed rows
+students = self.env['student.student'].search([])
+\end{lstlisting}
+	\begin{itemize}
+		\item Use both layers together.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Record Rule Best Practices}
+	\begin{itemize}
+		\item Name rules by business meaning, not technical noise.
+		\item Keep domains simple and indexed when possible.
+		\item Add a manager bypass rule when managers must see all records.
+		\item Test with multiple users in different groups.
+		\item Remember: \texttt{sudo()} bypasses record rules -- use carefully.
+	\end{itemize}
+\end{frame}

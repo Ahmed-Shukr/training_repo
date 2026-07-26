@@ -1,0 +1,92 @@
+\section{Security Groups}
+
+\slidebackground{backgrounds/wallpaper.jpg}
+
+\begin{frame}[fragile]{What Is a Security Group?}
+	\begin{itemize}
+		\item A \textbf{security group} is a role stored in \texttt{res.groups}.
+		\item Users are assigned to one or more groups.
+		\item Groups control access rights, record rules, and UI visibility.
+\begin{block}{Core Idea}
+	Give permissions to groups, then assign users to groups -- not the opposite.
+\end{block}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Defining a Category and Groups}
+\begin{lstlisting}[style=xml]
+<record id="module_category_school" model="ir.module.category">
+  <field name="name">School</field>
+  <field name="sequence">20</field>
+</record>
+
+<record id="group_school_user" model="res.groups">
+  <field name="name">User</field>
+  <field name="category_id" ref="module_category_school"/>
+  <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+</record>
+
+<record id="group_school_manager" model="res.groups">
+  <field name="name">Manager</field>
+  <field name="category_id" ref="module_category_school"/>
+  <field name="implied_ids" eval="[(4, ref('group_school_user'))]"/>
+  <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+</record>
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Breaking Down Group Fields}
+	\begin{itemize}
+		\item \textbf{\texttt{name}}: group label (User, Manager, Officer)
+		\item \textbf{\texttt{category\_id}}: Settings app section for the group
+		\item \textbf{\texttt{implied\_ids}}: groups automatically included
+		\item \textbf{\texttt{users}}: optional default members
+		\item \textbf{\texttt{comment}}: description of the role
+	\end{itemize}
+\begin{lstlisting}[style=xml]
+<field name="implied_ids" eval="[(4, ref('group_school_user'))]"/>
+\end{lstlisting}
+	\begin{itemize}
+		\item Manager implies User $\Rightarrow$ Manager gets all User rights too.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Typical School Privilege Ladder}
+	\begin{enumerate}
+		\item \textbf{User}: read students, limited write
+		\item \textbf{Officer/Teacher}: create/update operational data
+		\item \textbf{Manager}: full CRUD + configuration
+	\end{enumerate}
+\begin{lstlisting}[style=xml]
+<!-- Manager implies Officer implies User -->
+<field name="implied_ids" eval="[(4, ref('group_school_officer'))]"/>
+\end{lstlisting}
+	\begin{itemize}
+		\item Design roles as a ladder, not disconnected islands.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Checking Groups in Python}
+\begin{lstlisting}
+if self.env.user.has_group('school_manager.group_school_manager'):
+	# manager-only logic
+	pass
+
+if not self.env.user.has_group('school_manager.group_school_user'):
+	raise AccessError("You need School User access.")
+\end{lstlisting}
+	\begin{itemize}
+		\item Prefer XML-ID group checks over hard-coded group IDs.
+		\item Still define real ACL/record rules; Python checks are extra safety.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Group Design Best Practices}
+	\begin{itemize}
+		\item Create a module category for your app.
+		\item Keep group names short and clear.
+		\item Use \texttt{implied\_ids} for privilege inheritance.
+		\item Assign rights to groups, not individual users.
+		\item Put group XML in \texttt{security/} and load it before access CSV.
+	\end{itemize}
+\end{frame}
