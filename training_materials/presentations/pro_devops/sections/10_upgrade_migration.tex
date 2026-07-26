@@ -1,0 +1,104 @@
+\section{Upgrade Scripts \& Migration}
+
+\begin{frame}{Two Different Problems}
+\begin{description}
+  \item[Module upgrade] Same Odoo major version; schema/data evolve via \texttt{-u}
+  \item[Version migration] Move a database across Odoo majors (e.g.\ 16 $\rightarrow$ 17)
+\end{description}
+
+\vspace{0.6em}
+\begin{block}{Both need backups}
+  Always dump DB + filestore before either path.
+\end{block}
+\end{frame}
+
+\begin{frame}[fragile]{Module Upgrade (\texttt{-u})}
+\begin{lstlisting}[style=bash]
+# Upgrade one module and dependencies as needed
+odoo-bin -c /etc/odoo.conf -d school -u school_core --stop-after-init
+
+# Upgrade several
+odoo-bin -c /etc/odoo.conf -d school \
+  -u school_core,school_fees --stop-after-init
+\end{lstlisting}
+
+\vspace{0.4em}
+\begin{itemize}
+  \item Loads new fields, views, security, and runs migration scripts
+  \item \texttt{--stop-after-init} exits after upgrade --- good for CI/scripts
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Upgrade Scripts (Migration Scripts)}
+\begin{itemize}
+  \item Live under \texttt{migrations/<version>/} in the module
+  \item Run when module version in manifest increases
+\end{itemize}
+
+\vspace{0.4em}
+\begin{lstlisting}
+# school_core/migrations/17.0.1.1.0/pre-migrate.py
+def migrate(cr, version):
+    # raw SQL before ORM is fully ready
+    cr.execute("""
+        UPDATE school_student
+           SET state = 'draft'
+         WHERE state IS NULL
+    """)
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}{Script Naming \& Phases}
+\begin{description}
+  \item[\texttt{pre-*.py}] Before module update (schema may be old)
+  \item[\texttt{post-*.py}] After module update (new schema available)
+  \item[\texttt{end-*.py}] After all modules updated
+\end{description}
+
+\vspace{0.5em}
+\begin{alertblock}{API}
+  Signature is \texttt{migrate(cr, version)} --- use cursor carefully; ORM may be limited in \texttt{pre-}.
+\end{alertblock}
+\end{frame}
+
+\begin{frame}[fragile]{Post-Migrate with Environment}
+\begin{lstlisting}
+# migrations/17.0.1.2.0/post-migrate.py
+from odoo import api, SUPERUSER_ID
+
+def migrate(cr, version):
+    env = api.Environment(cr, SUPERUSER_ID, {})
+    students = env['school.student'].search([
+        ('grade_id', '=', False),
+    ])
+    default = env.ref('school_core.grade_default',
+                      raise_if_not_found=False)
+    if default:
+        students.write({'grade_id': default.id})
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}{Major Version Migration (Concept)}
+\begin{enumerate}
+  \item Inventory custom modules; port APIs to the new major
+  \item Upgrade official modules via Odoo upgrade service / OpenUpgrade (community path)
+  \item Test on a restored copy until scripts are clean
+  \item Plan cutover: freeze writes, final dump, migrate, switch DNS
+\end{enumerate}
+
+\vspace{0.5em}
+\begin{itemize}
+  \item Expect broken XML IDs, renamed fields, removed methods
+  \item Budget serious QA time --- this is not a weekend hobby for large DBs
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Upgrade / Migration Best Practices}
+\begin{itemize}
+  \item Bump \texttt{version} in \texttt{\_\_manifest\_\_.py} when schema/data changes
+  \item Keep migrations idempotent when possible
+  \item Prefer data fixes in scripts over manual SQL on production
+  \item Log progress for long migrations
+  \item Never skip staging for major upgrades
+\end{itemize}
+\end{frame}

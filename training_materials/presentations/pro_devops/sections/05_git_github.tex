@@ -1,0 +1,73 @@
+\section{Git \& GitHub}
+
+\begin{frame}[fragile]{Why Git for Odoo Teams}
+	\begin{itemize}
+		\item Track every module change.
+		\item Collaborate with branches and pull requests.
+		\item Roll back safely when a release fails.
+		\item Review code before it reaches production.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Core Git Workflow}
+\begin{lstlisting}[style=bash]
+git checkout -b feature/student-card
+git status
+git add .
+git commit -m "Add student card report"
+git push -u origin feature/student-card
+\end{lstlisting}
+	\begin{itemize}
+		\item Branch $\rightarrow$ commit $\rightarrow$ push $\rightarrow$ pull request $\rightarrow$ review $\rightarrow$ merge.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Useful Daily Commands}
+\begin{lstlisting}[style=bash]
+git pull origin main
+git diff
+git log --oneline --graph --decorate
+git stash
+git stash pop
+git restore --staged <file>
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{GitHub Pull Request Habits}
+	\begin{itemize}
+		\item Small PRs are easier to review.
+		\item Describe:
+		\begin{itemize}
+			\item what changed
+			\item why it changed
+			\item how to test
+		\end{itemize}
+		\item Request review before merging to main.
+		\item Keep \texttt{main} deployable.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{What Belongs in Git?}
+	\begin{itemize}
+		\item Yes: custom modules, scripts, deployment configs, docs
+		\item No: credentials, filestore, database dumps, \texttt{\_\_pycache\_\_}
+\begin{lstlisting}[style=bash]
+# .gitignore examples
+*.pyc
+__pycache__/
+.env
+*.dump
+filestore/
+\end{lstlisting}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Git Best Practices}
+	\begin{itemize}
+		\item Commit often with clear messages
+		\item Never commit secrets
+		\item Protect main branch with reviews
+		\item Use tags/releases for production deployments
+		\item Keep module changes isolated and reviewable
+	\end{itemize}
+\end{frame}

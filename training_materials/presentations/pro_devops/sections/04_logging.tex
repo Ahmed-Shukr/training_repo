@@ -1,0 +1,81 @@
+\section{Logging}
+
+\begin{frame}[fragile]{Why Logging Matters}
+	\begin{itemize}
+		\item Logs explain what the system did and where it failed.
+		\item Useful for:
+		\begin{itemize}
+			\item debugging local issues
+			\item monitoring cron jobs
+			\item tracing production incidents
+		\end{itemize}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Logging in Odoo Python}
+\begin{lstlisting}
+import logging
+_logger = logging.getLogger(__name__)
+
+class Student(models.Model):
+	_name = 'student.student'
+
+	def action_archive(self):
+		_logger.info("Archiving students: %s", self.ids)
+		try:
+			self.write({'active': False})
+		except Exception:
+			_logger.exception("Failed archiving students %s", self.ids)
+			raise
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Log Levels}
+	\begin{itemize}
+		\item \texttt{debug}: detailed developer info
+		\item \texttt{info}: normal significant events
+		\item \texttt{warning}: unexpected but recoverable
+		\item \texttt{error}: failure that needs attention
+		\item \texttt{exception}: error + stack trace
+	\end{itemize}
+\begin{lstlisting}
+_logger.debug("Domain used: %s", domain)
+_logger.warning("Missing email on student %s", student.id)
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Running Odoo with More Logs}
+\begin{lstlisting}[style=bash]
+./odoo-bin -c odoo.conf --log-level=debug
+./odoo-bin -c odoo.conf --log-handler=odoo.addons.school_manager:DEBUG
+\end{lstlisting}
+	\begin{itemize}
+		\item Increase logs temporarily while investigating.
+		\item Avoid leaving ultra-verbose logging on in production.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{What to Log (and Not Log)}
+	\begin{itemize}
+		\item Do log: record IDs, cron start/end, external API status codes
+		\item Do not log: passwords, API secrets, full personal payloads
+\begin{lstlisting}
+# Bad
+_logger.info("Password is %s", password)
+
+# Good
+_logger.info("External sync failed for student_id=%s status=%s",
+			 student.id, response.status_code)
+\end{lstlisting}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Logging Best Practices}
+	\begin{itemize}
+		\item Use \texttt{logging.getLogger(\_\_name\_\_)}
+		\item Prefer structured messages with \texttt{\%s} args
+		\item Log at the right level
+		\item Correlate logs with user actions and cron names
+		\item Rotate and monitor server log files
+	\end{itemize}
+\end{frame}

@@ -1,0 +1,85 @@
+\section{SQL Optimization}
+
+\begin{frame}[fragile]{When to Think in SQL}
+	\begin{itemize}
+		\item Most business code should stay in the ORM.
+		\item Use SQL carefully for:
+		\begin{itemize}
+			\item heavy reports
+			\item complex aggregates
+			\item performance-critical batch jobs
+		\end{itemize}
+\begin{block}{Rule}
+	ORM first; SQL when measured need exists.
+\end{block}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{EXPLAIN Your Slow Queries}
+\begin{lstlisting}[style=bash]
+psql school_db
+EXPLAIN ANALYZE
+SELECT classroom_id, COUNT(*)
+FROM student_student
+WHERE active = TRUE
+GROUP BY classroom_id;
+\end{lstlisting}
+	\begin{itemize}
+		\item Look for sequential scans on large tables.
+		\item Add/adjust indexes based on real query plans.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Useful Index Patterns}
+\begin{lstlisting}[style=bash]
+CREATE INDEX student_student_company_active_idx
+ON student_student (company_id, active);
+
+CREATE INDEX student_student_name_trgm_idx
+ON student_student USING gin (name gin_trgm_ops);
+\end{lstlisting}
+	\begin{itemize}
+		\item Composite indexes help common multi-field domains.
+		\item Trigram indexes can help \texttt{ilike} search (when extension is available).
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Safe Raw SQL in Odoo}
+\begin{lstlisting}
+self.env.cr.execute("""
+	SELECT classroom_id, COUNT(*)
+	FROM student_student
+	WHERE active = TRUE AND company_id = %s
+	GROUP BY classroom_id
+""", (self.env.company.id,))
+rows = self.env.cr.fetchall()
+\end{lstlisting}
+	\begin{itemize}
+		\item Always pass parameters with \texttt{\%s} placeholders.
+		\item Never concatenate user input into SQL strings.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Aggregation Alternatives}
+\begin{lstlisting}
+# ORM read_group for many reporting needs
+data = self.env['student.student'].read_group(
+	[('active', '=', True)],
+	['classroom_id'],
+	['classroom_id'],
+)
+\end{lstlisting}
+	\begin{itemize}
+		\item Try \texttt{read\_group} before custom SQL for grouped metrics.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{SQL Optimization Tips}
+	\begin{itemize}
+		\item Measure with \texttt{EXPLAIN ANALYZE}
+		\item Index for real filters/joins
+		\item Select only needed columns
+		\item Avoid functions on indexed columns in WHERE when possible
+		\item Keep vacuum/analyze healthy on production PostgreSQL
+	\end{itemize}
+\end{frame}

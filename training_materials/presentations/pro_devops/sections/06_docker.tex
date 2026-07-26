@@ -1,0 +1,117 @@
+\section{Docker}
+
+\begin{frame}{What is Docker?}
+\begin{itemize}
+  \item Tool that packages an application and its dependencies into a \textbf{container}
+  \item Containers share the host OS kernel --- lighter than full VMs
+  \item Same image runs the same way on laptop, server, or CI
+\end{itemize}
+
+\vspace{0.5em}
+\begin{block}{Why Odoo teams use Docker}
+  Reproducible environments: same PostgreSQL version, same Odoo version, same Python deps --- fewer ``works on my machine'' bugs.
+\end{block}
+\end{frame}
+
+\begin{frame}{Core Concepts}
+\begin{description}
+  \item[Image] Read-only template (e.g.\ \texttt{odoo:17.0})
+  \item[Container] Running instance of an image
+  \item[Dockerfile] Recipe to build a custom image
+  \item[Volume] Persistent storage (database, filestore)
+  \item[Compose] YAML file that starts multiple services together
+\end{description}
+\end{frame}
+
+\begin{frame}[fragile]{\texttt{docker-compose.yml} --- Database}
+\begin{lstlisting}[language={}]
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: odoo
+      POSTGRES_PASSWORD: odoo
+      POSTGRES_DB: postgres
+    volumes:
+      - odoo-db:/var/lib/postgresql/data
+
+volumes:
+  odoo-db:
+  odoo-web:
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{\texttt{docker-compose.yml} --- Odoo Web}
+\begin{lstlisting}[language={}]
+  web:
+    image: odoo:17.0
+    depends_on: [db]
+    ports:
+      - "8069:8069"
+    environment:
+      HOST: db
+      USER: odoo
+      PASSWORD: odoo
+    volumes:
+      - odoo-web:/var/lib/odoo
+      - ./addons:/mnt/extra-addons
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}{Compose Breakdown}
+\begin{description}
+  \item[\texttt{services}] Containers that make up the stack
+  \item[\texttt{db}] PostgreSQL --- Odoo needs a database server
+  \item[\texttt{web}] Odoo application process
+  \item[\texttt{depends\_on}] Start order hint (not a health wait by itself)
+  \item[\texttt{ports}] Map host \texttt{8069} to container \texttt{8069}
+  \item[\texttt{volumes}] Persist DB and filestore; mount custom addons
+\end{description}
+\end{frame}
+
+\begin{frame}[fragile]{Everyday Commands}
+\begin{lstlisting}[style=bash]
+# Start in background
+docker compose up -d
+
+# Follow Odoo logs
+docker compose logs -f web
+
+# Stop (keep volumes)
+docker compose stop
+
+# Stop and remove containers (volumes remain)
+docker compose down
+
+# Rebuild after Dockerfile change
+docker compose build --no-cache
+docker compose up -d
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Custom Image with Your Addons}
+\begin{lstlisting}[style=bash]
+# Dockerfile
+FROM odoo:17.0
+COPY ./custom_addons /mnt/extra-addons
+USER root
+RUN pip3 install --break-system-packages \
+    python-docx
+USER odoo
+\end{lstlisting}
+
+\vspace{0.4em}
+\begin{alertblock}{Tip}
+  Keep secrets out of the image. Pass passwords via environment or Docker secrets, never bake them into layers.
+\end{alertblock}
+\end{frame}
+
+\begin{frame}{Docker Best Practices for Odoo}
+\begin{itemize}
+  \item One responsibility per container (web vs DB vs reverse proxy)
+  \item Persist PostgreSQL data and Odoo filestore in named volumes
+  \item Pin image tags (\texttt{odoo:17.0}, not \texttt{latest})
+  \item Mount addons as volumes in development; bake them into images for production
+  \item Limit container resources (memory/CPU) in production
+\end{itemize}
+\end{frame}
