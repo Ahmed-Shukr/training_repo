@@ -1,0 +1,77 @@
+\section{Hooks}
+
+\begin{frame}{What Are Hooks?}
+	\begin{itemize}
+		\item Hooks are functions used inside \texttt{setup()} to add behavior to components.
+		\item They help with:
+		\begin{itemize}
+			\item reactive state
+			\item services
+			\item lifecycle
+			\item DOM refs
+			\item component environment utilities
+		\end{itemize}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Common OWL / Odoo Hooks}
+\begin{lstlisting}[style=js]
+import { useState, onWillStart, onMounted } from "@odoo/owl";
+import { useService } from "@web/core/utils/hooks";
+
+setup() {
+	this.orm = useService("orm");
+	this.state = useState({ students: [] });
+
+	onWillStart(async () => {
+		this.state.students = await this.orm.searchRead(
+			"student.student", [], ["name"]
+		);
+	});
+
+	onMounted(() => {
+		console.log("Student component mounted");
+	});
+}
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Lifecycle Hooks}
+	\begin{itemize}
+		\item \texttt{onWillStart}: before first render (async loading fits here)
+		\item \texttt{onMounted}: after first DOM mount
+		\item \texttt{onWillUpdateProps}: before props change is applied
+		\item \texttt{onPatched}: after re-render/DOM patch
+		\item \texttt{onWillUnmount}: cleanup
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Custom Hook Example}
+\begin{lstlisting}[style=js]
+import { useState, onWillStart } from "@odoo/owl";
+import { useService } from "@web/core/utils/hooks";
+
+export function useActiveStudents() {
+	const orm = useService("orm");
+	const state = useState({ records: [], ready: false });
+	onWillStart(async () => {
+		state.records = await orm.searchRead(
+			"student.student",
+			[["active", "=", true]],
+			["name", "email"]
+		);
+		state.ready = true;
+	});
+	return state;
+}
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}{Hooks Best Practices}
+	\begin{itemize}
+		\item Call hooks only inside \texttt{setup()} (or custom hooks).
+		\item Keep \texttt{onWillStart} loading logic clear and failure-tolerant.
+		\item Extract reusable hook logic when multiple components need it.
+		\item Clean up listeners/timers in unmount hooks.
+	\end{itemize}
+\end{frame}

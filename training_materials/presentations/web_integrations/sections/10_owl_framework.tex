@@ -1,0 +1,62 @@
+\section{OWL Framework}
+
+\begin{frame}{What Is OWL?}
+	\begin{itemize}
+		\item \textbf{OWL} (Odoo Web Library) is Odoo's modern frontend framework.
+		\item Component-based, reactive, and inspired by ideas from React-like systems.
+		\item Used heavily in Odoo 17 web client, OWL apps, and custom UI.
+\begin{block}{Core Idea}
+	UI is built from components that own state, templates, and lifecycle.
+\end{block}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Why OWL in Odoo?}
+	\begin{itemize}
+		\item Replaces older widget-heavy JS patterns for many new UIs.
+		\item Better composition through components.
+		\item Services provide shared browser-side features (RPC, notification, etc.).
+		\item Hooks and lifecycle methods make state easier to manage.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Minimal OWL Component}
+\begin{lstlisting}[style=js]
+/** @odoo-module **/
+import { Component } from "@odoo/owl";
+
+export class HelloStudent extends Component {
+	static template = "school_manager.HelloStudent";
+	static props = {
+		name: { type: String },
+	};
+}
+\end{lstlisting}
+\begin{lstlisting}[style=xml]
+<t t-name="school_manager.HelloStudent">
+  <div class="o_hello_student">
+	Hello <t t-esc="props.name"/>
+  </div>
+</t>
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{OWL Building Blocks}
+	\begin{itemize}
+		\item \textbf{Component}: reusable UI unit
+		\item \textbf{Template}: XML/QWeb-like structure for rendering
+		\item \textbf{Props}: inputs from parent
+		\item \textbf{State}: reactive internal data
+		\item \textbf{Services}: shared global features
+		\item \textbf{Hooks}: lifecycle and utility helpers
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{OWL Best Practices}
+	\begin{itemize}
+		\item Keep components small and focused.
+		\item Pass data through props; avoid hidden globals.
+		\item Put shared logic in services when many components need it.
+		\item Register assets correctly so OWL modules load.
+	\end{itemize}
+\end{frame}

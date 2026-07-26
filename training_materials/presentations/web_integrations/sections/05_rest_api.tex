@@ -1,0 +1,72 @@
+\section{REST API}
+
+\begin{frame}{REST Style in Odoo Controllers}
+	\begin{itemize}
+		\item Odoo does not force a pure REST framework, but you can design REST-like HTTP APIs.
+		\item REST ideas:
+		\begin{itemize}
+			\item resources as URLs
+			\item HTTP verbs for actions (\texttt{GET}, \texttt{POST}, \texttt{PUT}, \texttt{DELETE})
+			\item JSON request/response bodies
+		\end{itemize}
+		\item Useful for mobile apps and external backends.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{REST-like Endpoints Example}
+\begin{lstlisting}
+class StudentAPI(http.Controller):
+
+	@http.route('/api/v1/students', type='http', auth='user',
+				methods=['GET'], csrf=False)
+	def list_students(self, **kwargs):
+		students = request.env['student.student'].search_read(
+			[], ['name', 'email']
+		)
+		return request.make_json_response(students)
+
+	@http.route('/api/v1/students', type='http', auth='user',
+				methods=['POST'], csrf=False)
+	def create_student(self, **kwargs):
+		data = request.get_json_data()
+		student = request.env['student.student'].create(data)
+		return request.make_json_response({'id': student.id}, status=201)
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{REST Design Tips}
+\begin{lstlisting}
+GET    /api/v1/students
+GET    /api/v1/students/<id>
+POST   /api/v1/students
+PUT    /api/v1/students/<id>
+DELETE /api/v1/students/<id>
+\end{lstlisting}
+	\begin{itemize}
+		\item Keep endpoints resource-oriented.
+		\item Use proper status codes when building HTTP APIs.
+		\item Protect with login, API keys, or custom auth as needed.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{make\_json\_response}
+\begin{lstlisting}
+return request.make_json_response(
+	{'ok': True, 'student_id': student.id},
+	status=200,
+)
+\end{lstlisting}
+	\begin{itemize}
+		\item Convenient helper for HTTP JSON APIs in modern Odoo.
+		\item Alternative to pure \texttt{type='json'} when you want classical REST verbs.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{REST Best Practices}
+	\begin{itemize}
+		\item Version your API (\texttt{/api/v1/...}) when exposing publicly.
+		\item Validate payloads strictly.
+		\item Never expose elevated APIs without authentication and authorization.
+		\item Document endpoints for integrators.
+	\end{itemize}
+\end{frame}

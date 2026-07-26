@@ -1,0 +1,114 @@
+\section{Assets and Custom Widgets}
+
+\begin{frame}[fragile]{What Are Assets?}
+	\begin{itemize}
+		\item Assets are JS, CSS, SCSS, and XML frontend files loaded by Odoo.
+		\item In Odoo 17 they are usually declared in \texttt{\_\_manifest\_\_.py}.
+\begin{lstlisting}
+'assets': {
+	'web.assets_backend': [
+		'school_manager/static/src/**/*',
+	],
+	'web.assets_frontend': [
+		'school_manager/static/src/website/**/*',
+	],
+},
+\end{lstlisting}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Typical Frontend Folder Layout}
+\begin{lstlisting}
+school_manager/
+  static/
+	src/
+	  components/
+		student_card.js
+		student_card.xml
+		student_card.scss
+	  services/
+		student_service.js
+	  js/
+		student_badge_field.js
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Custom Field Widget (OWL)}
+\begin{lstlisting}[style=js]
+/** @odoo-module **/
+import { Component } from "@odoo/owl";
+import { registry } from "@web/core/registry";
+import { standardFieldProps } from "@web/views/fields/standard_field_props";
+
+class StudentBadgeField extends Component {
+	static template = "school_manager.StudentBadgeField";
+	static props = { ...standardFieldProps };
+	get label() {
+		return this.props.record.data[this.props.name] || "N/A";
+	}
+}
+
+registry.category("fields").add("student_badge", {
+	component: StudentBadgeField,
+});
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Using the Widget in a View}
+\begin{lstlisting}[style=xml]
+<field name="code" widget="student_badge"/>
+\end{lstlisting}
+\begin{lstlisting}[style=xml]
+<t t-name="school_manager.StudentBadgeField">
+  <span class="badge text-bg-primary" t-esc="label"/>
+</t>
+\end{lstlisting}
+	\begin{itemize}
+		\item The \texttt{widget=} name must match the registry key.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Custom Client Action}
+\begin{lstlisting}[style=js]
+registry.category("actions").add("student_dashboard", StudentDashboard);
+\end{lstlisting}
+\begin{lstlisting}[style=xml]
+<record id="action_student_dashboard" model="ir.actions.client">
+  <field name="name">Student Dashboard</field>
+  <field name="tag">student_dashboard</field>
+</record>
+\end{lstlisting}
+	\begin{itemize}
+		\item Client actions open custom OWL screens inside the backend.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Assets \& Widget Best Practices}
+	\begin{itemize}
+		\item Put frontend files under \texttt{static/src}.
+		\item Declare assets in the manifest; upgrade module after changes.
+		\item Keep JS/XML/SCSS for one component together.
+		\item Use clear registry names namespaced by your app.
+		\item Test widgets in list/form views with empty and long values.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Web Development Summary}
+	\begin{itemize}
+		\item Controllers + routes expose HTTP/JSON endpoints.
+		\item REST/XML-RPC/JSON-RPC connect Odoo with external systems.
+		\item File routes and attachments handle uploads/downloads.
+		\item OWL components, services, hooks, and assets build modern UI.
+		\item Custom widgets and client actions extend the backend experience.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Practical Checklist}
+	\begin{itemize}
+		\item Need a webpage/endpoint? $\rightarrow$ Controller + \texttt{@http.route}
+		\item Need AJAX data? $\rightarrow$ JSON controller / ORM service
+		\item Need external system access? $\rightarrow$ XML-RPC / JSON-RPC / REST
+		\item Need custom UI? $\rightarrow$ OWL component + assets + registry
+		\item Need special field display? $\rightarrow$ custom field widget
+	\end{itemize}
+\end{frame}

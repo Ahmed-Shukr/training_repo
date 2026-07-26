@@ -1,0 +1,71 @@
+\section{External API Integration}
+
+\begin{frame}{Calling External APIs from Odoo}
+	\begin{itemize}
+		\item Controllers/RPC expose Odoo to the outside world.
+		\item External API integration is the reverse: Odoo calls another system.
+		\item Examples:
+		\begin{itemize}
+			\item payment gateways
+			\item SMS providers
+			\item national ID verification
+			\item shipping / accounting services
+		\end{itemize}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Basic Outbound HTTP Call}
+\begin{lstlisting}
+import requests
+from odoo import models, api
+from odoo.exceptions import UserError
+
+class Student(models.Model):
+	_inherit = 'student.student'
+
+	def action_sync_external(self):
+		self.ensure_one()
+		url = self.env['ir.config_parameter'].sudo().get_param(
+			'school_manager.external_api_url'
+		)
+		response = requests.post(url, json={
+			'name': self.name,
+			'email': self.email,
+		}, timeout=20)
+		if response.status_code >= 400:
+			raise UserError("External API sync failed.")
+		self.external_ref = response.json().get('id')
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Integration Design Pattern}
+	\begin{enumerate}
+		\item Store API URL/keys in \texttt{ir.config\_parameter} or settings
+		\item Isolate call logic in a model method / service class
+		\item Handle timeouts, retries, and errors
+		\item Log request references for debugging
+		\item Optionally queue calls with cron for reliability
+	\end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]{Safe Credential Handling}
+\begin{lstlisting}
+ICP = self.env['ir.config_parameter'].sudo()
+api_key = ICP.get_param('school_manager.external_api_key')
+headers = {'Authorization': f'Bearer {api_key}'}
+\end{lstlisting}
+	\begin{itemize}
+		\item Do not commit secrets into public repositories.
+		\item Restrict settings access to admins.
+		\item Prefer environment-specific parameters.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{External Integration Best Practices}
+	\begin{itemize}
+		\item Keep external IO out of tight UI loops when possible.
+		\item Use clear UserError messages for business failures.
+		\item Write tests with mocked HTTP responses.
+		\item Document mapping between Odoo fields and external payloads.
+	\end{itemize}
+\end{frame}

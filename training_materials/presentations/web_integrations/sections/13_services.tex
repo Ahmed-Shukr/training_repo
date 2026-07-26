@@ -1,0 +1,85 @@
+\section{Services}
+
+\begin{frame}{What Are Services?}
+	\begin{itemize}
+		\item \textbf{Services} are shared frontend features available to many components.
+		\item Examples from Odoo web:
+		\begin{itemize}
+			\item \texttt{rpc} / ORM calls
+			\item \texttt{notification}
+			\item \texttt{action}
+			\item \texttt{dialog}
+			\item \texttt{user}
+		\end{itemize}
+		\item Access them with \texttt{useService(...)}.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Using Built-in Services}
+\begin{lstlisting}[style=js]
+import { Component, useState } from "@odoo/owl";
+import { useService } from "@web/core/utils/hooks";
+
+export class StudentRefresh extends Component {
+	static template = "school_manager.StudentRefresh";
+	setup() {
+		this.orm = useService("orm");
+		this.notification = useService("notification");
+		this.state = useState({ students: [] });
+	}
+	async load() {
+		this.state.students = await this.orm.searchRead(
+			"student.student",
+			[["active", "=", true]],
+			["name", "email"]
+		);
+		this.notification.add("Students loaded", { type: "success" });
+	}
+}
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Custom Service Skeleton}
+\begin{lstlisting}[style=js]
+/** @odoo-module **/
+import { registry } from "@web/core/registry";
+
+export const studentService = {
+	dependencies: ["orm", "notification"],
+	start(env, { orm, notification }) {
+		return {
+			async countActive() {
+				const n = await orm.searchCount("student.student", [[["active", "=", true]]]);
+				notification.add(`Active students: ${n}`);
+				return n;
+			},
+		};
+	},
+};
+
+registry.category("services").add("student_service", studentService);
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Using a Custom Service}
+\begin{lstlisting}[style=js]
+setup() {
+	this.studentService = useService("student_service");
+}
+async onClick() {
+	await this.studentService.countActive();
+}
+\end{lstlisting}
+	\begin{itemize}
+		\item Custom services are ideal for reusable frontend business helpers.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Service Best Practices}
+	\begin{itemize}
+		\item Use services for shared logic, not one-off component details.
+		\item Declare dependencies explicitly.
+		\item Keep services side-effect aware and easy to test.
+		\item Prefer ORM/RPC services over handmade fetch calls when talking to Odoo.
+	\end{itemize}
+\end{frame}

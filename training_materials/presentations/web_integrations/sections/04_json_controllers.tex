@@ -1,0 +1,74 @@
+\section{JSON Controllers}
+
+\begin{frame}[fragile]{What Is a JSON Controller?}
+	\begin{itemize}
+		\item A JSON controller route uses \texttt{type='json'}.
+		\item It receives JSON-RPC style calls and returns Python data (dict/list).
+		\item Ideal for AJAX / OWL service calls inside Odoo web client.
+\begin{block}{Method Syntax}
+\begin{lstlisting}
+@http.route('/school/student/info', type='json', auth='user')
+def student_info(self, student_id):
+	student = request.env['student.student'].browse(student_id)
+	return {
+		'id': student.id,
+		'name': student.name,
+		'email': student.email,
+	}
+\end{lstlisting}
+\end{block}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Calling a JSON Route from JS}
+\begin{lstlisting}[style=js]
+/** @odoo-module **/
+import { jsonrpc } from "@web/core/network/rpc_service";
+
+const result = await jsonrpc("/school/student/info", {
+	student_id: 15,
+});
+console.log(result.name);
+\end{lstlisting}
+	\begin{itemize}
+		\item Frontend sends arguments; backend returns JSON-serializable data.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{JSON vs HTTP Routes}
+	\begin{itemize}
+		\item \texttt{type='http'}: returns HTML/text/files/redirects
+		\item \texttt{type='json'}: returns JSON data for programmatic clients
+	\end{itemize}
+\begin{lstlisting}
+# HTTP
+return request.render(...)
+return request.make_response(...)
+
+# JSON
+return {'ok': True, 'count': 3}
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Validation and Errors}
+\begin{lstlisting}
+@http.route('/school/student/update_email', type='json', auth='user')
+def update_email(self, student_id, email):
+	student = request.env['student.student'].browse(student_id)
+	if not student.exists():
+		return {'error': 'Student not found'}
+	if not email or '@' not in email:
+		return {'error': 'Invalid email'}
+	student.write({'email': email})
+	return {'ok': True}
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}{JSON Controller Best Practices}
+	\begin{itemize}
+		\item Return simple dict/list structures.
+		\item Keep authentication strict (\texttt{auth='user'} by default).
+		\item Do not leak internal exceptions to clients.
+		\item Prefer model methods for reusable business logic.
+	\end{itemize}
+\end{frame}

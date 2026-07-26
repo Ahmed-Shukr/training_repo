@@ -1,0 +1,46 @@
+%-------------------------------------------------------------
+%  Package : BJT Beamer Theme
+%  Author  : Baijayanta
+%  Version : 1.0
+%  Date    : 2026-07-17
+%
+%  Description:
+%    A clean, modern Beamer theme built on top of the
+%    Metropolis theme with customized colors, typography,
+%    and layout for academic presentations.
+%
+%  Repository:
+%    https://github.com/Baijayanta21/bjt-beamer-theme
+%
+%  License:
+%    Copyright (c) 2026 Baijayanta.
+%    Released under the MIT License.
+%-------------------------------------------------------------
+
+% for beamer fonts
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{fonttheme}
+
+% Font theme
+\usefonttheme{serif}
+
+% Text and math fonts
+\RequirePackage{mathptmx}
+\RequirePackage{eulervm}
+\RequirePackage{bookman}
+
+% Frame title
+% change appearance of frametitle 
+\setbeamerfont{frametitle}{
+    family = \rmfamily,   % serif
+    series = \mdseries,   % medium-bold
+    shape  = \scshape,    % small caps
+    size   = \Large       % size
+}
+
+% title and authorname font customization (currently diabled)
+% \setbeamerfont{title}{family=\rmfamily, series=\bfseries, size=\Huge}
+% \setbeamerfont{author}{size=\large}
+
+\endinput
