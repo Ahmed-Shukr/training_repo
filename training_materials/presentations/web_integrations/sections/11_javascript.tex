@@ -1,0 +1,64 @@
+\section{JavaScript}
+
+\begin{frame}[fragile]{JavaScript in Odoo 17}
+	\begin{itemize}
+		\item Odoo frontend code is organized as ES modules.
+		\item Files usually start with:
+\begin{lstlisting}[style=js]
+/** @odoo-module **/
+\end{lstlisting}
+		\item Modules import from Odoo packages such as:
+		\begin{itemize}
+			\item \texttt{@odoo/owl}
+			\item \texttt{@web/core/...}
+			\item \texttt{@web/views/...}
+		\end{itemize}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Module Import / Export}
+\begin{lstlisting}[style=js]
+/** @odoo-module **/
+import { Component, useState } from "@odoo/owl";
+import { registry } from "@web/core/registry";
+
+export class StudentCounter extends Component {
+	static template = "school_manager.StudentCounter";
+	setup() {
+		this.state = useState({ value: 0 });
+	}
+	increment() {
+		this.state.value++;
+	}
+}
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Registering Frontend Pieces}
+\begin{lstlisting}[style=js]
+registry.category("actions").add("school_student_dashboard", StudentDashboard);
+registry.category("fields").add("student_badge", studentBadgeField);
+\end{lstlisting}
+	\begin{itemize}
+		\item Registries are how Odoo discovers actions, fields, views, services, and more.
+		\item Custom JS usually extends an existing registry category.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Debugging Tips}
+	\begin{itemize}
+		\item Use browser devtools extensively.
+		\item Check Assets for load/order issues after upgrades.
+		\item Prefer small modules over giant JS files.
+		\item Keep naming consistent with module technical names.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{JavaScript Best Practices}
+	\begin{itemize}
+		\item Always include \texttt{/** @odoo-module **/}.
+		\item Prefer official \texttt{@web} / \texttt{@odoo/owl} imports.
+		\item Avoid editing core Odoo JS; extend via your module assets.
+		\item Write intentional UI logic, not copies of backend business rules.
+	\end{itemize}
+\end{frame}

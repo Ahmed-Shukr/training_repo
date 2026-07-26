@@ -1,0 +1,70 @@
+\section{JSON-RPC}
+
+\begin{frame}[fragile]{What Is JSON-RPC in Odoo?}
+	\begin{itemize}
+		\item \textbf{JSON-RPC} is Odoo's JSON-based remote call protocol.
+		\item Endpoint: \texttt{/jsonrpc}
+		\item Same idea as XML-RPC, but with JSON payloads.
+\begin{block}{Why Use It?}
+	Easier for JavaScript / modern web and mobile clients.
+\end{block}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Authenticate with JSON-RPC}
+\begin{lstlisting}
+import requests
+
+url = "http://localhost:8069/jsonrpc"
+payload = {
+	"jsonrpc": "2.0",
+	"method": "call",
+	"params": {
+		"service": "common",
+		"method": "authenticate",
+		"args": ["school_db", "admin", "admin", {}],
+	},
+	"id": 1,
+}
+uid = requests.post(url, json=payload).json()["result"]
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Search Read via JSON-RPC}
+\begin{lstlisting}
+payload = {
+	"jsonrpc": "2.0",
+	"method": "call",
+	"params": {
+		"service": "object",
+		"method": "execute_kw",
+		"args": [
+			"school_db", uid, "admin",
+			"student.student", "search_read",
+			[[["active", "=", True]]],
+			{"fields": ["name", "email"], "limit": 10},
+		],
+	},
+	"id": 2,
+}
+result = requests.post(url, json=payload).json()["result"]
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{XML-RPC vs JSON-RPC}
+	\begin{itemize}
+		\item Both call the same Odoo ORM layer remotely.
+		\item XML-RPC: XML payloads, Python stdlib support.
+		\item JSON-RPC: JSON payloads, natural for JS/web stacks.
+		\item For many new integrations, JSON-RPC is more convenient.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{JSON-RPC Best Practices}
+	\begin{itemize}
+		\item Store credentials securely; never hard-code in frontend public code.
+		\item Use a dedicated integration user with least privilege.
+		\item Handle \texttt{error} responses from JSON-RPC carefully.
+		\item Prefer HTTPS and strong passwords/API policies.
+	\end{itemize}
+\end{frame}

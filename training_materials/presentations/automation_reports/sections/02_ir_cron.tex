@@ -1,0 +1,150 @@
+\section{Scheduled Actions (\texttt{ir.cron})}
+
+\slidebackground{backgrounds/wallpaper.jpg}
+
+\begin{frame}[fragile]{What Is \texttt{ir.cron}?}
+	\begin{itemize}
+		\item \textbf{\texttt{ir.cron}} is Odoo's scheduled action (cron job) model.
+		\item It runs a Python method automatically on a schedule.
+		\item Typical uses:
+		\begin{itemize}
+			\item send reminder emails
+			\item archive old records
+			\item compute nightly statistics
+			\item sync data with external systems
+		\end{itemize}
+\begin{block}{Core Idea}
+	A cron points to a model method and a timing interval.
+\end{block}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Defining a Cron in XML}
+\begin{lstlisting}[style=xml]
+<record id="ir_cron_student_reminder" model="ir.cron">
+  <field name="name">Student: Send Attendance Reminder</field>
+  <field name="model_id" ref="model_student_student"/>
+  <field name="state">code</field>
+  <field name="code">model._cron_send_attendance_reminder()</field>
+  <field name="interval_number">1</field>
+  <field name="interval_type">days</field>
+  <field name="numbercall">-1</field>
+  <field name="active" eval="True"/>
+</record>
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Breaking Down Cron Fields}
+	\begin{itemize}
+		\item \textbf{\texttt{name}}: label in Settings $\rightarrow$ Technical $\rightarrow$ Scheduled Actions
+		\item \textbf{\texttt{model\_id}}: model that owns the method
+		\item \textbf{\texttt{state}}: usually \texttt{code}
+		\item \textbf{\texttt{code}}: Python expression executed by the cron
+		\item \textbf{\texttt{interval\_number}} / \textbf{\texttt{interval\_type}}: how often it runs
+		\item \textbf{\texttt{numbercall}}: how many times (\texttt{-1} = forever)
+		\item \textbf{\texttt{active}}: enable/disable the cron
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Interval Types}
+	\begin{itemize}
+		\item Common \texttt{interval\_type} values:
+		\begin{itemize}
+			\item \texttt{minutes}
+			\item \texttt{hours}
+			\item \texttt{days}
+			\item \texttt{weeks}
+			\item \texttt{months}
+		\end{itemize}
+	\end{itemize}
+\begin{lstlisting}[style=xml]
+<field name="interval_number">30</field>
+<field name="interval_type">minutes</field>
+\end{lstlisting}
+	\begin{itemize}
+		\item Choose intervals carefully -- too frequent jobs can overload the server.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Writing the Cron Method}
+\begin{block}{Method Syntax}
+\begin{lstlisting}
+@api.model
+def _cron_send_attendance_reminder(self):
+	students = self.search([
+		('active', '=', True),
+		('email', '!=', False),
+	])
+	template = self.env.ref(
+		'school_manager.mail_template_attendance_reminder',
+		raise_if_not_found=False,
+	)
+	if not template:
+		return False
+	for student in students:
+		template.send_mail(student.id, force_send=False)
+	return True
+\end{lstlisting}
+\end{block}
+\end{frame}
+
+\begin{frame}[fragile]{Important Cron Method Rules}
+	\begin{itemize}
+		\item Use \texttt{@api.model} for cron entry methods.
+		\item Keep the method name private-style: \texttt{\_cron\_...}
+		\item Make the job \textbf{idempotent} when possible (safe if run twice).
+		\item Avoid huge work in one transaction; batch when needed.
+		\item Log failures clearly.
+	\end{itemize}
+\begin{lstlisting}
+@api.model
+def _cron_archive_old_logs(self):
+	old = self.env['student.log'].search([
+		('create_date', '<', fields.Datetime.subtract(
+			fields.Datetime.now(), days=90)),
+	])
+	old.unlink()
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Manual Testing of a Cron}
+\begin{lstlisting}
+# Odoo shell
+env['student.student']._cron_send_attendance_reminder()
+
+# Or open Settings > Technical > Automation > Scheduled Actions
+# and click Run Manually
+\end{lstlisting}
+	\begin{itemize}
+		\item Always test the method manually before relying on the schedule.
+		\item Check server logs after the first automatic runs.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{User, Company, and Rights in Crons}
+	\begin{itemize}
+		\item Cron jobs usually run as the OdooBot / superuser environment.
+		\item Still write safe domains and business checks.
+		\item If you need a specific company:
+\begin{lstlisting}
+@api.model
+def _cron_company_cleanup(self):
+	for company in self.env['res.company'].search([]):
+		students = self.with_company(company).search([
+			('company_id', '=', company.id),
+			('active', '=', False),
+		])
+		# company-specific processing
+\end{lstlisting}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Cron Best Practices}
+	\begin{itemize}
+		\item One cron = one clear responsibility.
+		\item Prefer nightly/hourly jobs over very short loops.
+		\item Use \texttt{numbercall = -1} for recurring jobs.
+		\item Keep XML cron definitions in \texttt{data/} with \texttt{noupdate} when users may customize schedules.
+		\item Monitor runtime and failure logs in production.
+	\end{itemize}
+\end{frame}

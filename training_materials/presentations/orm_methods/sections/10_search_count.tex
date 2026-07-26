@@ -1,0 +1,104 @@
+
+\section{\textbf{\texttt{search\_count()}} ORM Method}
+
+\begin{frame}[fragile]{\textbf{\texttt{search\_count()}} Method}
+	\begin{itemize}
+		\item The \textbf{\texttt{search\_count()}} method returns the \textbf{number of records} that match a domain.
+		\item It is more efficient than searching all records and then using \texttt{len()}.
+		\item The method returns an integer.
+\begin{block}{Method Syntax}
+\begin{lstlisting}
+@api.model
+def search_count(self, domain, limit=None):
+	return super().search_count(domain, limit=limit)
+\end{lstlisting}
+	\begin{itemize}
+		\item Important parts: \textbf{\texttt{domain}}, optional \textbf{\texttt{limit}}.
+	\end{itemize}
+\end{block}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Breaking Down the Method Signature}
+	\begin{block}{}
+		\begin{itemize}
+			\item \textbf{\texttt{@api.model}}: Executed at the model level.
+			\item \textbf{\texttt{self}}: The model, not a specific record.
+			\item \textbf{\texttt{domain}}: Same domain language used by \texttt{search()}.
+			\item \textbf{\texttt{limit}}: Optional maximum count (less commonly used).
+\begin{lstlisting}
+domain = [('active', '=', True), ('age', '>=', 18)]
+\end{lstlisting}
+		\end{itemize}
+	\end{block}
+\end{frame}
+
+\begin{frame}[fragile]{What Does \texttt{search\_count()} Return?}
+	\begin{block}{}
+		\begin{itemize}
+			\item It returns an \textbf{integer}.
+\begin{lstlisting}
+total = self.env['student.student'].search_count([
+	('gender', '=', 'male'),
+])
+print(total)
+\end{lstlisting}
+			Output is (example):
+\begin{lstlisting}
+12
+\end{lstlisting}
+			\item No recordset is created.
+			\item Only the count is computed.
+		\end{itemize}
+	\end{block}
+\end{frame}
+
+\begin{frame}[fragile]{Why Not Use \texttt{len(search(...))}?}
+	Less efficient pattern:
+\begin{lstlisting}
+total = len(self.env['student.student'].search([
+	('active', '=', True),
+]))
+\end{lstlisting}
+	Better pattern:
+\begin{lstlisting}
+total = self.env['student.student'].search_count([
+	('active', '=', True),
+])
+\end{lstlisting}
+	\begin{itemize}
+		\item \texttt{search\_count()} avoids loading every matching record into Python.
+		\item Important when tables are large.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Practical Examples}
+\begin{lstlisting}
+adults = self.env['student.student'].search_count([
+	('age', '>=', 18),
+])
+archived = self.env['student.student'].search_count([
+	('active', '=', False),
+])
+has_email = self.env['student.student'].search_count([
+	('email', '!=', False),
+])
+\end{lstlisting}
+	\begin{itemize}
+		\item Useful for dashboards, KPIs, and validation checks.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Method Call}
+\begin{block}{Method Call}
+\begin{lstlisting}
+count = self.env['student.student'].search_count([
+	('name', 'ilike', 'ahmed'),
+])
+\end{lstlisting}
+	\begin{itemize}
+		\item Here, \textbf{\texttt{.search\_count(...)}} is the \textbf{method call}.
+		\item Return type reminder: \textbf{int}.
+	\end{itemize}
+\end{block}
+\end{frame}

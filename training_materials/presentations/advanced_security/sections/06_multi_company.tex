@@ -1,0 +1,107 @@
+\section{Multi Company}
+
+\begin{frame}[fragile]{What Is Multi-Company?}
+	\begin{itemize}
+		\item Multi-company allows one database to serve multiple companies.
+		\item Records often belong to a \texttt{company\_id}.
+		\item Users may have access to one or several companies.
+\begin{block}{Typical Field}
+\begin{lstlisting}
+company_id = fields.Many2one(
+	'res.company',
+	required=True,
+	default=lambda self: self.env.company,
+)
+\end{lstlisting}
+\end{block}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Company Field on Business Models}
+\begin{lstlisting}
+class Student(models.Model):
+	_name = 'student.student'
+
+	name = fields.Char(required=True)
+	company_id = fields.Many2one(
+		'res.company',
+		string='Company',
+		required=True,
+		index=True,
+		default=lambda self: self.env.company,
+	)
+\end{lstlisting}
+	\begin{itemize}
+		\item Default to \texttt{env.company}.
+		\item Index \texttt{company\_id} because security domains use it often.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Multi-Company Record Rule}
+\begin{lstlisting}[style=xml]
+<record id="student_comp_rule" model="ir.rule">
+  <field name="name">Student multi-company</field>
+  <field name="model_id" ref="model_student_student"/>
+  <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+</record>
+\end{lstlisting}
+	\begin{itemize}
+		\item \texttt{company\_ids} = companies currently allowed in the user environment.
+		\item This is the standard isolation pattern.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Environment Helpers for Company}
+\begin{lstlisting}
+# Active company
+company = self.env.company
+
+# Allowed companies
+companies = self.env.companies
+
+# Force operations in another company
+records = self.env['student.student'].with_company(other_company).search([])
+\end{lstlisting}
+	\begin{itemize}
+		\item Prefer \texttt{with\_company()} over hard-coding company IDs.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Views and Company Fields}
+\begin{lstlisting}[style=xml]
+<field name="company_id" groups="base.group_multi_company"/>
+\end{lstlisting}
+	\begin{itemize}
+		\item Often show \texttt{company\_id} only when multi-company is enabled.
+		\item In many2one fields, domain can restrict to current companies:
+\begin{lstlisting}[style=xml]
+<field name="classroom_id"
+	   domain="[('company_id', 'in', company_ids)]"/>
+\end{lstlisting}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Check Company Consistency}
+\begin{lstlisting}
+@api.constrains('classroom_id', 'company_id')
+def _check_company_consistency(self):
+	for student in self:
+		if student.classroom_id and student.classroom_id.company_id != student.company_id:
+			raise ValidationError(
+				"Student and Classroom must belong to the same company."
+			)
+\end{lstlisting}
+	\begin{itemize}
+		\item Related records should usually share the same company.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Multi-Company Best Practices}
+	\begin{itemize}
+		\item Add \texttt{company\_id} early on shared business models.
+		\item Add a company record rule.
+		\item Default from \texttt{env.company}.
+		\item Validate consistency between related records.
+		\item Test with users who can access more than one company.
+	\end{itemize}
+\end{frame}

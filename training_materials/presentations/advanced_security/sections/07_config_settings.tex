@@ -1,0 +1,125 @@
+\section{Configuration Settings and System Parameters}
+
+\begin{frame}[fragile]{What Are Configuration Settings?}
+	\begin{itemize}
+		\item Configuration settings are admin options shown in Settings.
+		\item In modern Odoo they usually extend \texttt{res.config.settings}.
+		\item They let managers enable features and store defaults without code changes.
+\begin{block}{Model}
+\begin{lstlisting}
+class ResConfigSettings(models.TransientModel):
+	_inherit = 'res.config.settings'
+\end{lstlisting}
+\end{block}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Adding Settings Fields}
+\begin{lstlisting}
+class ResConfigSettings(models.TransientModel):
+	_inherit = 'res.config.settings'
+
+	school_default_age = fields.Integer(
+		string='Default Student Age',
+		config_parameter='school_manager.default_age',
+	)
+	school_allow_self_register = fields.Boolean(
+		string='Allow Self Registration',
+		config_parameter='school_manager.allow_self_register',
+	)
+\end{lstlisting}
+	\begin{itemize}
+		\item \texttt{config\_parameter} stores the value in \texttt{ir.config\_parameter}.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Settings View XML}
+\begin{lstlisting}[style=xml]
+<record id="res_config_settings_view_form_school" model="ir.ui.view">
+  <field name="name">res.config.settings.view.form.school</field>
+  <field name="model">res.config.settings</field>
+  <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+  <field name="arch" type="xml">
+	<xpath expr="//form" position="inside">
+	  <app string="School" name="school_manager">
+		<block title="Student Defaults">
+		  <setting string="Default Age">
+			<field name="school_default_age"/>
+		  </setting>
+		  <setting string="Self Registration">
+			<field name="school_allow_self_register"/>
+		  </setting>
+		</block>
+	  </app>
+	</xpath>
+  </field>
+</record>
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{What Is \texttt{ir.config\_parameter}?}
+	\begin{itemize}
+		\item System parameters are key/value settings stored in \texttt{ir.config\_parameter}.
+		\item Useful for module-wide options and integrations.
+\begin{lstlisting}
+ICP = self.env['ir.config_parameter'].sudo()
+age = int(ICP.get_param('school_manager.default_age', default=18))
+ICP.set_param('school_manager.allow_self_register', True)
+\end{lstlisting}
+		\item Often accessed with \texttt{sudo()} because parameters are technical.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Creating a Parameter in XML}
+\begin{lstlisting}[style=xml]
+<record id="school_default_age_param" model="ir.config_parameter">
+  <field name="key">school_manager.default_age</field>
+  <field name="value">18</field>
+</record>
+\end{lstlisting}
+	\begin{itemize}
+		\item Good for default install values.
+		\item Prefer namespaced keys: \texttt{module\_name.option\_name}.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Using Settings in Business Code}
+\begin{lstlisting}
+@api.model
+def _default_age(self):
+	value = self.env['ir.config_parameter'].sudo().get_param(
+		'school_manager.default_age', '18'
+	)
+	return int(value)
+
+age = fields.Integer(default=_default_age)
+\end{lstlisting}
+	\begin{itemize}
+		\item Settings become real defaults for models and flows.
+		\item Keep conversion/validation around string parameters.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Security Around Settings}
+\begin{lstlisting}[style=xml]
+<menuitem id="menu_school_settings"
+		  name="Settings"
+		  parent="menu_school_root"
+		  action="action_school_config_settings"
+		  groups="base.group_system"/>
+\end{lstlisting}
+	\begin{itemize}
+		\item Settings pages are usually for Administration / Settings users.
+		\item Do not expose technical parameters to normal employees.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Settings Best Practices}
+	\begin{itemize}
+		\item Use \texttt{res.config.settings} for admin-facing options.
+		\item Store durable values with \texttt{config\_parameter}.
+		\item Namespace keys by module.
+		\item Provide sensible defaults in XML or field defaults.
+		\item Restrict settings UI to the right group.
+	\end{itemize}
+\end{frame}

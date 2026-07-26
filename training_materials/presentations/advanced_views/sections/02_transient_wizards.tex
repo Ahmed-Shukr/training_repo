@@ -1,0 +1,104 @@
+\section{Transient Models and Wizard Forms}
+
+\slidebackground{backgrounds/wallpaper.jpg}
+
+\begin{frame}[fragile]{What Is a Transient Model?}
+	\begin{itemize}
+		\item A \textbf{transient model} stores temporary wizard data.
+		\item It inherits from \textbf{\texttt{models.TransientModel}}.
+		\item Records are cleaned automatically after some time.
+\begin{block}{Method Syntax}
+\begin{lstlisting}
+class StudentWizard(models.TransientModel):
+	_name = 'student.wizard'
+	_description = 'Student Wizard'
+\end{lstlisting}
+\end{block}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{TransientModel vs Model}
+	\begin{itemize}
+		\item \texttt{models.Model}: normal business data (students, invoices, partners).
+		\item \texttt{models.TransientModel}: temporary UI/process data.
+	\end{itemize}
+\begin{lstlisting}
+# Permanent
+class Student(models.Model):
+	_name = 'student.student'
+
+# Temporary wizard
+class StudentWizard(models.TransientModel):
+	_name = 'student.wizard'
+\end{lstlisting}
+	\begin{itemize}
+		\item Do not store important long-term business data in transient models.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Building a Wizard Model}
+\begin{lstlisting}
+class StudentAssignWizard(models.TransientModel):
+	_name = 'student.assign.wizard'
+	_description = 'Assign Classroom Wizard'
+
+	classroom_id = fields.Many2one('school.classroom', required=True)
+	student_ids = fields.Many2many('student.student', string='Students')
+
+	def action_assign(self):
+		self.ensure_one()
+		self.student_ids.write({'classroom_id': self.classroom_id.id})
+		return {'type': 'ir.actions.act_window_close'}
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Wizard Form View}
+\begin{lstlisting}[style=xml]
+<record id="view_student_assign_wizard" model="ir.ui.view">
+  <field name="name">student.assign.wizard.form</field>
+  <field name="model">student.assign.wizard</field>
+  <field name="arch" type="xml">
+	<form string="Assign Classroom">
+	  <group>
+		<field name="classroom_id"/>
+		<field name="student_ids" widget="many2many_tags"/>
+	  </group>
+	  <footer>
+		<button name="action_assign" type="object" string="Assign" class="btn-primary"/>
+		<button string="Cancel" special="cancel"/>
+	  </footer>
+	</form>
+  </field>
+</record>
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Opening a Wizard with an Action}
+\begin{lstlisting}
+def action_open_assign_wizard(self):
+	return {
+		'type': 'ir.actions.act_window',
+		'name': 'Assign Classroom',
+		'res_model': 'student.assign.wizard',
+		'view_mode': 'form',
+		'target': 'new',
+		'context': {
+			'default_student_ids': [(6, 0, self.ids)],
+		},
+	}
+\end{lstlisting}
+	\begin{itemize}
+		\item \texttt{target='new'} opens the wizard as a modal dialog.
+		\item Context can prefill wizard fields.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Wizard Best Practices}
+	\begin{itemize}
+		\item Keep wizards focused on one job.
+		\item Validate inputs in the wizard method.
+		\item Close the wizard with \texttt{act\_window\_close} or return another action.
+		\item Use \texttt{default\_*} context keys to prefill values.
+		\item Remember: transient data is temporary.
+	\end{itemize}
+\end{frame}

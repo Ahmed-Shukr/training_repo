@@ -1,0 +1,78 @@
+\section{Code Quality}
+
+\begin{frame}{What is Code Quality?}
+\begin{itemize}
+  \item Code that is correct, readable, testable, and maintainable
+  \item Not only ``it works once on my laptop''
+  \item Especially important in Odoo: many modules, shared DB, long-lived projects
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Quality Pillars for Odoo Projects}
+\begin{enumerate}
+  \item Clear module boundaries and naming
+  \item Security (ACL, record rules, sudo discipline)
+  \item Performance (prefetch, domains, SQL when needed)
+  \item Tests (unit / HTTP / tours where valuable)
+  \item Style consistency (linters, reviews)
+\end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]{Static Checks}
+\begin{lstlisting}[style=bash]
+# Example toolchain (adapt to your repo)
+ruff check .
+ruff format --check .
+pylint-odoo $(find . -name '*.py')
+
+# Odoo module tests
+odoo-bin -c odoo.conf -d test_db \
+  -i school_core --test-enable --stop-after-init
+\end{lstlisting}
+
+\vspace{0.4em}
+\begin{block}{Idea}
+  Catch style and common bugs before review; catch regressions with tests before deploy.
+\end{block}
+\end{frame}
+
+\begin{frame}[fragile]{Readable ORM Code}
+\begin{lstlisting}
+# Prefer clear domains and helpers
+def action_enroll(self):
+    self.ensure_one()
+    if self.state != 'draft':
+        raise UserError(_("Only draft students can enroll."))
+    self.write({
+        'state': 'enrolled',
+        'enroll_date': fields.Date.context_today(self),
+    })
+    return True
+\end{lstlisting}
+
+\vspace{0.3em}
+\begin{itemize}
+  \item Small methods, explicit guards, user-facing errors
+  \item Avoid giant \texttt{create}/\texttt{write} overrides without comments
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Review Checklist (Pull Requests)}
+\begin{itemize}
+  \item Does it need a migration script?
+  \item New fields: stored? indexed? related?
+  \item Access rights / record rules updated?
+  \item Any N+1 loops or \texttt{sudo()} without reason?
+  \item Tests or manual test notes for the change?
+  \item Manifest version bumped when required?
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Code Quality Habits}
+\begin{itemize}
+  \item One PR = one concern
+  \item Delete dead code; avoid commented-out blocks in main
+  \item Document non-obvious business rules near the code
+  \item Prefer extending via inheritance over copy-paste modules
+\end{itemize}
+\end{frame}

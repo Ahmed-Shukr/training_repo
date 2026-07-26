@@ -1,0 +1,84 @@
+\section{Components}
+
+\begin{frame}[fragile]{What Is an OWL Component?}
+	\begin{itemize}
+		\item A component is a class + template (+ optional props/state).
+		\item Parents compose children to build complex screens.
+\begin{block}{Shape}
+\begin{lstlisting}[style=js]
+export class StudentCard extends Component {
+	static template = "school_manager.StudentCard";
+	static props = ["student"];
+	static components = {};
+}
+\end{lstlisting}
+\end{block}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{State with \texttt{useState}}
+\begin{lstlisting}[style=js]
+import { Component, useState } from "@odoo/owl";
+
+export class StudentFilter extends Component {
+	static template = "school_manager.StudentFilter";
+	setup() {
+		this.state = useState({
+			query: "",
+			onlyActive: true,
+		});
+	}
+	onQueryInput(ev) {
+		this.state.query = ev.target.value;
+	}
+}
+\end{lstlisting}
+	\begin{itemize}
+		\item Changing reactive state re-renders the component.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Props and Child Components}
+\begin{lstlisting}[style=js]
+export class StudentList extends Component {
+	static template = "school_manager.StudentList";
+	static components = { StudentCard };
+	static props = {
+		students: { type: Array },
+	};
+}
+\end{lstlisting}
+\begin{lstlisting}[style=xml]
+<t t-name="school_manager.StudentList">
+  <t t-foreach="props.students" t-as="student" t-key="student.id">
+	<StudentCard student="student"/>
+  </t>
+</t>
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Events / Callbacks}
+\begin{lstlisting}[style=js]
+export class StudentCard extends Component {
+	static props = {
+		student: { type: Object },
+		onSelect: { type: Function, optional: true },
+	};
+	select() {
+		this.props.onSelect?.(this.props.student);
+	}
+}
+\end{lstlisting}
+	\begin{itemize}
+		\item Prefer callbacks/props over tightly coupled parent lookups.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Component Best Practices}
+	\begin{itemize}
+		\item One component = one UI responsibility.
+		\item Declare \texttt{static props} clearly.
+		\item Use \texttt{t-key} in loops.
+		\item Keep templates close to the component's module assets.
+	\end{itemize}
+\end{frame}

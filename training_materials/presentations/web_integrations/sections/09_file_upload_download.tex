@@ -1,0 +1,68 @@
+\section{File Upload \& Download}
+
+\begin{frame}[fragile]{Files in Odoo Web}
+	\begin{itemize}
+		\item Upload: browser sends files to a controller or into \texttt{ir.attachment}.
+		\item Download: controller returns a file response.
+		\item Attachments are the standard storage model for many files.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Upload via Controller}
+\begin{lstlisting}
+import base64
+
+@http.route('/school/student/upload', type='http', auth='user',
+			methods=['POST'], website=True)
+def upload_student_file(self, student_id, ufile, **post):
+	student = request.env['student.student'].browse(int(student_id))
+	request.env['ir.attachment'].create({
+		'name': ufile.filename,
+		'res_model': 'student.student',
+		'res_id': student.id,
+		'type': 'binary',
+		'datas': base64.b64encode(ufile.read()),
+		'mimetype': ufile.content_type,
+	})
+	return request.redirect(f'/school/student/{student.id}')
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Download a File}
+\begin{lstlisting}
+@http.route('/school/attachment/<int:attachment_id>/download',
+			type='http', auth='user')
+def download_attachment(self, attachment_id, **kwargs):
+	attachment = request.env['ir.attachment'].browse(attachment_id)
+	if not attachment.exists():
+		return request.not_found()
+	return request.make_response(
+		base64.b64decode(attachment.datas),
+		headers=[
+			('Content-Type', attachment.mimetype or 'application/octet-stream'),
+			('Content-Disposition',
+			 f'attachment; filename="{attachment.name}"'),
+		],
+	)
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Binary Fields vs Attachments}
+	\begin{itemize}
+		\item \textbf{Binary field}: file stored on the record field
+\begin{lstlisting}
+photo = fields.Binary(string='Photo', attachment=True)
+\end{lstlisting}
+		\item \textbf{ir.attachment}: separate attachment records linked by model/res\_id
+		\item Use attachments for multiple documents per record.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{File Handling Best Practices}
+	\begin{itemize}
+		\item Validate file type/size before accepting uploads.
+		\item Check record access before download.
+		\item Prefer \texttt{attachment=True} for large binary fields.
+		\item Never trust original filenames blindly in headers/paths.
+	\end{itemize}
+\end{frame}

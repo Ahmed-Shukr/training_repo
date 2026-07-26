@@ -1,0 +1,106 @@
+\section{XPath and Extend Views}
+
+\begin{frame}{What Is View Inheritance?}
+	\begin{itemize}
+		\item View inheritance lets you modify an existing view without rewriting it.
+		\item You create a new \texttt{ir.ui.view} with:
+		\begin{itemize}
+			\item \texttt{inherit\_id} pointing to the parent view
+			\item XPath / \texttt{<field name="...">} instructions describing changes
+		\end{itemize}
+		\item This is the standard way to customize Odoo screens.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Basic Inherited View Structure}
+\begin{lstlisting}[style=xml]
+<record id="view_student_form_inherit" model="ir.ui.view">
+  <field name="name">student.student.form.inherit</field>
+  <field name="model">student.student</field>
+  <field name="inherit_id" ref="school_manager.view_student_form"/>
+  <field name="arch" type="xml">
+	<!-- modification instructions here -->
+  </field>
+</record>
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Shortcut: Inherit by Field Name}
+\begin{lstlisting}[style=xml]
+<field name="email" position="after">
+  <field name="blood_group"/>
+</field>
+\end{lstlisting}
+	\begin{itemize}
+		\item This finds the field named \texttt{email} and applies a position.
+		\item Common positions:
+		\begin{itemize}
+			\item \texttt{after}
+			\item \texttt{before}
+			\item \texttt{inside}
+			\item \texttt{replace}
+			\item \texttt{attributes}
+		\end{itemize}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{XPath Inheritance}
+\begin{block}{Method Syntax}
+\begin{lstlisting}[style=xml]
+<xpath expr="//field[@name='age']" position="after">
+  <field name="birth_date"/>
+</xpath>
+\end{lstlisting}
+\end{block}
+	\begin{itemize}
+		\item \texttt{expr} is an XPath expression into the parent architecture.
+		\item More powerful when the target is not a simple field.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Useful XPath Examples}
+\begin{lstlisting}[style=xml]
+<!-- Add a page inside a notebook -->
+<xpath expr="//notebook" position="inside">
+  <page string="Medical">
+	<field name="blood_group"/>
+  </page>
+</xpath>
+
+<!-- Replace a field -->
+<xpath expr="//field[@name='notes']" position="replace">
+  <field name="internal_notes"/>
+</xpath>
+
+<!-- Change attributes -->
+<xpath expr="//field[@name='email']" position="attributes">
+  <attribute name="required">1</attribute>
+</xpath>
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Positions Explained}
+	\begin{itemize}
+		\item \texttt{before}: insert before the matched node
+		\item \texttt{after}: insert after the matched node
+		\item \texttt{inside}: insert as a child of the matched node
+		\item \texttt{replace}: replace the matched node completely
+		\item \texttt{attributes}: modify XML attributes of the matched node
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{View Extension Tips}
+	\begin{itemize}
+		\item Target stable nodes (named fields, named groups/pages).
+		\item Prefer precise XPath expressions.
+		\item Do not replace large view chunks unless necessary.
+		\item Test after module upgrade because parent views may change.
+\begin{lstlisting}[style=xml]
+<xpath expr="//page[@name='info']" position="inside">
+  <group>
+	<field name="guardian_phone"/>
+  </group>
+</xpath>
+\end{lstlisting}
+	\end{itemize}
+\end{frame}

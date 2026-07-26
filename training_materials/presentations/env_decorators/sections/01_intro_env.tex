@@ -1,0 +1,26 @@
+\section{Introduction to the Environment}
+
+\begin{frame}{What Will We Learn?}
+	\begin{itemize}
+		\item What \textbf{\texttt{self.env}} is and why every Odoo method uses it.
+		\item The main parts of the environment: user, company, context, cursor, and registry.
+		\item How to switch environment safely with \texttt{with\_context}, \texttt{with\_user}, \texttt{sudo()}, and friends.
+		\item How to resolve XML IDs with \texttt{env.ref()}.
+		\item The most important \textbf{\texttt{@api}} decorators and when to use each one.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Why the Environment Matters}
+	\begin{itemize}
+		\item In Odoo, business code almost never talks to PostgreSQL directly.
+		\item Every recordset carries an \textbf{environment}.
+		\item The environment answers questions such as:
+		\begin{itemize}
+			\item Who is the current user?
+			\item Which company is active?
+			\item What language / context flags are active?
+			\item Which database cursor should be used?
+		\end{itemize}
+		\item Understanding \texttt{self.env} is the foundation for correct ORM code.
+	\end{itemize}
+\end{frame}

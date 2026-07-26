@@ -1,0 +1,49 @@
+\section{\textbf{\texttt{self.env}} Explained}
+
+\begin{frame}[fragile]{What Is \texttt{self.env}?}
+	\begin{itemize}
+		\item \textbf{\texttt{self.env}} is the \textbf{Environment} object attached to a recordset.
+		\item It is the gateway to models, users, companies, context, and the database cursor.
+\begin{block}{Basic Access}
+\begin{lstlisting}
+class Student(models.Model):
+	_name = 'student.student'
+
+	def action_demo(self):
+		print(self.env)
+		students = self.env['student.student'].search([])
+\end{lstlisting}
+\end{block}
+		\item Inside model methods, you almost always start from \texttt{self.env}.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Environment vs Recordset}
+	\begin{itemize}
+		\item A \textbf{recordset} represents one or more records of a model.
+		\item An \textbf{environment} is the execution context around those records.
+\begin{lstlisting}
+student = self.env['student.student'].browse(15)
+print(student)      # student.student(15,)
+print(student.env)  # Environment object
+\end{lstlisting}
+		\item Different recordsets may share the same environment.
+		\item Changing the environment (for example with \texttt{sudo()}) returns a \textbf{new} recordset / env pair.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Where Does \texttt{self.env} Come From?}
+	\begin{itemize}
+		\item Odoo builds the environment when a request / shell / cron job starts.
+		\item Then every recordset created in that flow receives that environment.
+\begin{lstlisting}
+# In Odoo shell
+env['student.student'].search([])
+
+# In a model method
+self.env['student.student'].search([])
+\end{lstlisting}
+		\item In both cases, \texttt{env} is the same kind of object.
+		\item In model methods, it is available as \textbf{\texttt{self.env}}.
+	\end{itemize}
+\end{frame}

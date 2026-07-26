@@ -1,0 +1,105 @@
+\section{Nginx}
+
+\begin{frame}{What is Nginx?}
+\begin{itemize}
+  \item High-performance \textbf{web server} and \textbf{reverse proxy}
+  \item Sits in front of Odoo (port 8069) and longpolling (8072)
+  \item Handles HTTPS, static files, compression, and load balancing
+\end{itemize}
+
+\vspace{0.5em}
+\begin{block}{Why put Nginx in front of Odoo?}
+  Terminate TLS, hide internal ports, serve assets efficiently, and protect the app from direct internet exposure.
+\end{block}
+\end{frame}
+
+\begin{frame}{Typical Traffic Flow}
+\begin{center}
+\begin{tabular}{c}
+Browser \\
+$\downarrow$ HTTPS :443 \\
+\textbf{Nginx} \\
+$\downarrow$ HTTP :8069 / :8072 \\
+Odoo workers / longpolling
+\end{tabular}
+\end{center}
+
+\vspace{0.8em}
+\begin{itemize}
+  \item Regular HTTP requests $\rightarrow$ Odoo HTTP port
+  \item Bus / longpolling $\rightarrow$ gevent longpolling port
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Reverse Proxy --- Upstreams \& Timeouts}
+\begin{lstlisting}[language={}]
+upstream odoo {
+    server 127.0.0.1:8069;
+}
+upstream odoochat {
+    server 127.0.0.1:8072;
+}
+
+server {
+    listen 80;
+    server_name erp.example.com;
+
+    proxy_read_timeout 720s;
+    proxy_connect_timeout 720s;
+    proxy_send_timeout 720s;
+}
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Reverse Proxy --- Locations}
+\begin{lstlisting}[language={}]
+    location / {
+        proxy_pass http://odoo;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For
+            $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location /longpolling {
+        proxy_pass http://odoochat;
+    }
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}{Directive Breakdown}
+\begin{description}
+  \item[\texttt{upstream}] Named backend pool for Odoo / chat
+  \item[\texttt{proxy\_pass}] Forward request to that upstream
+  \item[\texttt{X-Forwarded-*}] Tell Odoo the original host and scheme
+  \item[\texttt{proxy\_*\_timeout}] Long enough for heavy reports/imports
+  \item[\texttt{/longpolling}] Separate path for realtime bus
+\end{description}
+\end{frame}
+
+\begin{frame}[fragile]{HTTPS with Let's Encrypt (Concept)}
+\begin{lstlisting}[style=bash]
+# Install certbot plugin, then:
+sudo certbot --nginx -d erp.example.com
+
+# Nginx gains listen 443 ssl and certificate paths
+# HTTP can redirect to HTTPS
+\end{lstlisting}
+
+\vspace{0.5em}
+\begin{itemize}
+  \item Prefer TLS everywhere in production
+  \item Redirect port 80 $\rightarrow$ 443
+  \item Keep certificates renewing automatically
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Nginx Tips for Odoo}
+\begin{itemize}
+  \item Enable \texttt{proxy\_mode = True} in Odoo config when behind a proxy
+  \item Increase body size for large attachments:
+        \texttt{client\_max\_body\_size 64m;}
+  \item Cache or gzip static assets carefully
+  \item Do not expose PostgreSQL or Odoo ports publicly if Nginx is the entry point
+\end{itemize}
+\end{frame}

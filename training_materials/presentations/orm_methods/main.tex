@@ -1,0 +1,108 @@
+\documentclass{bjt}
+% more options
+% \documentclass[12pt]{bjt}
+% by default 10pt, 16:9 aspect ratio
+
+\usepackage{listings}
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{bjt}{
+    language=Python,
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\rmfamily\footnotesize\slshape,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2,
+    frame=single,
+    framesep=2pt,
+    framerule=0.2pt,
+    rulecolor=\color{black},
+}
+
+\lstset{style=bjt}
+
+
+% Presentation information
+\newcommand{\Title}{ORM Methods}                                          % (EDIT HERE)
+\newcommand{\ShortTitle}{ORM Methods}                                     % (EDIT HERE) short form for footer
+\newcommand{\Subtitle}{Odoo 17 Development Tutorials}                     % (EDIT HERE)
+\newcommand{\AuthorName}{Ahmed Muhumed}                                   % (EDIT HERE)
+\newcommand{\ShortAuthor}{Ahmed M.}                                       % (EDIT HERE) short form for footer
+\newcommand{\PresentationDate}{\today}                                    % (EDIT HERE)
+\serieslabel{Odoo Developer Program}                                      % (EDIT HERE) small label above title; leave empty to hide
+
+
+% Beamer metadata
+\title[\ShortTitle]{\Title}               % (DO NOT EDIT HERE)
+\subtitle{\Subtitle}                      % (DO NOT EDIT HERE)
+\author[\ShortAuthor]{\AuthorName}         % (DO NOT EDIT HERE)
+\date{\PresentationDate}                  % (DO NOT EDIT HERE)
+
+% for directory structure making
+\usepackage[edges]{forest}
+
+\begin{document}
+
+% make title frame
+\maketitleframe
+
+% make table of contents frame
+\begin{frame}{Outline}
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
+\tableofcontents[sections={1-11}]
+\end{column}
+\begin{column}{0.48\textwidth}
+\tableofcontents[sections={12-21}]
+\end{column}
+\end{columns}
+\end{frame}
+
+% content start
+\input{sections/01_introduction}
+\input{sections/02_create}
+\input{sections/03_write}
+\input{sections/04_unlink}
+\input{sections/05_copy}
+\input{sections/06_exists}
+\input{sections/07_search}
+\input{sections/08_read}
+\input{sections/09_search_read}
+\input{sections/10_search_count}
+\input{sections/11_name_create}
+\input{sections/12_default_get}
+\input{sections/13_name_search}
+\input{sections/14_get_view}
+\input{sections/15_ensure_one}
+\input{sections/16_filtered}
+\input{sections/17_mapped}
+\input{sections/18_sorted}
+\input{sections/19_grouped}
+\input{sections/20_fields_get}
+\input{sections/21_get_metadata}
+
+\begin{frame}{Summary}
+	\begin{itemize}
+		\item The Odoo ORM lets you work with PostgreSQL through Python recordsets.
+		\item \textbf{\texttt{create / write / unlink / copy}} manage the life cycle of records.
+		\item \textbf{\texttt{search / read / search\_read / search\_count}} query and fetch data.
+		\item \textbf{\texttt{name\_create / name\_search / default\_get / get\_view / fields\_get / get\_metadata}} support UI and metadata workflows.
+		\item \textbf{\texttt{exists / ensure\_one / filtered / mapped / sorted / grouped}} help you work safely with recordsets.
+	\end{itemize}
+\end{frame}
+
+\end{document}

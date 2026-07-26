@@ -1,0 +1,58 @@
+\section{Environment Components}
+
+\begin{frame}[fragile]{Main Parts of the Environment}
+	\begin{itemize}
+		\item The environment contains several important pieces:
+		\begin{enumerate}
+			\item \textbf{\texttt{env.cr}} -- database cursor
+			\item \textbf{\texttt{env.uid}} -- current user ID
+			\item \textbf{\texttt{env.user}} -- current user record
+			\item \textbf{\texttt{env.context}} -- context dictionary
+			\item \textbf{\texttt{env.company}} / \textbf{\texttt{env.companies}}
+			\item \textbf{\texttt{env.registry}} -- model registry
+			\item \textbf{\texttt{env.su}} -- whether sudo mode is active
+		\end{enumerate}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Breaking Down \texttt{env.cr}}
+	\begin{block}{}
+		\begin{itemize}
+			\item \textbf{\texttt{env.cr}} is the PostgreSQL cursor for the current transaction.
+\begin{lstlisting}
+self.env.cr.execute("SELECT COUNT(*) FROM student_student")
+count = self.env.cr.fetchone()[0]
+\end{lstlisting}
+			\item Prefer ORM methods over raw SQL whenever possible.
+			\item Use \texttt{env.cr} only for advanced queries/reports.
+			\item Odoo manages commit/rollback for HTTP requests automatically.
+		\end{itemize}
+	\end{block}
+\end{frame}
+
+\begin{frame}[fragile]{Breaking Down \texttt{env.uid} and \texttt{env.su}}
+	\begin{itemize}
+		\item \textbf{\texttt{env.uid}}: integer ID of the current user.
+		\item \textbf{\texttt{env.su}}: \texttt{True} if the environment is in superuser mode.
+\begin{lstlisting}
+print(self.env.uid)  # e.g. 2
+print(self.env.su)   # False in normal requests
+\end{lstlisting}
+		\item After \texttt{sudo()}, \texttt{env.su} becomes \texttt{True}.
+		\item Access rights and record rules depend on these values.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Breaking Down \texttt{env.registry}}
+	\begin{itemize}
+		\item \textbf{\texttt{env.registry}} holds all loaded models for the database.
+\begin{lstlisting}
+Student = self.env.registry['student.student']
+\end{lstlisting}
+		\item In normal business code, prefer:
+\begin{lstlisting}
+Student = self.env['student.student']
+\end{lstlisting}
+		\item The registry is rebuilt when modules are installed or updated.
+	\end{itemize}
+\end{frame}

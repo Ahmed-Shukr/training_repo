@@ -1,0 +1,85 @@
+\section{HTTP Routes}
+
+\begin{frame}[fragile]{What Is \texttt{@http.route}?}
+	\begin{itemize}
+		\item \texttt{@http.route} registers a URL endpoint on a controller method.
+\begin{block}{Method Syntax}
+\begin{lstlisting}
+@http.route('/school/hello', type='http', auth='public', methods=['GET'], csrf=False)
+def hello(self, **kwargs):
+	return "Hello from Odoo"
+\end{lstlisting}
+\end{block}
+		\item This is the foundation of Odoo web development.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Important Route Options}
+	\begin{itemize}
+		\item \textbf{\texttt{type}}: \texttt{http} or \texttt{json}
+		\item \textbf{\texttt{auth}}: \texttt{public}, \texttt{user}, \texttt{none}
+		\item \textbf{\texttt{methods}}: \texttt{['GET']}, \texttt{['POST']}, \ldots
+		\item \textbf{\texttt{website}}: enable website context/rendering
+		\item \textbf{\texttt{csrf}}: CSRF protection for form posts
+		\item \textbf{\texttt{cors}}: cross-origin configuration when needed
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Auth Modes Explained}
+	\begin{itemize}
+		\item \texttt{auth='public'}: website visitors can access; env may be public user
+		\item \texttt{auth='user'}: logged-in users only
+		\item \texttt{auth='none'}: no DB/session user setup initially (special cases)
+	\end{itemize}
+\begin{lstlisting}
+@http.route('/my/students', type='http', auth='user', website=True)
+def my_students(self, **kwargs):
+	students = request.env['student.student'].search([
+		('user_id', '=', request.env.user.id),
+	])
+	return request.render('school_manager.my_students', {'students': students})
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Path Parameters}
+\begin{lstlisting}
+@http.route('/school/student/<int:student_id>', type='http', auth='public', website=True)
+def student_detail(self, student_id, **kwargs):
+	student = request.env['student.student'].sudo().browse(student_id)
+	if not student.exists():
+		return request.not_found()
+	return request.render('school_manager.student_detail', {
+		'student': student,
+	})
+\end{lstlisting}
+	\begin{itemize}
+		\item Converters include \texttt{int}, \texttt{string}, and more.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{GET vs POST}
+\begin{lstlisting}
+@http.route('/school/search', type='http', auth='public', methods=['GET'], website=True)
+def search_students(self, q='', **kwargs):
+	students = request.env['student.student'].sudo().search([
+		('name', 'ilike', q),
+	])
+	return request.render('school_manager.student_search', {
+		'students': students,
+		'q': q,
+	})
+\end{lstlisting}
+	\begin{itemize}
+		\item Use GET for reads/search pages.
+		\item Use POST for create/update actions and forms.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{HTTP Route Best Practices}
+	\begin{itemize}
+		\item Keep URLs clear and namespaced (\texttt{/school/...}).
+		\item Restrict methods explicitly.
+		\item Validate and sanitize query/form parameters.
+		\item Return proper errors (\texttt{not\_found}, \texttt{forbidden}) when needed.
+	\end{itemize}
+\end{frame}

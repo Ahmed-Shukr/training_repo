@@ -1,0 +1,99 @@
+\section{PostgreSQL Backup \& Restore}
+
+\begin{frame}{Why Backup Matters}
+\begin{itemize}
+  \item Odoo stores business data in PostgreSQL
+  \item Filestore (attachments) lives on disk --- back that up too
+  \item Without tested restores, a backup is only a hope
+\end{itemize}
+
+\vspace{0.5em}
+\begin{alertblock}{Rule}
+  A backup you have never restored is not a backup.
+\end{alertblock}
+\end{frame}
+
+\begin{frame}{What to Back Up}
+\begin{enumerate}
+  \item \textbf{Database} --- all Odoo schemas/tables
+  \item \textbf{Filestore} --- \texttt{\$HOME/.local/share/Odoo/filestore/<db>}
+       (or Docker volume path)
+  \item \textbf{Config} --- \texttt{odoo.conf}, compose files, secrets location notes
+  \item \textbf{Custom addons} --- already in Git, but pin the deployed commit
+\end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]{Logical Dump with \texttt{pg\_dump}}
+\begin{lstlisting}[style=bash]
+# Custom format (recommended: compressed, parallel restore)
+pg_dump -h localhost -U odoo -Fc \
+  -f /backups/school_$(date +%F).dump school
+
+# Plain SQL (human-readable, larger)
+pg_dump -h localhost -U odoo \
+  -f /backups/school.sql school
+\end{lstlisting}
+
+\vspace{0.4em}
+\begin{block}{Flags}
+  \texttt{-Fc} = custom format; \texttt{-f} = output file; last arg = database name.
+\end{block}
+\end{frame}
+
+\begin{frame}[fragile]{Restore}
+\begin{lstlisting}[style=bash]
+# Create empty DB first
+createdb -h localhost -U odoo school_restore
+
+# Restore custom-format dump
+pg_restore -h localhost -U odoo \
+  -d school_restore \
+  --no-owner --role=odoo \
+  /backups/school_2026-07-25.dump
+
+# Plain SQL
+psql -h localhost -U odoo -d school_restore \
+  -f /backups/school.sql
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Filestore Backup}
+\begin{lstlisting}[style=bash]
+# Archive filestore next to DB dump
+tar -czf /backups/filestore_school_$(date +%F).tgz \
+  /var/lib/odoo/.local/share/Odoo/filestore/school
+
+# Restore
+tar -xzf filestore_school_2026-07-25.tgz -C /
+\end{lstlisting}
+
+\vspace{0.4em}
+\begin{itemize}
+  \item Database + filestore must stay in sync (same point in time)
+  \item Mismatched pairs cause missing attachments
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Odoo Built-in Backup (UI / RPC)}
+\begin{itemize}
+  \item Database manager: \texttt{/web/database/manager}
+  \item Downloads a \texttt{.zip} with dump + filestore
+  \item Convenient for small DBs; not ideal as the only production strategy
+\end{itemize}
+
+\vspace{0.5em}
+\begin{lstlisting}[style=bash]
+# Automate with cron + pg_dump + tar
+0 2 * * * /usr/local/bin/backup_odoo.sh
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}{Backup Best Practices}
+\begin{itemize}
+  \item Automate nightly dumps; keep multiple generations (7 daily / 4 weekly)
+  \item Store copies off-server (S3, another region, cold storage)
+  \item Encrypt backups that leave the machine
+  \item Test restore on a staging host every month
+  \item Document RPO/RTO with the business (how much data loss is acceptable)
+\end{itemize}
+\end{frame}

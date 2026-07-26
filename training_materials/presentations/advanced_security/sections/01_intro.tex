@@ -1,0 +1,37 @@
+\section{Introduction}
+
+\begin{frame}{What Will We Learn?}
+	\begin{itemize}
+		\item \textbf{Security Groups} -- roles that users belong to
+		\item \textbf{UI Visibility} -- hiding menus, buttons, and fields by group
+		\item \textbf{Access Rights} -- model-level CRUD permissions
+		\item \textbf{Record Rules} -- row-level domain security
+		\item \textbf{Multi Company} -- company-aware security and data isolation
+		\item \textbf{Configuration Settings \& System Parameters} -- admin settings and \texttt{ir.config\_parameter}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Why Advanced Security Matters}
+	\begin{itemize}
+		\item Beautiful views are useless if the wrong users can see or edit data.
+		\item Odoo security is layered:
+		\begin{enumerate}
+			\item Groups
+			\item Access rights (model)
+			\item Record rules (records)
+			\item UI visibility (menus/views/buttons)
+			\item Multi-company isolation
+		\end{enumerate}
+		\item Good security design protects data and improves UX.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Security Layers at a Glance}
+	\begin{itemize}
+		\item \textbf{Group}: Who is the user? (Teacher, Manager, Officer)
+		\item \textbf{Access right}: What can that group do on a model? (read/write/create/unlink)
+		\item \textbf{Record rule}: Which records are visible/editable?
+		\item \textbf{UI rules}: Which menus/buttons/fields appear?
+		\item \textbf{Company}: Which company does the record belong to?
+	\end{itemize}
+\end{frame}

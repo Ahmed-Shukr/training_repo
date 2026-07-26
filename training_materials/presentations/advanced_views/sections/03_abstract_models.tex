@@ -1,0 +1,72 @@
+\section{Abstract Models}
+
+\begin{frame}[fragile]{What Is an Abstract Model?}
+	\begin{itemize}
+		\item An \textbf{abstract model} is a reusable mixin.
+		\item It inherits from \textbf{\texttt{models.AbstractModel}}.
+		\item It does \textbf{not} create its own database table.
+\begin{block}{Method Syntax}
+\begin{lstlisting}
+class SchoolMailMixin(models.AbstractModel):
+	_name = 'school.mail.mixin'
+	_description = 'School Mail Mixin'
+\end{lstlisting}
+\end{block}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Why Use Abstract Models?}
+	\begin{itemize}
+		\item Share fields and methods across many models.
+		\item Avoid copy-paste logic.
+		\item Classic Odoo examples:
+		\begin{itemize}
+			\item \texttt{mail.thread}
+			\item \texttt{mail.activity.mixin}
+			\item \texttt{portal.mixin}
+		\end{itemize}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Creating and Using a Mixin}
+\begin{lstlisting}
+class ArchiveMixin(models.AbstractModel):
+	_name = 'school.archive.mixin'
+	_description = 'Archive Mixin'
+
+	active = fields.Boolean(default=True)
+
+	def action_archive(self):
+		self.write({'active': False})
+
+class Student(models.Model):
+	_name = 'student.student'
+	_inherit = ['school.archive.mixin']
+\end{lstlisting}
+	\begin{itemize}
+		\item \texttt{student.student} receives \texttt{active} and \texttt{action\_archive}.
+		\item No table is created for \texttt{school.archive.mixin}.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{AbstractModel vs Model vs TransientModel}
+	\begin{itemize}
+		\item \texttt{Model}: real persistent business records + table.
+		\item \texttt{TransientModel}: temporary wizard records + temporary table.
+		\item \texttt{AbstractModel}: reusable definition only, no own table.
+	\end{itemize}
+\begin{lstlisting}
+models.Model
+models.TransientModel
+models.AbstractModel
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Abstract Model Best Practices}
+	\begin{itemize}
+		\item Give mixins clear names ending with \texttt{mixin} when useful.
+		\item Keep them focused (mailing, archiving, rating, etc.).
+		\item Inherit them with \texttt{\_inherit = ['my.mixin', ...]}.
+		\item Do not expect to \texttt{search()} on an abstract model itself.
+	\end{itemize}
+\end{frame}

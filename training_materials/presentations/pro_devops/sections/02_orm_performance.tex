@@ -1,0 +1,102 @@
+\section{ORM Performance}
+
+\slidebackground{backgrounds/wallpaper.jpg}
+
+\begin{frame}[fragile]{What Is ORM Performance?}
+	\begin{itemize}
+		\item ORM performance means getting correct results with fewer/faster database operations.
+		\item Common problems:
+		\begin{itemize}
+			\item N+1 queries
+			\item browsing huge recordsets unnecessarily
+			\item searching without indexes
+			\item writing in Python loops instead of batch ORM calls
+		\end{itemize}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{N+1 Query Problem}
+\begin{lstlisting}
+# Bad: one search + one query per student
+students = self.env['student.student'].search([])
+for student in students:
+	print(student.classroom_id.name)
+\end{lstlisting}
+\begin{lstlisting}
+# Better: prefetch / batch read relational data
+students = self.env['student.student'].search([])
+students.mapped('classroom_id.name')
+\end{lstlisting}
+	\begin{itemize}
+		\item Prefer batch operations over per-record chatter with the database.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{search vs search\_count vs search\_read}
+\begin{lstlisting}
+# Need records? use search
+recs = self.env['student.student'].search([('active', '=', True)], limit=80)
+
+# Need only a number? use search_count
+total = self.env['student.student'].search_count([('active', '=', True)])
+
+# Need dict rows for API/export? use search_read
+rows = self.env['student.student'].search_read(
+	[('active', '=', True)], ['name', 'email'], limit=80
+)
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Batch Create / Write / Unlink}
+\begin{lstlisting}
+# Bad
+for vals in vals_list:
+	self.env['student.student'].create(vals)
+
+# Good
+self.env['student.student'].create(vals_list)
+
+# Bad
+for rec in records:
+	rec.write({'active': False})
+
+# Good
+records.write({'active': False})
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Indexes and Domains}
+\begin{lstlisting}
+code = fields.Char(index=True)
+company_id = fields.Many2one('res.company', index=True)
+\end{lstlisting}
+	\begin{itemize}
+		\item Index fields used often in search/domain/group by.
+		\item Keep domains selective (\texttt{company\_id}, \texttt{active}, dates, codes).
+		\item Avoid \texttt{ilike '\%term\%'} on huge tables when exact match is possible.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Prefetch and mapped/filtered}
+\begin{lstlisting}
+students = self.env['student.student'].browse(ids)
+# relational prefetch helps when accessing same field on many records
+classrooms = students.mapped('classroom_id')
+adults = students.filtered(lambda s: s.age >= 18)
+\end{lstlisting}
+	\begin{itemize}
+		\item Use \texttt{filtered}/\texttt{mapped} on already-loaded recordsets.
+		\item Use \texttt{search} when filtering should happen in SQL.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{ORM Performance Checklist}
+	\begin{itemize}
+		\item No N+1 loops on related fields
+		\item Batch create/write/unlink
+		\item Use \texttt{search\_count} for counts
+		\item Limit fields with \texttt{search\_read}/\texttt{read}
+		\item Index real search fields
+		\item Profile before ``optimizing'' randomly
+	\end{itemize}
+\end{frame}

@@ -1,0 +1,83 @@
+\section{CI/CD Concepts}
+
+\begin{frame}{What is CI/CD?}
+\begin{description}
+  \item[CI] Continuous Integration --- every push builds and tests automatically
+  \item[CD] Continuous Delivery/Deployment --- tested artifacts ready (or shipped) to environments
+\end{description}
+
+\vspace{0.5em}
+\begin{block}{Why it matters}
+  Humans forget checklists. Pipelines do not. Faster feedback, fewer broken main branches.
+\end{block}
+\end{frame}
+
+\begin{frame}{Typical Pipeline Stages}
+\begin{enumerate}
+  \item \textbf{Checkout} --- fetch the commit
+  \item \textbf{Lint} --- Ruff / pylint-odoo / XML checks
+  \item \textbf{Test} --- install modules with \texttt{--test-enable}
+  \item \textbf{Build} --- Docker image or packaged addons
+  \item \textbf{Deploy} --- staging automatically; production on approval
+\end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]{GitHub Actions Sketch}
+\begin{lstlisting}[language={}]
+# .github/workflows/ci.yml
+name: CI
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: odoo
+          POSTGRES_PASSWORD: odoo
+        ports: ["5432:5432"]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run module tests
+        run: ./scripts/run_tests.sh
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}{What to Automate First}
+\begin{itemize}
+  \item Lint + format check on every PR
+  \item Install your custom modules on a clean DB
+  \item Run existing Odoo tests for those modules
+  \item Block merge if the pipeline fails
+\end{itemize}
+
+\vspace{0.5em}
+\begin{alertblock}{Start small}
+  A short green pipeline that always runs beats a perfect pipeline nobody maintains.
+\end{alertblock}
+\end{frame}
+
+\begin{frame}{CD Strategies}
+\begin{description}
+  \item[Manual promote] CI builds artifact; human deploys to prod
+  \item[Staging auto] Every main commit deploys to staging
+  \item[Prod gated] Production needs approval / tag / release
+\end{description}
+
+\vspace{0.5em}
+\begin{itemize}
+  \item Odoo often needs \texttt{-u} during deploy --- script it
+  \item Keep DB backups as a pipeline or runbook step before prod upgrade
+\end{itemize}
+\end{frame}
+
+\begin{frame}{CI/CD Best Practices}
+\begin{itemize}
+  \item Secrets in GitHub Secrets / vault --- never in YAML committed plaintext
+  \item Cache dependencies to keep pipelines fast
+  \item Same Docker image tag promoted from staging to production
+  \item Notify the team on failure (Slack / email)
+  \item Measure: time-to-feedback and deploy frequency
+\end{itemize}
+\end{frame}

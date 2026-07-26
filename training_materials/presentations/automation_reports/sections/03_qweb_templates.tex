@@ -1,0 +1,156 @@
+\section{QWeb Templates}
+
+\begin{frame}[fragile]{What Is QWeb?}
+	\begin{itemize}
+		\item \textbf{QWeb} is Odoo's XML templating engine.
+		\item It renders HTML from XML templates + Python values.
+		\item Used for:
+		\begin{itemize}
+			\item PDF/HTML reports
+			\item website snippets and pages
+			\item some portal and mail rendering flows
+		\end{itemize}
+\begin{block}{Core Idea}
+	Template + values $\Rightarrow$ rendered HTML.
+\end{block}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Minimal QWeb Report Template}
+\begin{lstlisting}[style=xml]
+<template id="report_student_card">
+  <t t-call="web.html_container">
+	<t t-foreach="docs" t-as="o">
+	  <t t-call="web.external_layout">
+		<div class="page">
+		  <h2>Student Card</h2>
+		  <p><strong>Name:</strong> <t t-esc="o.name"/></p>
+		  <p><strong>Code:</strong> <t t-esc="o.code"/></p>
+		  <p><strong>Classroom:</strong>
+			 <t t-esc="o.classroom_id.display_name"/>
+		  </p>
+		</div>
+	  </t>
+	</t>
+  </t>
+</template>
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Breaking Down Key QWeb Directives}
+	\begin{itemize}
+		\item \textbf{\texttt{t-esc}}: escape and print a value (safe HTML escaping)
+		\item \textbf{\texttt{t-out}}: modern output directive (preferred in newer code)
+		\item \textbf{\texttt{t-raw}}: print raw HTML (use carefully)
+		\item \textbf{\texttt{t-if}} / \textbf{\texttt{t-elif}} / \textbf{\texttt{t-else}}: conditions
+		\item \textbf{\texttt{t-foreach}} / \textbf{\texttt{t-as}}: loops
+		\item \textbf{\texttt{t-call}}: include/call another template
+		\item \textbf{\texttt{t-set}} / \textbf{\texttt{t-value}}: create variables
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Conditions and Loops}
+\begin{lstlisting}[style=xml]
+<t t-if="o.email">
+  <p>Email: <t t-esc="o.email"/></p>
+</t>
+<t t-else="">
+  <p>No email on file</p>
+</t>
+
+<ul>
+  <t t-foreach="o.attendance_ids" t-as="line">
+	<li>
+	  <t t-esc="line.date"/> -
+	  <t t-esc="line.status"/>
+	</li>
+  </t>
+</ul>
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Variables with \texttt{t-set}}
+\begin{lstlisting}[style=xml]
+<t t-set="full_name" t-value="o.name"/>
+<t t-set="is_adult" t-value="o.age &gt;= 18"/>
+
+<p>Student: <t t-esc="full_name"/></p>
+<p t-if="is_adult">This student is an adult.</p>
+\end{lstlisting}
+	\begin{itemize}
+		\item Keep expressions simple and readable.
+		\item Heavy business logic belongs in Python, not deep inside templates.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Layout Helpers}
+	\begin{itemize}
+		\item Common report wrappers:
+		\begin{itemize}
+			\item \texttt{web.html\_container}
+			\item \texttt{web.external\_layout}
+			\item \texttt{web.internal\_layout}
+		\end{itemize}
+	\end{itemize}
+\begin{lstlisting}[style=xml]
+<t t-call="web.html_container">
+  <t t-foreach="docs" t-as="o">
+	<t t-call="web.external_layout">
+	  <div class="page">
+		<!-- report body -->
+	  </div>
+	</t>
+  </t>
+</t>
+\end{lstlisting}
+	\begin{itemize}
+		\item \texttt{external\_layout} adds company header/footer.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{\texttt{docs} and Report Context}
+	\begin{itemize}
+		\item In reports, \texttt{docs} is the recordset being printed.
+		\item Each record is usually looped as \texttt{o}.
+\begin{lstlisting}[style=xml]
+<t t-foreach="docs" t-as="o">
+  <p><t t-esc="o.name"/></p>
+</t>
+\end{lstlisting}
+		\item Extra values can come from a custom report parser / abstract model.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Styling QWeb Reports}
+\begin{lstlisting}[style=xml]
+<div class="page">
+  <h2 class="text-center">Student Report</h2>
+  <table class="table table-sm o_main_table">
+	<thead>
+	  <tr>
+		<th>Name</th>
+		<th>Age</th>
+		<th>Classroom</th>
+	  </tr>
+	</thead>
+	<tbody>
+	  <tr>
+		<td><t t-esc="o.name"/></td>
+		<td><t t-esc="o.age"/></td>
+		<td><t t-esc="o.classroom_id.display_name"/></td>
+	  </tr>
+	</tbody>
+  </table>
+</div>
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}{QWeb Best Practices}
+	\begin{itemize}
+		\item Keep templates readable and modular with \texttt{t-call}.
+		\item Prefer \texttt{t-esc}/\texttt{t-out} over \texttt{t-raw}.
+		\item Put complex calculations in Python methods/fields.
+		\item Reuse company layout templates for consistent branding.
+		\item Test with records that have empty related fields.
+	\end{itemize}
+\end{frame}

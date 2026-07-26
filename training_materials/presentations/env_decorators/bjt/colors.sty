@@ -1,0 +1,59 @@
+%-------------------------------------------------------------
+%  Package : BJT Beamer Theme
+%  Author  : Baijayanta
+%  Version : 1.0
+%  Date    : 2026-07-17
+%
+%  Description:
+%    A clean, modern Beamer theme built on top of the
+%    Metropolis theme with customized colors, typography,
+%    and layout for academic presentations.
+%
+%  Repository:
+%    https://github.com/Baijayanta21/bjt-beamer-theme
+%
+%  License:
+%    Copyright (c) 2026 Baijayanta.
+%    Released under the MIT License.
+%-------------------------------------------------------------
+
+% for beamer colors
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{colors}
+
+\definecolor{bjtnavy}{HTML}{0F1C2E}
+\definecolor{bjtteal}{HTML}{0A7A8F}
+\definecolor{bjtaccent}{HTML}{E8A838}
+
+% Color theme base
+\usecolortheme{default}
+
+% progress bar and structure
+\setbeamercolor{progress bar}{fg=bjtaccent,bg=bjtnavy!25}
+\setbeamercolor{normal text}{fg=black,bg=white}
+\setbeamercolor{structure}{fg=bjtteal}
+\setbeamercolor{title}{fg=white}
+\setbeamercolor{frametitle}{fg=white,bg=bjtnavy}
+\setbeamercolor{section title}{fg=bjtnavy}
+\setbeamercolor{palette primary}{fg=white,bg=bjtnavy}
+\setbeamercolor{block title}{fg=bjtnavy,bg=bjtteal!18}
+\setbeamercolor{block body}{fg=black,bg=bjtteal!7}
+
+
+% set title and body colors of different blocks (diabled)
+
+% % Normal block
+% \setbeamercolor{block title}{fg=black,bg=red!15}
+% \setbeamercolor{block body}{fg=black,bg=blue!10}
+
+% % Alert block
+% \setbeamercolor{block title alerted}{fg=black!80!red,bg=red!40}
+% \setbeamercolor{block body alerted}{fg=black,bg=red!10!white}
+
+% % Example block
+\setbeamercolor{block title example}{fg=green!25!black,bg=green!20}
+\setbeamercolor{block body example}{fg=black,bg=green!10}
+
+
+\endinput

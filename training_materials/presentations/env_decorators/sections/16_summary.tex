@@ -1,0 +1,31 @@
+\section{Summary}
+
+\begin{frame}{Environment Summary}
+	\begin{itemize}
+		\item \textbf{\texttt{self.env}} is the gateway to models, users, companies, context, and the cursor.
+		\item Use \texttt{env['model']}, \texttt{env.user}, \texttt{env.company}, \texttt{env.context}, and \texttt{env.ref()}.
+		\item Switch environment with \texttt{with\_context}, \texttt{with\_user}, \texttt{with\_company}, and \texttt{sudo()}.
+		\item Environment helpers return new recordsets; keep the returned value.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Decorator Summary}
+	\begin{itemize}
+		\item \texttt{@api.model} / \texttt{@api.model\_create\_multi} -- model-level methods and create overrides.
+		\item \texttt{@api.depends} -- computed field dependencies.
+		\item \texttt{@api.onchange} -- UI form updates before save.
+		\item \texttt{@api.constrains} -- Python validation on create/write.
+		\item \texttt{@api.ondelete}, \texttt{@api.private}, \texttt{@api.readonly}, \texttt{@api.autovacuum} -- specialized behaviors.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Practical Checklist}
+	\begin{itemize}
+		\item Need another model? $\rightarrow$ \texttt{self.env['model.name']}
+		\item Need current user/company? $\rightarrow$ \texttt{env.user} / \texttt{env.company}
+		\item Need temporary flags? $\rightarrow$ \texttt{with\_context(...)}
+		\item Need to bypass rights carefully? $\rightarrow$ \texttt{sudo()}
+		\item Need stable record lookup? $\rightarrow$ \texttt{env.ref('module.xml\_id')}
+		\item Need compute / onchange / validation? $\rightarrow$ choose the correct decorator
+	\end{itemize}
+\end{frame}

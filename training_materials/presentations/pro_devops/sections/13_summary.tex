@@ -1,0 +1,37 @@
+\section{Summary}
+
+\begin{frame}{What We Covered}
+\begin{enumerate}
+  \item ORM performance --- prefetch, batch, avoid N+1
+  \item SQL optimization --- indexes, EXPLAIN, raw SQL wisely
+  \item Logging --- levels, structured messages, production logs
+  \item Git \& GitHub --- branches, reviews, tags
+  \item Docker --- images, compose, volumes
+  \item Nginx --- reverse proxy, TLS, longpolling
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{What We Covered (cont.)}
+\begin{enumerate}
+  \setcounter{enumi}{6}
+  \item PostgreSQL backup \& restore --- dump + filestore + test restores
+  \item Deployment --- environments, workers, release checklist
+  \item Upgrade scripts \& migration --- \texttt{-u}, \texttt{migrations/}, majors
+  \item Code quality --- lint, tests, reviews
+  \item CI/CD --- automate check, test, promote
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{Takeaway Mindset}
+\begin{itemize}
+  \item Optimize the hot paths you measure
+  \item Treat production as sacred: backup, stage, then ship
+  \item Automate the boring checks so reviews focus on design
+  \item Document runbooks for the 3\,a.m.\ failure
+\end{itemize}
+
+\vspace{0.8em}
+\begin{center}
+\Large Thank you --- questions?
+\end{center}
+\end{frame}

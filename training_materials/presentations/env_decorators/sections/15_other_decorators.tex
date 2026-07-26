@@ -1,0 +1,60 @@
+\section{Other Important Decorators}
+
+\begin{frame}[fragile]{\texttt{@api.ondelete}}
+	\begin{itemize}
+		\item Controls deletion restrictions in modern Odoo versions.
+\begin{lstlisting}
+@api.ondelete(at_uninstall=False)
+def _unlink_except_done(self):
+	for rec in self:
+		if rec.state == 'done':
+			raise UserError("Done records cannot be deleted.")
+\end{lstlisting}
+		\item Clearer than putting all logic only in \texttt{unlink()}.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{\texttt{@api.autovacuum}}
+	\begin{itemize}
+		\item Marks a method for periodic cleanup by the autovacuum cron.
+\begin{lstlisting}
+@api.autovacuum
+def _gc_old_logs(self):
+	old = self.search([
+		('create_date', '<', fields.Datetime.subtract(fields.Datetime.now(), days=90)),
+	])
+	old.unlink()
+\end{lstlisting}
+		\item Useful for temporary logs, transient leftovers, and cleanup tasks.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{\texttt{@api.private} and \texttt{@api.readonly}}
+\begin{lstlisting}
+@api.private
+def _prepare_student_vals(self, values):
+	values = dict(values)
+	values.setdefault('active', True)
+	return values
+
+@api.readonly
+def get_report_data(self):
+	return self.read(['name', 'age'])
+\end{lstlisting}
+	\begin{itemize}
+		\item \texttt{@api.private}: not available through RPC / external API.
+		\item \texttt{@api.readonly}: declares a non-writing method (useful for routing/optimization).
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{\texttt{@api.returns}}
+\begin{lstlisting}
+@api.returns('self', lambda value: value.id)
+def copy(self, default=None):
+	return super().copy(default)
+\end{lstlisting}
+	\begin{itemize}
+		\item Documents / adapts return values for RPC compatibility.
+		\item Seen on methods that return records but need IDs over XML-RPC.
+	\end{itemize}
+\end{frame}

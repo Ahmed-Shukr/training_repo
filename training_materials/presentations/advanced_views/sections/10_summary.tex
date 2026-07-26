@@ -1,0 +1,36 @@
+\section{Summary}
+
+\begin{frame}{Chapter Four Summary}
+	\begin{itemize}
+		\item \textbf{Transient models} power wizard forms and temporary processes.
+		\item \textbf{Abstract models} share reusable mixin logic.
+		\item \textbf{Python + SQL constraints} protect data quality.
+		\item \textbf{\_inherit} extends models; \textbf{\_inherits} delegates to a parent record.
+		\item \textbf{XPath / view inheritance} customizes screens cleanly.
+		\item \textbf{Smart buttons} expose KPIs and related documents.
+		\item \textbf{Advanced views} (Kanban, Pivot, Graph, Calendar, Activity, Gantt) unlock richer UX.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Practical Build Order}
+	\begin{enumerate}
+		\item Create/extend the model and constraints
+		\item Add form/list views
+		\item Inherit views with XPath where needed
+		\item Add smart buttons and actions
+		\item Add advanced views and search group-bys
+		\item Add wizards for multi-step processes
+	\end{enumerate}
+\end{frame}
+
+\begin{frame}{Checklist}
+	\begin{itemize}
+		\item Wizard? $\rightarrow$ \texttt{TransientModel} + form + \texttt{target='new'}
+		\item Shared logic? $\rightarrow$ \texttt{AbstractModel} mixin
+		\item Validation? $\rightarrow$ \texttt{@api.constrains} and/or \texttt{\_sql\_constraints}
+		\item Extend model/view? $\rightarrow$ \texttt{\_inherit} / XPath
+		\item Compose partner-like data? $\rightarrow$ \texttt{\_inherits}
+		\item KPI shortcut? $\rightarrow$ smart button + action
+		\item Analysis/schedule UI? $\rightarrow$ pivot/graph/calendar/gantt/kanban/activity
+	\end{itemize}
+\end{frame}

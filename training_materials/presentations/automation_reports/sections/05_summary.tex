@@ -1,0 +1,42 @@
+\section{Summary}
+
+\begin{frame}{Automation and Reports Summary}
+	\begin{itemize}
+		\item \textbf{\texttt{ir.cron}} runs model methods on a schedule.
+		\item \textbf{QWeb} renders XML templates into HTML for reports and pages.
+		\item \textbf{Report actions} bind a model + QWeb template into printable PDF/HTML output.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Practical Checklist}
+	\begin{itemize}
+		\item Need nightly automation? $\rightarrow$ \texttt{ir.cron} + \texttt{@api.model} method
+		\item Need HTML structure for documents? $\rightarrow$ QWeb template
+		\item Need Print menu / PDF button? $\rightarrow$ \texttt{ir.actions.report}
+		\item Need extra report values? $\rightarrow$ \texttt{report.<module>.<template>} abstract model
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Suggested Module Layout}
+\begin{lstlisting}
+school_manager/
+  data/
+    ir_cron_data.xml
+  report/
+    student_card_report.xml
+  models/
+    student_student.py
+    report_student_card.py
+  __manifest__.py
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}{End-to-End Flow}
+	\begin{enumerate}
+		\item Create business records (students, invoices, \ldots)
+		\item Automate processes with scheduled actions
+		\item Design QWeb layouts for documents
+		\item Expose report actions on forms and print menus
+		\item Test cron manually and print sample PDFs
+	\end{enumerate}
+\end{frame}

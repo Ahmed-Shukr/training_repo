@@ -1,0 +1,78 @@
+\section{Controllers}
+
+\slidebackground{backgrounds/wallpaper.jpg}
+
+\begin{frame}[fragile]{What Is a Controller?}
+	\begin{itemize}
+		\item A \textbf{controller} is a Python class that handles HTTP requests.
+		\item In Odoo it inherits from \texttt{http.Controller}.
+		\item Controllers define routes that return HTML, JSON, files, or redirects.
+\begin{block}{Method Syntax}
+\begin{lstlisting}
+from odoo import http
+from odoo.http import request
+
+class StudentController(http.Controller):
+	pass
+\end{lstlisting}
+\end{block}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Controller File Placement}
+\begin{lstlisting}
+school_manager/
+  controllers/
+	__init__.py
+	student_portal.py
+  __init__.py
+\end{lstlisting}
+\begin{lstlisting}
+# school_manager/__init__.py
+from . import controllers
+
+# school_manager/controllers/__init__.py
+from . import student_portal
+\end{lstlisting}
+	\begin{itemize}
+		\item Controllers must be imported or Odoo will not register the routes.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{request Object}
+	\begin{itemize}
+		\item Inside controllers, \texttt{request} is the current HTTP request.
+\begin{lstlisting}
+request.env          # environment for current user/db
+request.httprequest  # underlying Werkzeug request
+request.session      # session data
+request.params       # combined request parameters
+\end{lstlisting}
+		\item Most business work uses \texttt{request.env['model.name']}.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Simple HTML Controller}
+\begin{lstlisting}
+class StudentController(http.Controller):
+
+	@http.route('/school/students', type='http', auth='public', website=True)
+	def student_list(self, **kwargs):
+		students = request.env['student.student'].sudo().search([])
+		return request.render('school_manager.student_list_page', {
+			'students': students,
+		})
+\end{lstlisting}
+	\begin{itemize}
+		\item \texttt{request.render()} renders a QWeb website template.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Controller Best Practices}
+	\begin{itemize}
+		\item Keep controllers thin; put business logic in models.
+		\item Choose \texttt{auth} carefully (\texttt{public}, \texttt{user}, \texttt{none}).
+		\item Validate input before writing to the database.
+		\item Use \texttt{sudo()} only when the route intentionally needs elevated access.
+	\end{itemize}
+\end{frame}

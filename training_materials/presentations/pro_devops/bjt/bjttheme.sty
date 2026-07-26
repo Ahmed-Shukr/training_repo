@@ -1,0 +1,42 @@
+%-------------------------------------------------------------
+%  Package : BJT Beamer Theme
+%  Author  : Baijayanta
+%  Version : 1.0
+%  Date    : 2026-07-17
+%
+%  Description:
+%    A clean, modern Beamer theme built on top of the
+%    Metropolis theme with customized colors, typography,
+%    and layout for academic presentations.
+%
+%  Repository:
+%    https://github.com/Baijayanta21/bjt-beamer-theme
+%
+%  License:
+%    Copyright (c) 2026 Baijayanta.
+%    Released under the MIT License.
+%-------------------------------------------------------------
+
+% for theme settings
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{bjttheme}[2026/07/17 v1.0 Baijayanta Beamer Theme]
+
+% Load Base theme
+\usetheme[progressbar=frametitle]{metropolis}   % Requires the Metropolis package
+
+% Core Theme components
+\RequirePackage{bjt/colors}
+\RequirePackage{bjt/fonttheme}
+\RequirePackage{bjt/innertheme}
+\RequirePackage{bjt/outertheme}
+\RequirePackage{bjt/commands}
+
+% Templates
+\RequirePackage{bjt/templates}
+
+% User commands
+\RequirePackage{bjt/commands}
+
+
+\endinput

@@ -1,0 +1,78 @@
+\section{XML-RPC}
+
+\begin{frame}[fragile]{What Is XML-RPC in Odoo?}
+	\begin{itemize}
+		\item \textbf{XML-RPC} is a classic remote procedure protocol supported by Odoo.
+		\item External systems call Odoo methods over HTTP using XML payloads.
+		\item Common endpoints:
+		\begin{itemize}
+			\item \texttt{/xmlrpc/2/common}
+			\item \texttt{/xmlrpc/2/object}
+		\end{itemize}
+\begin{block}{Use Case}
+	Legacy ERP connectors, scripts, and external apps.
+\end{block}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Authentication Flow}
+\begin{lstlisting}
+import xmlrpc.client
+
+url = "http://localhost:8069"
+db = "school_db"
+username = "admin"
+password = "admin"
+
+common = xmlrpc.client.ServerProxy(f"{url}/xmlrpc/2/common")
+uid = common.authenticate(db, username, password, {})
+print(uid)  # user id if login succeeds
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Calling ORM Methods via XML-RPC}
+\begin{lstlisting}
+models = xmlrpc.client.ServerProxy(f"{url}/xmlrpc/2/object")
+
+student_ids = models.execute_kw(
+	db, uid, password,
+	'student.student', 'search',
+	[[('active', '=', True)]],
+)
+
+students = models.execute_kw(
+	db, uid, password,
+	'student.student', 'read',
+	[student_ids, ['name', 'email']],
+)
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Create / Write / Unlink}
+\begin{lstlisting}
+new_id = models.execute_kw(
+	db, uid, password,
+	'student.student', 'create',
+	[{'name': 'Ahmed Muhumed', 'email': 'ahmed@example.com'}],
+)
+
+models.execute_kw(
+	db, uid, password,
+	'student.student', 'write',
+	[[new_id], {'age': 22}],
+)
+\end{lstlisting}
+	\begin{itemize}
+		\item Same ORM method names, called remotely.
+		\item Access rights and record rules still apply to the authenticated user.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{XML-RPC Notes}
+	\begin{itemize}
+		\item Stable and widely supported.
+		\item Verbose XML payloads compared to JSON-RPC.
+		\item Great for simple external scripts.
+		\item Prefer HTTPS in production.
+	\end{itemize}
+\end{frame}

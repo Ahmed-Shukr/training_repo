@@ -1,0 +1,83 @@
+\section{Smart / Stats Buttons}
+
+\begin{frame}{What Are Smart Buttons?}
+	\begin{itemize}
+		\item Smart buttons (stat buttons) appear at the top of a form view.
+		\item They show a KPI / count and open related records when clicked.
+		\item Excellent for navigation and dashboard-like form headers.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Stat Button in the Form View}
+\begin{lstlisting}[style=xml]
+<div class="oe_button_box" name="button_box">
+  <button class="oe_stat_button"
+		  type="object"
+		  name="action_view_attendances"
+		  icon="fa-calendar-check-o">
+	<field name="attendance_count" widget="statinfo" string="Attendances"/>
+  </button>
+</div>
+\end{lstlisting}
+	\begin{itemize}
+		\item Place them inside \texttt{oe\_button\_box}.
+		\item Use \texttt{statinfo} widget for the count/value.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Computed Count Field}
+\begin{lstlisting}
+attendance_count = fields.Integer(compute='_compute_attendance_count')
+
+def _compute_attendance_count(self):
+	Attendance = self.env['student.attendance']
+	for student in self:
+		student.attendance_count = Attendance.search_count([
+			('student_id', '=', student.id),
+		])
+\end{lstlisting}
+	\begin{itemize}
+		\item The button label usually comes from this computed field.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Button Action Method}
+\begin{lstlisting}
+def action_view_attendances(self):
+	self.ensure_one()
+	return {
+		'type': 'ir.actions.act_window',
+		'name': 'Attendances',
+		'res_model': 'student.attendance',
+		'view_mode': 'list,form',
+		'domain': [('student_id', '=', self.id)],
+		'context': {'default_student_id': self.id},
+	}
+\end{lstlisting}
+	\begin{itemize}
+		\item The action opens related records filtered to the current student.
+		\item Context can set defaults for creating new related rows.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Adding a Smart Button by Inheritance}
+\begin{lstlisting}[style=xml]
+<xpath expr="//div[@name='button_box']" position="inside">
+  <button class="oe_stat_button" type="object"
+		  name="action_view_attendances"
+		  icon="fa-calendar-check-o">
+	<field name="attendance_count" widget="statinfo" string="Attendances"/>
+  </button>
+</xpath>
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}{Smart Button Best Practices}
+	\begin{itemize}
+		\item One button = one related document type / KPI.
+		\item Keep count compute methods efficient.
+		\item Use clear icons and short labels.
+		\item Always return an action with a proper domain.
+		\item Call \texttt{ensure\_one()} in the button method.
+	\end{itemize}
+\end{frame}

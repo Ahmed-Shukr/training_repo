@@ -1,0 +1,46 @@
+\section{Accessing Models with \texttt{env[...]}}
+
+\begin{frame}[fragile]{The Pattern \texttt{self.env['model.name']}}
+	\begin{itemize}
+		\item This is the standard way to get a model from the environment.
+\begin{block}{Method Syntax}
+\begin{lstlisting}
+Model = self.env['student.student']
+records = Model.search([])
+\end{lstlisting}
+\end{block}
+		\item \texttt{self.env['student.student']} returns an empty recordset of that model in the current environment.
+		\item From there you call ORM methods: \texttt{create}, \texttt{search}, \texttt{browse}, \ldots
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Practical Examples}
+\begin{lstlisting}
+# Search students
+students = self.env['student.student'].search([('active', '=', True)])
+
+# Create a classroom
+classroom = self.env['school.classroom'].create({
+	'name': 'Grade 12-A',
+})
+
+# Browse by ID
+partner = self.env['res.partner'].browse(7)
+\end{lstlisting}
+	\begin{itemize}
+		\item Always use the technical model name (\texttt{\_name}), not the Python class name.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Same Model, Different Environments}
+\begin{lstlisting}
+students = self.env['student.student']
+admin_students = self.env['student.student'].sudo()
+company_students = self.env['student.student'].with_company(company)
+\end{lstlisting}
+	\begin{itemize}
+		\item All three access the same model.
+		\item But rights, company, or context may differ.
+		\item This is why environment control is so important.
+	\end{itemize}
+\end{frame}

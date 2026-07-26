@@ -1,0 +1,93 @@
+\section{Deployment}
+
+\begin{frame}{What is Deployment?}
+\begin{itemize}
+  \item Moving code and configuration from development to a running production system
+  \item Includes: servers, database, workers, reverse proxy, monitoring, backups
+\end{itemize}
+
+\vspace{0.5em}
+\begin{block}{Goal}
+  Ship new features safely, with rollback paths, without surprising users.
+\end{block}
+\end{frame}
+
+\begin{frame}{Environment Layers}
+\begin{description}
+  \item[Local] Developer laptop / Docker Compose
+  \item[Staging] Production-like copy for UAT and migration tests
+  \item[Production] Live business system
+\end{description}
+
+\vspace{0.6em}
+\begin{alertblock}{Never}
+  Test migrations or risky modules for the first time on production.
+\end{alertblock}
+\end{frame}
+
+\begin{frame}[fragile]{Odoo Service Layout (Bare Metal / VM)}
+\begin{lstlisting}[style=bash]
+# Typical pieces
+# 1) PostgreSQL
+# 2) Odoo service (systemd)
+# 3) Nginx reverse proxy + TLS
+# 4) Backups + log rotation
+
+sudo systemctl status odoo
+sudo systemctl restart odoo
+\end{lstlisting}
+
+\vspace{0.4em}
+\begin{itemize}
+  \item Run Odoo as a dedicated OS user
+  \item Use \texttt{odoo.conf} for db, addons path, workers, proxy mode
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Key \texttt{odoo.conf} Settings}
+\begin{lstlisting}[language={}]
+[options]
+admin_passwd = strong-master-password
+db_host = 127.0.0.1
+db_user = odoo
+db_password = ***
+addons_path = /opt/odoo/addons,/opt/odoo/custom
+proxy_mode = True
+workers = 4
+max_cron_threads = 1
+limit_memory_soft = 2147483648
+limit_time_cpu = 600
+limit_time_real = 1200
+logfile = /var/log/odoo/odoo.log
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}{Workers vs Threaded Mode}
+\begin{itemize}
+  \item \texttt{workers = 0} --- single process (dev / small)
+  \item \texttt{workers > 0} --- multiprocess for production concurrency
+  \item Longpolling needs a separate gevent process (often via systemd or compose)
+  \item Size workers from CPU/RAM: rough guide $\approx$ (CPU $\times$ 2) + 1, then measure
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Safe Release Checklist}
+\begin{enumerate}
+  \item Merge to main after review
+  \item Tag release (\texttt{v1.4.0})
+  \item Backup DB + filestore
+  \item Deploy code to staging; run \texttt{-u module}
+  \item Smoke-test critical flows
+  \item Deploy to production in a maintenance window
+  \item Watch logs / errors for the first hour
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{Deployment Best Practices}
+\begin{itemize}
+  \item Immutable-ish deploys: know exact Git commit on the server
+  \item Separate secrets from code (env files, vault, not Git)
+  \item Prefer rolling or blue/green when downtime is costly
+  \item Keep a written runbook: restart, rollback, restore
+\end{itemize}
+\end{frame}

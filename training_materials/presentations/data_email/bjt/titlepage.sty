@@ -1,0 +1,91 @@
+%-------------------------------------------------------------
+%  Package : BJT Beamer Theme
+%  Author  : Baijayanta
+%  Version : 1.0
+%  Date    : 2026-07-17
+%
+%  Description:
+%    A clean, modern Beamer theme built on top of the
+%    Metropolis theme with customized colors, typography,
+%    and layout for academic presentations.
+%
+%  Repository:
+%    https://github.com/Baijayanta21/bjt-beamer-theme
+%
+%  License:
+%    Copyright (c) 2026 Baijayanta.
+%    Released under the MIT License.
+%-------------------------------------------------------------
+
+% for beamer titlepage
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{titlepage}
+
+% Title Page
+%--------------------------------------------------------------------
+
+% Series label above title (e.g. "Odoo Developer Program")
+\newcommand{\serieslabel}[1]{\def\insertserieslabel{#1}}
+\def\insertserieslabel{}
+
+\newcommand{\titlebackground}[2][0.10]{%
+    \def\titlebackgroundopacity{#1}%
+    \def\inserttitlebackground{#2}%
+}
+
+% Usage:
+% \titlebackground[<opacity>]{<image-file-name>}
+% opacity is optional, by default set to 0.1
+% \titlebackground{wallpaper.jpg}           % only file name
+% \titlebackground[0.25]{wallpaper.jpg}     % file name and opacity
+
+% by default no background 
+\def\inserttitlebackground{}
+\def\titlebackgroundopacity{0.10}
+
+
+\definecolor{bjtnavy}{HTML}{0F1C2E}
+\definecolor{bjtteal}{HTML}{0A7A8F}
+\definecolor{bjtaccent}{HTML}{E8A838}
+
+\setbeamertemplate{title page}{
+\begin{tikzpicture}[remember picture,overlay]
+
+% Background and opacity settings
+\ifx\inserttitlebackground\@empty
+    \fill[bjtnavy] (current page.north west) rectangle (current page.south east);
+    \fill[bjtteal] (current page.north west) rectangle ([xshift=0.32cm]current page.south west);
+    \fill[bjtaccent] ([yshift=-3.55cm]current page.north west) ++(0.04cm,0) rectangle ++(0.24cm,-0.24cm);
+\else
+    \node[opacity=\titlebackgroundopacity] at (current page.center) {\includegraphics[width=\paperwidth,height=\paperheight]{\inserttitlebackground}};
+    \fill[black, opacity=0.35] (current page.north west) rectangle (current page.south east);
+\fi
+\end{tikzpicture}
+
+\vspace*{0.9cm}
+\ifx\insertserieslabel\@empty\else
+{\color{black!25}\small\MakeUppercase{\insertserieslabel}\par}
+\vspace{0.45cm}
+\fi
+{\usebeamerfont{title}\color{white}\inserttitle\par}
+
+\vspace{0.25cm}
+{\color{bjtaccent}\rule{2.8cm}{1.1pt}\par}
+\vspace{0.35cm}
+{\usebeamerfont{subtitle}\color{white!90}\insertsubtitle\par}
+
+\vspace{0.9cm}
+{\large\color{black!25}\insertauthor\par}
+
+\vspace{0.2cm}
+{\normalsize\color{black!25}\insertdate\par}
+}
+
+\newcommand{\maketitleframe}{
+\begin{frame}[plain]
+\titlepage
+\end{frame}
+}
+
+\endinput

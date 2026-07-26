@@ -1,0 +1,50 @@
+\section{Summary}
+
+\begin{frame}{Advanced Security Summary}
+	\begin{itemize}
+		\item \textbf{Groups} define roles and privilege ladders.
+		\item \textbf{UI visibility} hides menus/buttons/fields per group.
+		\item \textbf{Access rights} control model-level CRUD.
+		\item \textbf{Record rules} filter which rows each role can reach.
+		\item \textbf{Multi-company} isolates data through \texttt{company\_id} and company rules.
+		\item \textbf{Settings / system parameters} store admin configuration safely.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Security Design Checklist}
+	\begin{enumerate}
+		\item Create groups and category
+		\item Add ACL CSV for every model/wizard
+		\item Add record rules for row ownership/company
+		\item Restrict menus/buttons/fields with \texttt{groups=}
+		\item Add company fields/rules if multi-company
+		\item Put admin options in Settings + \texttt{ir.config\_parameter}
+		\item Test with non-admin users for each role
+	\end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]{Suggested Security Files}
+\begin{lstlisting}
+school_manager/
+  security/
+    school_security.xml      # categories, groups, record rules
+    ir.model.access.csv      # ACL
+  views/
+    res_config_settings_views.xml
+  data/
+    ir_config_parameter_data.xml
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}{Final Reminder}
+	\begin{itemize}
+		\item Hidden UI $\neq$ secure data.
+		\item Always combine:
+		\begin{itemize}
+			\item Groups
+			\item Access rights
+			\item Record rules
+		\end{itemize}
+		\item Admin/sudo can hide bugs -- verify with real role users.
+	\end{itemize}
+\end{frame}

@@ -1,0 +1,109 @@
+%================================================
+\section{Introduction to ORM Methods}
+
+\begin{frame}[fragile]{What is ORM?}
+	\begin{itemize}
+		\item The \texttt{ORM} stands for \textbf{Object Relational Mapping}.
+		\item It is a programming technique that allows developers to interact with a database using \textbf{Python objects and methods} instead of writing \textbf{SQL queries directly}.
+		\item In Odoo, the ORM acts as a \textbf{bridge} between the Python application and the PostgreSQL database.
+		\item Instead of writing:
+		\begin{lstlisting}[language=SQL,basicstyle=\scriptsize]
+INSERT INTO student_student (name, age) VALUES ('Ahmed', 22);
+\end{lstlisting}
+		\item we simply write:
+		\begin{lstlisting}
+self.env['student.student'].create({
+	'name': 'Ahmed',
+	'age': 22,
+})
+\end{lstlisting}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{What Does ``Object Relational Mapping'' Mean?}
+	\begin{itemize}
+		\item The term consists of three parts.
+		\begin{enumerate}
+			\item \textbf{Object} - an object is an instance of a Python class.
+			\begin{lstlisting}
+student = self.env['student.student'].browse(1)
+\end{lstlisting}
+			 - Here, \textbf{\textit{student}} is a Python object representing a student.
+
+			\item \textbf{Relational} - a relational database stores data in tables that are connected using relationships.
+			\begin{table}
+				\centering
+				\begin{tabular}{l|c}
+					\toprule
+					Students & Classes \\
+					\midrule
+					Mohamed     & Grade 12 \\
+					\bottomrule
+				\end{tabular}
+			\end{table}
+			\item \textbf{Mapping} - mapping means connecting two different worlds.
+			\begin{block}{}
+				\centering
+				Python Object   $\Rightarrow$   Odoo ORM    $\Rightarrow$   PostgreSQL Table
+			\end{block}
+		\end{enumerate}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{ORM Architecture}
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.8\textwidth]{orm_architecture}
+	\end{figure}
+\end{frame}
+
+\begin{frame}{Why is ORM Important?}
+	\begin{itemize}
+		\item Without an ORM, developers would need to:
+		\begin{itemize}
+			\item Write SQL for every operation.
+			\item Manage database connections manually.
+			\item Convert database rows into Python objects.
+			\item Prevent SQL injection.
+		\end{itemize}
+		\item Although powerful, the ORM has limitations.
+		\begin{itemize}
+			\item Less control over complex SQL queries.
+			\item Very large reports may require raw SQL.
+			\item Advanced database tuning sometimes needs direct SQL.
+		\end{itemize}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Common ORM Methods}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\begin{itemize}
+				\item create
+				\item write
+				\item unlink
+				\item copy
+				\item exists
+				\item search
+				\item read
+				\item search\_read
+				\item search\_count
+				\item name\_create
+			\end{itemize}
+		\end{column}
+		\begin{column}{0.5\textwidth}
+			\begin{itemize}
+				\item default\_get
+				\item name\_search
+				\item get\_view()
+				\item ensure\_one()
+				\item filtered()
+				\item mapped()
+				\item sorted()
+				\item grouped()
+				\item fields\_get()
+				\item get\_metadata
+			\end{itemize}
+		\end{column}
+	\end{columns}
+\end{frame}

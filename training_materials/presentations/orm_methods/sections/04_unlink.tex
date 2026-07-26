@@ -1,0 +1,115 @@
+
+\section{\textbf{\texttt{unlink()}} ORM Method}
+
+\begin{frame}[fragile]{\textbf{\texttt{unlink()}} Method}
+	\begin{itemize}
+		\item The \textbf{\texttt{unlink()}} method is an ORM method used to \textbf{delete} one or more existing records from an Odoo model.
+		\item In database terms, \texttt{unlink()} is similar to SQL \texttt{DELETE}.
+		\item The method returns a boolean value: \texttt{True} when deletion succeeds.
+\begin{block}{Method Syntax}
+	\begin{itemize}
+		\item The standard syntax of the unlink() method is:
+\begin{lstlisting}
+def unlink(self):
+	return super().unlink()
+\end{lstlisting}
+		\item This method has two important parts:
+		\begin{enumerate}
+			\item \textbf{\texttt{unlink}}
+			\item \textbf{\texttt{self}}
+		\end{enumerate}
+	\end{itemize}
+\end{block}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Breaking Down the Method Signature}
+	\begin{block}{}
+		\begin{itemize}
+			\item \textbf{\texttt{unlink}}: The ORM method responsible for deleting records.
+			\item \textbf{\texttt{self}}: A recordset of one or more records that will be deleted.
+\begin{lstlisting}
+student = self.env['student.student'].browse(15)
+print(student)
+\end{lstlisting}
+			Output is:
+\begin{lstlisting}
+student.student(15,)
+\end{lstlisting}
+			\item \texttt{unlink()} does \textbf{not} take a \texttt{vals} dictionary.
+			\item It only needs the recordset that should be removed.
+		\end{itemize}
+	\end{block}
+\end{frame}
+
+\begin{frame}[fragile]{What Does \texttt{unlink()} Return?}
+	\begin{block}{}
+		\begin{itemize}
+			\item The \textbf{\texttt{unlink()}} method returns \texttt{True} on success.
+\begin{lstlisting}
+student = self.env['student.student'].browse(15)
+result = student.unlink()
+print(result)
+\end{lstlisting}
+			Output is:
+\begin{lstlisting}
+True
+\end{lstlisting}
+			\item After \texttt{unlink()}, the record no longer exists in the database.
+			\item Related one2many / many2many cleanup is handled by the ORM according to the field \texttt{ondelete} behavior.
+		\end{itemize}
+	\end{block}
+\end{frame}
+
+\begin{frame}[fragile]{Deleting One Record vs Many Records}
+	\begin{enumerate}
+		\item \textbf{One record:}
+\begin{lstlisting}
+student = self.env['student.student'].browse(15)
+student.unlink()
+\end{lstlisting}
+		\item \textbf{Many records:}
+\begin{lstlisting}
+students = self.env['student.student'].search([
+	('active', '=', False),
+])
+students.unlink()
+\end{lstlisting}
+	\end{enumerate}
+	\begin{itemize}
+		\item Prefer one \texttt{unlink()} on a recordset over deleting records in a Python loop.
+		\item Access rights and record rules still apply before deletion.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Method Call and Override Pattern}
+\begin{block}{Method Call}
+\begin{lstlisting}
+student.unlink()
+\end{lstlisting}
+	\begin{itemize}
+		\item Here, \textbf{\texttt{.unlink()}} is the \textbf{method call}.
+	\end{itemize}
+\end{block}
+\begin{block}{Common Override Pattern}
+\begin{lstlisting}
+def unlink(self):
+	for record in self:
+		if record.state == 'done':
+			raise UserError("Done students cannot be deleted.")
+	return super().unlink()
+\end{lstlisting}
+\end{block}
+\end{frame}
+
+\begin{frame}[fragile]{Important Notes About \texttt{unlink()}}
+	\begin{itemize}
+		\item Deletion is permanent for normal models (unless you use archive/\texttt{active}).
+		\item Many business models prefer \textbf{archiving} instead of deleting:
+\begin{lstlisting}
+student.write({'active': False})  # soft delete / archive
+\end{lstlisting}
+		\item Foreign-key constraints may raise errors if other records still depend on the record you are deleting.
+		\item Always check business rules before calling \texttt{unlink()} in production code.
+	\end{itemize}
+\end{frame}

@@ -1,0 +1,144 @@
+\section{Report Actions}
+
+\begin{frame}[fragile]{What Is a Report Action?}
+	\begin{itemize}
+		\item A \textbf{report action} connects:
+		\begin{enumerate}
+			\item a model
+			\item a QWeb template
+			\item a printable output (usually PDF)
+		\end{enumerate}
+		\item Stored mainly as \texttt{ir.actions.report}.
+\begin{block}{Core Idea}
+	Select records $\rightarrow$ render QWeb $\rightarrow$ download/print PDF.
+\end{block}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Defining a Report Action}
+\begin{lstlisting}[style=xml,escapeinside=||]
+<record id="action_report_student_card" model="ir.actions.report">
+  <field name="name">Student Card</field>
+  <field name="model">student.student</field>
+  <field name="report_type">qweb-pdf</field>
+  <field name="report_name">school_manager.report_student_card</field>
+  <field name="report_file">school_manager.report_student_card</field>
+  <field name="print_report_name">'Student Card - |\%|s' |\%| (object.name)</field>
+  <field name="binding_model_id" ref="model_student_student"/>
+  <field name="binding_type">report</field>
+</record>
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Breaking Down Report Action Fields}
+	\begin{itemize}
+		\item \textbf{\texttt{name}}: label in Print menu
+		\item \textbf{\texttt{model}}: source model
+		\item \textbf{\texttt{report\_type}}: \texttt{qweb-pdf} or \texttt{qweb-html}
+		\item \textbf{\texttt{report\_name}} / \textbf{\texttt{report\_file}}: QWeb template XML ID path
+		\item \textbf{\texttt{print\_report\_name}}: downloaded file name expression
+		\item \textbf{\texttt{binding\_model\_id}}: shows report in the model's Print/Action menu
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Full Report File Pattern}
+\begin{lstlisting}[style=xml]
+<!-- 1) Report action -->
+<record id="action_report_student_card" model="ir.actions.report">
+  <field name="name">Student Card</field>
+  <field name="model">student.student</field>
+  <field name="report_type">qweb-pdf</field>
+  <field name="report_name">school_manager.report_student_card</field>
+  <field name="report_file">school_manager.report_student_card</field>
+  <field name="binding_model_id" ref="model_student_student"/>
+</record>
+
+<!-- 2) QWeb template -->
+<template id="report_student_card">
+  <t t-call="web.html_container">
+	<t t-foreach="docs" t-as="o">
+	  <t t-call="web.external_layout">
+		<div class="page">
+		  <h2><t t-esc="o.name"/></h2>
+		</div>
+	  </t>
+	</t>
+  </t>
+</template>
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Calling a Report from Python}
+\begin{lstlisting}
+def action_print_student_card(self):
+	self.ensure_one()
+	return self.env.ref(
+		'school_manager.action_report_student_card'
+	).report_action(self)
+\end{lstlisting}
+	\begin{itemize}
+		\item \texttt{report\_action(self)} opens/downloads the report for the recordset.
+		\item Useful on form buttons: ``Print Student Card''.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Button to Print a Report}
+\begin{lstlisting}[style=xml]
+<header>
+  <button name="action_print_student_card"
+		  type="object"
+		  string="Print Card"
+		  class="btn-secondary"/>
+</header>
+\end{lstlisting}
+	\begin{itemize}
+		\item Users can also use the Print menu when \texttt{binding\_model\_id} is set.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Custom Report Parser (Optional)}
+\begin{lstlisting}
+class ReportStudentCard(models.AbstractModel):
+	_name = 'report.school_manager.report_student_card'
+	_description = 'Student Card Report'
+
+	@api.model
+	def _get_report_values(self, docids, data=None):
+		docs = self.env['student.student'].browse(docids)
+		return {
+			'doc_ids': docids,
+			'doc_model': 'student.student',
+			'docs': docs,
+			'company': self.env.company,
+		}
+\end{lstlisting}
+	\begin{itemize}
+		\item Use this when the template needs extra computed values.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Paper Format}
+\begin{lstlisting}[style=xml]
+<record id="paperformat_student_card" model="report.paperformat">
+  <field name="name">Student Card Paper</field>
+  <field name="format">A4</field>
+  <field name="orientation">Portrait</field>
+  <field name="margin_top">40</field>
+  <field name="margin_bottom">20</field>
+</record>
+
+<record id="action_report_student_card" model="ir.actions.report">
+  <field name="paperformat_id" ref="paperformat_student_card"/>
+</record>
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}{Report Action Best Practices}
+	\begin{itemize}
+		\item Keep one report action per business document type.
+		\item Use clear print names for downloaded files.
+		\item Bind reports only to models where they make sense.
+		\item Test empty fields, long names, and multi-record printing.
+		\item Put report XML in \texttt{report/} and list it in the manifest.
+	\end{itemize}
+\end{frame}
